@@ -1039,10 +1039,10 @@ function renderInfluencerBoard(qList) {
         ${items.map(inf=>`
           <div class="kanban-card" onclick="editInfluencer(${inf.id})">
             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px;margin-bottom:2px">
-              <div class="kc-handle">${esc(inf.instagramHandle||inf.name)}</div>
+              <div class="kc-handle">${esc((inf.firstName||inf.lastName)?(inf.firstName+' '+inf.lastName).trim():(inf.fullName||inf.instagramHandle||inf.name))}</div>
               ${inf.quarter?`<span style="font-size:9px;font-weight:600;padding:1px 6px;border-radius:10px;background:var(--surface2);color:var(--text2);flex-shrink:0;margin-top:1px">${esc(inf.quarter)}</span>`:''}
             </div>
-            ${(inf.firstName||inf.lastName||inf.fullName)?`<div class="kc-name">${esc((inf.firstName&&inf.lastName)?inf.firstName+' '+inf.lastName:(inf.firstName||inf.lastName||inf.fullName||''))}</div>`:''}
+            ${inf.instagramHandle?`<div class="kc-name" style="color:var(--text3)">${esc(inf.instagramHandle)}</div>`:''}
             <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">
               <span class="badge b-purple" style="font-size:10px">${inf.platform}</span>
               <span class="badge b-accent" style="font-size:10px">${inf.tier}</span>
