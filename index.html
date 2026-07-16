@@ -1207,11 +1207,11 @@ function moveStage(id, stage) {
     toast.id = 'pay-toast';
     toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--amber);color:var(--text1);padding:12px 18px;border-radius:var(--radius);font-size:12px;z-index:9999;box-shadow:0 4px 24px rgba(0,0,0,.2);font-family:var(--font);max-width:340px;width:90%';
     toast.innerHTML = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><i class="ti ti-cash" style="color:var(--amber);font-size:16px"></i><strong>Payment reminder created</strong></div>
-      <div style="color:var(--text2);margin-bottom:8px">Calendar event added for ${payDate}. Email reminder sending to Jayson…</div>
+      <div id="pay-toast-msg" style="color:var(--text2);margin-bottom:8px;font-size:12px">Calendar event added for ${payDate}. Sending email to Jayson…</div>
       <a href="${gcUrl}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:6px;background:var(--accent);color:#fff;padding:7px 14px;border-radius:var(--radius-sm);text-decoration:none;font-weight:500;font-size:12px"><i class="ti ti-brand-google"></i> Add to Jayson's Google Calendar</a>
       <button onclick="document.getElementById('pay-toast').remove()" style="position:absolute;top:8px;right:10px;background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px">×</button>`;
     document.body.appendChild(toast);
-    setTimeout(()=>{const t=document.getElementById('pay-toast');if(t)t.remove();},15000);
+    setTimeout(()=>{const t=document.getElementById('pay-toast');if(t)t.remove();},20000);
     // Send automated email to Jayson
     const user = S.users?.find(u=>u.id===window._session?.userId);
     fetch('/api/send-email', {
@@ -1225,9 +1225,14 @@ function moveStage(id, stage) {
         addedBy: user?.name || 'Aspen',
       })
     }).then(r=>r.json()).then(d=>{
-      const t=document.getElementById('pay-toast');
-      if(t){const msg=t.querySelector('div:nth-child(2)');if(msg)msg.textContent=d.error?`Calendar event added for ${payDate}. Email error: ${d.error}`:`Calendar event added for ${payDate}. Email sent to Jayson ✓`;}
-    }).catch(()=>{});
+      const msg=document.getElementById('pay-toast-msg');
+      if(msg) msg.innerHTML = d.success
+        ? `<span style="color:var(--green)">✓ Email sent to jayson@solveallpest.com</span>`
+        : `<span style="color:var(--red)">Email error: ${d.error}</span>`;
+    }).catch(err=>{
+      const msg=document.getElementById('pay-toast-msg');
+      if(msg) msg.innerHTML=`<span style="color:var(--red)">Email failed: ${err.message}</span>`;
+    });
   }
   persist(); render();
 }
