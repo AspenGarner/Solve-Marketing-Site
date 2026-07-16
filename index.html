@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Solve Branding — Marketing OS</title>
+<title>Solve Marketing — Marketing OS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 
 <!-- ============================================================
-  BRAND COLORS — edit these 4 lines to match Solve Branding
+  BRAND COLORS — edit these 4 lines to match Solve Marketing
   ============================================================ -->
 <style id="brand-vars">
 :root {
@@ -249,7 +249,7 @@ label{font-size:12px;color:var(--text2);display:block;margin-bottom:4px;font-wei
 
 <nav class="sidebar" id="sidebar">
   <div class="logo">
-    <div class="logo-wordmark">Solve Branding</div>
+    <div class="logo-wordmark">Solve Marketing</div>
     <div class="logo-sub">Marketing OS · v2.0</div>
   </div>
   <div class="nav-label">Overview</div>
@@ -516,7 +516,7 @@ function renderFirebaseMsgs(msgs) {
   const box = document.getElementById("chat-messages");
   if (!box) return;
   const myId = window.APP_STATE?.profile?.id || "me";
-  box.innerHTML = `<div class="chat-system">Solve Branding · Team chat</div>`;
+  box.innerHTML = `<div class="chat-system">Solve Marketing · Team chat</div>`;
   msgs.slice(-60).forEach(m => {
     const mine = m.senderId === myId;
     const time = m.clientTs ? new Date(m.clientTs).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : "";
@@ -711,7 +711,7 @@ function renderDashboard() {
   return `
   <div style="margin-bottom:20px">
     <div style="font-size:20px;font-weight:500">Good morning${name} <span style="opacity:.4">☀</span></div>
-    <div style="font-size:13px;color:var(--text2);margin-top:2px">Here's what's happening at Solve Branding today.</div>
+    <div style="font-size:13px;color:var(--text2);margin-top:2px">Here's what's happening at Solve Marketing today.</div>
   </div>
   <div class="stats">
     <div class="stat"><div class="stat-n">${S.influencers.filter(i=>i.stage==='Serviced'||i.stage==='Paid').length}</div><div class="stat-l">Active influencers</div></div>
@@ -2268,7 +2268,7 @@ async function generateKPIReport() {
   const reportDate=new Date().toLocaleDateString('default',{month:'long',day:'numeric',year:'numeric'});
   const reportHtml=`<div style="font-family:var(--font,sans-serif)">
     <div style="font-size:20px;font-weight:700;margin-bottom:2px">Marketing KPI Report — ${q} 2026</div>
-    <div style="color:var(--text2,#666);margin-bottom:18px;font-size:12px">Generated ${reportDate} · Solve All Pest / Solve Branding</div>
+    <div style="color:var(--text2,#666);margin-bottom:18px;font-size:12px">Generated ${reportDate} · Solve All Pest / Solve Marketing</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
       <div style="border:1px solid var(--border,#e5e5e5);border-radius:8px;padding:12px">
         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;color:var(--accent,#046c5e)">Influencers</div>
