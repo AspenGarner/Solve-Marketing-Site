@@ -1,0 +1,2576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solve Branding — Marketing OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+<!-- To activate Tiempos Headline: add your Adobe Fonts kit <link> here and it will automatically take precedence over Lora via the CSS stack -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+
+<!-- ============================================================
+  BRAND COLORS — edit these 4 lines to match Solve Branding
+  ============================================================ -->
+<style id="brand-vars">
+:root {
+  --brand-primary:   #223241;   /* Primary — nav, headers */
+  --brand-accent:    #046c5e;   /* Territory — buttons, active states */
+  --brand-accent2:   #7bc796;   /* Secondary — highlights, success */
+  --brand-light:     #d3d6d4;   /* Accent — page surface */
+  --brand-secondary: #7bc796;
+}
+</style>
+
+<style>
+:root {
+  --bg:var(--brand-light);--surface:#ffffff;--surface2:#f0ede8;
+  --nav-bg:var(--brand-primary);--nav-text:rgba(255,255,255,0.65);--nav-active:#ffffff;
+  --accent:var(--brand-accent);--accent2:var(--brand-accent2);
+  --border:rgba(0,0,0,0.09);--border2:rgba(0,0,0,0.16);
+  --text:#1a1916;--text2:#5f5e59;--text3:#9b9a94;
+  --green:#0f6e56;--green-bg:#e1f5ee;--amber:#854f0b;--amber-bg:#faeeda;
+  --red:#a32d2d;--red-bg:#fcebeb;--purple:#534ab7;--purple-bg:#eeedfe;--blue:#185fa5;--blue-bg:#e6f1fb;
+  --radius:10px;--radius-sm:6px;--nav:220px;
+  --font:'Poppins',sans-serif;--mono:'SF Mono','Fira Code','Courier New',monospace;
+  --font-heading:'Tiempos Headline','Lora',Georgia,serif;
+  --shadow:0 1px 3px rgba(0,0,0,0.07),0 0 0 0.5px rgba(0,0,0,0.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--font-heading);font-weight:500;letter-spacing:-.01em}
+a{color:var(--accent);text-decoration:none}
+.app{display:flex;min-height:100vh}
+.sidebar{width:var(--nav);background:var(--nav-bg);display:flex;flex-direction:column;position:fixed;top:0;bottom:0;left:0;overflow-y:auto;z-index:10}
+.main{margin-left:var(--nav);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:var(--surface);border-bottom:0.5px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
+.content{padding:24px;flex:1;max-width:1080px}
+.logo{padding:18px 18px 14px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.logo-wordmark{font-size:16px;font-weight:500;color:#fff;letter-spacing:-.01em;font-family:var(--font-heading)}
+.logo-sub{font-size:11px;color:rgba(255,255,255,0.38);margin-top:2px;font-family:var(--mono)}
+.nav-label{padding:14px 18px 4px;font-size:10px;font-weight:500;color:rgba(255,255,255,0.3);letter-spacing:.08em;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 18px;cursor:pointer;color:var(--nav-text);font-size:13px;transition:all .12s;border-left:2px solid transparent;position:relative}
+.nav-item:hover{background:rgba(255,255,255,0.07);color:#fff}
+.nav-item.active{background:rgba(255,255,255,0.11);color:var(--nav-active);border-left-color:var(--accent);font-weight:500}
+.nav-item i{font-size:15px;flex-shrink:0}
+.nav-badge{margin-left:auto;font-size:10px;background:var(--accent);color:#fff;padding:1px 6px;border-radius:20px;font-weight:500;font-family:var(--mono)}
+.nav-user{padding:14px 18px;border-top:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:9px;cursor:pointer;transition:background .12s}
+.nav-user:hover{background:rgba(255,255,255,0.07)}
+.page-title{font-size:15px;font-weight:500;font-family:var(--font-heading)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.topbar-btn{width:32px;height:32px;border-radius:50%;border:0.5px solid var(--border2);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:16px;transition:background .12s}
+.topbar-btn:hover{background:var(--surface2)}
+button,.btn{cursor:pointer;font-family:var(--font);font-size:13px;padding:7px 14px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);transition:all .12s;display:inline-flex;align-items:center;gap:5px}
+button:hover{background:var(--surface2)}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary:hover{opacity:.88}
+.btn-sm{padding:4px 10px;font-size:12px}
+.btn-danger{color:var(--red);border-color:rgba(163,45,45,.2)}
+.btn-danger:hover{background:var(--red-bg)}
+.btn-success{color:var(--green);border-color:rgba(15,110,86,.2)}
+.btn-success:hover{background:var(--green-bg)}
+.btn-ghost{border:none;background:none;color:var(--text2);padding:6px 8px}
+.btn-ghost:hover{background:var(--surface2);color:var(--text)}
+input,select,textarea{font-family:var(--font);font-size:13px;padding:8px 11px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);width:100%;transition:border-color .12s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(4,108,94,.12)}
+textarea{resize:vertical;min-height:72px}
+label{font-size:12px;color:var(--text2);display:block;margin-bottom:4px;font-weight:500}
+.card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow);transition:border-color .12s}
+.card:hover{border-color:var(--border2)}
+.card-row{display:flex;align-items:flex-start;gap:12px}
+.card-body{flex:1;min-width:0}
+.card-title{font-size:14px;font-weight:500;margin-bottom:5px}
+.card-meta{font-size:12px;color:var(--text2);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.card-actions{display:flex;gap:6px;flex-shrink:0}
+.badge{display:inline-flex;align-items:center;font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;white-space:nowrap;font-family:var(--mono)}
+.b-active,.b-done,.b-approved{background:var(--green-bg);color:var(--green)}
+.b-review,.b-pending,.b-scheduled{background:var(--amber-bg);color:var(--amber)}
+.b-planned,.b-draft{background:var(--surface2);color:var(--text2)}
+.b-rejected{background:var(--red-bg);color:var(--red)}
+.b-accent{background:rgba(4,108,94,.12);color:var(--accent)}
+.b-purple{background:var(--purple-bg);color:var(--purple)}
+.b-blue{background:var(--blue-bg);color:var(--blue)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px}
+.stat{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow)}
+.stat-n{font-size:24px;font-weight:600;font-family:var(--font);letter-spacing:-.03em;line-height:1.1}
+.stat-l{font-size:11px;color:var(--text3);margin-top:4px;font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+.data-table{width:100%;border-collapse:collapse;font-size:13px}
+.data-table th{text-align:left;padding:8px 12px;font-size:11px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.04em;border-bottom:0.5px solid var(--border)}
+.data-table td{padding:10px 12px;border-bottom:0.5px solid var(--border);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--surface2)}
+.toolbar{display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+.toolbar select,.toolbar input{width:auto}
+.tab-bar{display:flex;gap:2px;border-bottom:0.5px solid var(--border);margin-bottom:18px}
+.tab{padding:8px 14px;font-size:13px;cursor:pointer;color:var(--text2);border:none;background:none;border-bottom:2px solid transparent;font-family:var(--font);transition:all .12s}
+.tab:hover{color:var(--text);background:none}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:500}
+.kpi-block{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+.kpi-title{font-size:11px;font-weight:500;color:var(--text2);margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:6px}
+.kpi-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:0.5px solid var(--border);font-size:13px}
+.kpi-row:last-child{border-bottom:none}
+.kpi-val{font-weight:600;font-family:var(--font);letter-spacing:-.02em}
+.kpi-up{color:var(--green)}.kpi-dn{color:var(--red)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-day-hdr{text-align:center;font-size:11px;color:var(--text3);padding:5px 0;font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+.cal-day{min-height:58px;border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:5px 7px;font-size:11px;background:var(--surface)}
+.cal-compact .cal-day{min-height:36px;padding:3px 4px;font-size:10px}
+.cal-compact .cal-num{font-size:10px;margin-bottom:1px}
+.cal-compact .cal-event{font-size:9px;padding:0 3px}
+.cal-compact .cal-day-hdr{font-size:9px;padding:3px 0}
+.cal-day.today{border-color:var(--accent);background:rgba(4,108,94,.06)}
+.cal-day.other-month{opacity:.3;background:transparent;border-color:transparent}
+.cal-num{font-weight:600;margin-bottom:3px;color:var(--text2);font-family:var(--font);font-size:12px;letter-spacing:-.02em}
+.cal-event{font-size:10px;padding:1px 5px;border-radius:3px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+.ce-red{background:rgba(4,108,94,.12);color:var(--accent)}
+.ce-green{background:var(--green-bg);color:var(--green)}
+.ce-amber{background:var(--amber-bg);color:var(--amber)}
+.ce-purple{background:var(--purple-bg);color:var(--purple)}
+.ce-blue{background:var(--blue-bg);color:var(--blue)}
+/* Reminder chip on influencer cards */
+.reminder-chip{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:3px 7px;border-radius:20px;cursor:pointer;transition:all .12s;font-weight:500;white-space:nowrap}
+.reminder-chip.has-reminder{background:var(--blue-bg);color:var(--blue)}
+.reminder-chip.has-reminder:hover{background:var(--blue);color:#fff}
+.reminder-chip.no-reminder{background:var(--surface2);color:var(--text3);border:0.5px dashed var(--border2)}
+.reminder-chip.no-reminder:hover{background:var(--surface);color:var(--text2);border-color:var(--blue)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:flex-start;justify-content:center;padding-top:60px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:22px;width:480px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,.14);max-height:85vh;overflow-y:auto}
+.modal h3{font-size:15px;font-weight:500;margin-bottom:16px}
+.fg{margin-bottom:12px}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;padding-top:14px;border-top:0.5px solid var(--border)}
+.avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;font-family:var(--mono);flex-shrink:0;overflow:hidden;background:var(--surface2)}
+.profile-hero{background:var(--nav-bg);border-radius:var(--radius);padding:28px;margin-bottom:20px;display:flex;align-items:center;gap:20px;position:relative;overflow:hidden}
+.profile-hero::before{content:'';position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,0.04)}
+.profile-av{width:72px;height:72px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:500;color:#fff;flex-shrink:0;font-family:var(--mono);overflow:hidden;border:3px solid rgba(255,255,255,0.15)}
+.profile-info{flex:1;position:relative;z-index:1}
+.profile-name{font-size:20px;font-weight:500;color:#fff;margin-bottom:3px;font-family:var(--font-heading)}
+.profile-role{font-size:13px;color:rgba(255,255,255,.55)}
+.chat-panel{display:none;position:fixed;bottom:0;right:24px;width:340px;background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius) var(--radius) 0 0;box-shadow:0 -4px 24px rgba(0,0,0,.1);z-index:50;flex-direction:column}
+.chat-panel.open{display:flex}
+.chat-header{background:var(--nav-bg);padding:12px 16px;border-radius:var(--radius) var(--radius) 0 0;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.chat-header-left{display:flex;align-items:center;gap:10px}
+.chat-online{width:8px;height:8px;border-radius:50%;background:#2ecc71;flex-shrink:0}
+.chat-header-name{font-size:13px;font-weight:500;color:#fff}
+.chat-header-sub{font-size:11px;color:rgba(255,255,255,.45)}
+.chat-messages{height:300px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.chat-msg{display:flex;gap:8px;align-items:flex-end}
+.chat-msg.mine{flex-direction:row-reverse}
+.bubble{max-width:72%;padding:8px 12px;border-radius:12px;font-size:13px;line-height:1.5;word-break:break-word}
+.bubble-mine{background:var(--accent);color:#fff;border-bottom-right-radius:3px}
+.bubble-other{background:var(--surface2);color:var(--text);border-bottom-left-radius:3px}
+.msg-time{font-size:10px;color:var(--text3);margin-top:2px;font-family:var(--mono)}
+.chat-input-row{display:flex;gap:6px;padding:10px 12px;border-top:0.5px solid var(--border);align-items:center}
+.chat-input{flex:1;border-radius:20px;padding:7px 14px;font-size:13px;border:0.5px solid var(--border2)}
+.chat-send{width:32px;height:32px;border-radius:50%;background:var(--accent);color:#fff;border:none;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+.chat-send:hover{opacity:.85}
+.chat-system{text-align:center;font-size:11px;color:var(--text3);padding:4px 0;font-family:var(--mono)}
+.chat-toggle{position:fixed;bottom:24px;right:24px;width:48px;height:48px;border-radius:50%;background:var(--nav-bg);color:#fff;border:none;box-shadow:0 4px 16px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;font-size:20px;z-index:49;cursor:pointer;transition:transform .15s}
+.chat-toggle:hover{transform:scale(1.07)}
+.unread-dot{position:absolute;top:8px;right:8px;width:10px;height:10px;background:var(--accent);border-radius:50%;border:2px solid var(--nav-bg)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.notice{background:var(--amber-bg);color:var(--amber);border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.notice-success{background:var(--green-bg);color:var(--green)}
+.notice-info{background:var(--blue-bg);color:var(--blue)}
+.prog-bar{height:3px;background:var(--surface2);border-radius:2px;margin-top:8px;overflow:hidden}
+.prog-fill{height:100%;border-radius:2px}
+.divider{height:0.5px;background:var(--border);margin:16px 0}
+.empty{text-align:center;padding:40px 20px;color:var(--text3);font-size:13px}
+.empty i{font-size:32px;display:block;margin-bottom:8px;opacity:.4}
+.post-preview{font-size:13px;padding:10px 12px;background:var(--surface2);border-radius:var(--radius-sm);line-height:1.6;margin-top:8px;color:var(--text);border-left:2px solid var(--accent)}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.firebase-status{font-size:11px;font-family:var(--mono);padding:4px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:5px}
+.sync-chip{font-size:11px;font-family:var(--mono);padding:3px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:5px;transition:all .3s}
+.sync-chip i{font-size:13px}
+.sync-ok{background:var(--green-bg);color:var(--green)}
+.sync-busy{background:var(--amber-bg);color:var(--amber)}
+.sync-offline{background:var(--surface2);color:var(--text3)}
+.sync-error{background:var(--red-bg);color:var(--red)}
+.fs-connected{background:var(--green-bg);color:var(--green)}
+.fs-disconnected{background:var(--surface2);color:var(--text3)}
+.fs-dot{width:6px;height:6px;border-radius:50%}
+.fs-connected .fs-dot{background:var(--green)}
+.fs-disconnected .fs-dot{background:var(--text3)}
+@media(max-width:900px){
+  .sidebar{transform:translateX(-220px);transition:transform .2s}
+  .main{margin-left:0}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .grid2{grid-template-columns:1fr}
+}
+/* ── Kanban board ─────────────────────────────────────── */
+.kanban-board{display:flex;gap:12px;overflow-x:auto;padding-bottom:16px}
+.kanban-board::-webkit-scrollbar{height:5px}
+.kanban-col{min-width:210px;max-width:210px;background:var(--surface2);border-radius:var(--radius);padding:11px;flex-shrink:0}
+.kanban-col-hdr{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;padding:0 2px}
+.kanban-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 11px;margin-bottom:7px;cursor:pointer;transition:all .12s;box-shadow:var(--shadow)}
+.kanban-card:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:0 3px 10px rgba(0,0,0,.1)}
+.kanban-card:hover .kc-handle{color:var(--accent)}
+.kc-handle{font-size:13px;font-weight:500;margin-bottom:3px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kc-name{font-size:11px;color:var(--text2);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kc-meta{font-size:11px;color:var(--text3);display:flex;gap:8px;align-items:center;margin-top:7px}
+.kc-empty{font-size:11px;color:var(--text3);text-align:center;padding:18px 0;border:1px dashed var(--border2);border-radius:var(--radius-sm)}
+/* ── Promo codes ──────────────────────────────────────── */
+.promo-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:12px 15px;margin-bottom:8px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px}
+.promo-code{font-family:var(--mono);font-size:14px;font-weight:600;letter-spacing:.04em;color:var(--accent);background:rgba(4,108,94,.08);padding:4px 10px;border-radius:5px;flex-shrink:0}
+/* ── Login screen ─────────────────────────────────────── */
+.login-screen{position:fixed;inset:0;background:var(--brand-primary);display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column}
+.login-logo{font-size:26px;font-weight:500;color:#fff;letter-spacing:-.02em;text-align:center;font-family:var(--font-heading)}
+.login-sub{font-size:12px;color:rgba(255,255,255,.38);margin-top:4px;font-family:var(--mono);text-align:center;letter-spacing:.08em;text-transform:uppercase}
+.login-prompt{font-size:13px;color:rgba(255,255,255,.5);margin:36px 0 20px;text-align:center}
+.login-cards{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;padding:0 20px}
+.login-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:24px 28px;cursor:pointer;transition:all .15s;text-align:center;min-width:150px}
+.login-card:hover{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.25);transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.login-av{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:500;color:#fff;margin:0 auto 12px;font-family:var(--mono)}
+.login-name{font-size:14px;font-weight:500;color:#fff;margin-bottom:3px}
+.login-title{font-size:11px;color:rgba(255,255,255,.45)}
+.login-role-chip{margin-top:8px;display:inline-block;font-size:10px;font-family:var(--mono);padding:2px 8px;border-radius:20px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.55)}
+.login-manage{margin-top:28px;font-size:12px;color:rgba(255,255,255,.3);cursor:pointer;text-decoration:underline}
+.login-manage:hover{color:rgba(255,255,255,.6)}
+/* ── User management ──────────────────────────────────── */
+.user-card{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:8px;box-shadow:var(--shadow)}
+</style>
+</head>
+<body>
+
+<!-- ── Login Screen ────────────────────────────────────── -->
+<div class="login-screen" id="login-screen">
+  <div class="login-logo">Solve Branding</div>
+  <div class="login-sub">Marketing OS · v2.0</div>
+  <div class="login-prompt">Select your profile to continue</div>
+  <div class="login-cards" id="login-cards"></div>
+  <div class="login-manage" onclick="openModal('manageUsers')">Manage users</div>
+</div>
+
+<div class="app" id="main-app" style="display:none">
+
+<nav class="sidebar" id="sidebar">
+  <div class="logo">
+    <div class="logo-wordmark">Solve Branding</div>
+    <div class="logo-sub">Marketing OS · v2.0</div>
+  </div>
+  <div class="nav-label">Overview</div>
+  <div class="nav-item active" onclick="nav('dashboard')"><i class="ti ti-home"></i>Dashboard</div>
+  <div class="nav-label">Modules</div>
+  <div class="nav-item" onclick="nav('influencers')"><i class="ti ti-user-star"></i>Influencers</div>
+  <div class="nav-item" onclick="nav('social')"><i class="ti ti-brand-instagram"></i>Social content<span class="nav-badge" id="social-badge">2</span></div>
+  <div class="nav-item" onclick="nav('newsletters')"><i class="ti ti-mail"></i>Newsletters</div>
+  <div class="nav-item" onclick="nav('events')"><i class="ti ti-calendar-event"></i>Events</div>
+  <div class="nav-item" onclick="nav('partners')"><i class="ti ti-building-community"></i>Community partners</div>
+  <div class="nav-item" onclick="nav('kpis')"><i class="ti ti-chart-bar"></i>KPI dashboard</div>
+  <div class="nav-label">Shared</div>
+  <div class="nav-item" onclick="nav('calendar')"><i class="ti ti-calendar"></i>Calendar</div>
+  <div class="nav-item" onclick="nav('files')"><i class="ti ti-folder"></i>Files &amp; briefs</div>
+  <div class="nav-item" onclick="nav('todos')"><i class="ti ti-checkbox"></i>To-Dos<span class="nav-badge" id="todos-badge" style="display:none">0</span></div>
+  <div class="nav-label" style="margin-top:auto">Account</div>
+  <div class="nav-item" onclick="nav('profile')"><i class="ti ti-user-circle"></i>My profile</div>
+  <div class="nav-item" onclick="logout()" style="color:rgba(255,255,255,.4)"><i class="ti ti-logout"></i>Sign out</div>
+  <div class="nav-user" onclick="nav('profile')">
+    <div class="avatar" id="nav-avatar" style="background:var(--accent);width:28px;height:28px">
+      <span class="av-initials" id="nav-initials" style="color:#fff;font-size:10px">ME</span>
+    </div>
+    <div style="min-width:0">
+      <div style="font-size:12px;color:#fff;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="nav-name">My Profile</div>
+      <div style="font-size:10px;color:rgba(255,255,255,.38);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="nav-title">Edit profile →</div>
+    </div>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="page-title" id="page-title">Dashboard</div>
+    </div>
+    <div class="topbar-right">
+      <div id="firebase-indicator" class="firebase-status fs-disconnected"><span class="fs-dot"></span>Chat offline</div>
+      <div id="sync-chip" class="sync-chip sync-offline"><i class="ti ti-cloud-off"></i>Local only</div>
+      <div style="position:relative">
+        <div class="topbar-btn" onclick="toggleChat()" title="Team chat"><i class="ti ti-message-circle"></i></div>
+        <div class="unread-dot" id="unread-dot" style="display:none"></div>
+      </div>
+      <div class="avatar" id="topbar-avatar" style="background:var(--accent);cursor:pointer" onclick="nav('profile')">
+        <span class="av-initials" id="topbar-initials" style="color:#fff;font-size:11px">ME</span>
+      </div>
+    </div>
+  </div>
+  <div class="content" id="content-area"></div>
+</div>
+</div>
+
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-header" onclick="toggleChat()">
+    <div class="chat-header-left">
+      <div class="chat-online" id="chat-online-dot"></div>
+      <div>
+        <div class="chat-header-name">Team Chat</div>
+        <div class="chat-header-sub" id="chat-status-sub">Connecting to Firebase…</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div id="firebase-chat-badge" class="firebase-status fs-disconnected" style="font-size:10px"><span class="fs-dot"></span></div>
+      <i class="ti ti-chevron-down" style="color:rgba(255,255,255,.5);font-size:14px"></i>
+    </div>
+  </div>
+  <div class="chat-messages" id="chat-messages">
+    <div class="chat-system">Team chat — powered by Firebase</div>
+    <div class="chat-system" id="firebase-setup-msg">⚠ Add your Firebase config to enable real-time messaging</div>
+  </div>
+  <div class="chat-input-row">
+    <input class="chat-input" id="chat-input" placeholder="Message the team…" onkeydown="if(event.key==='Enter')sendChatMsg()">
+    <button class="chat-send" onclick="sendChatMsg()"><i class="ti ti-send"></i></button>
+  </div>
+</div>
+
+<button class="chat-toggle" id="chat-toggle-fab" onclick="toggleChat()" title="Team chat" style="display:none">
+  <i class="ti ti-message-circle"></i>
+  <div class="unread-dot" id="fab-unread" style="display:none"></div>
+</button>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalBox"></div>
+</div>
+
+<script type="module">
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyDBtpPHtxC7-KhZK_TLlMT4f5qwm6VLc0A",
+  authDomain:        "solve-marketing-os-29e7e.firebaseapp.com",
+  projectId:         "solve-marketing-os-29e7e",
+  storageBucket:     "solve-marketing-os-29e7e.firebasestorage.app",
+  messagingSenderId: "379023305033",
+  appId:             "1:379023305033:web:14a723f29fcc2708a3d298"
+};
+
+const CONFIGURED = !FIREBASE_CONFIG.apiKey.startsWith("REPLACE");
+window.FIREBASE_CONFIGURED = CONFIGURED;
+
+// ── Sync status chip ─────────────────────────────────────
+function setSyncStatus(state) {
+  const el = document.getElementById('sync-chip');
+  if (!el) return;
+  const map = {
+    synced:  ['sync-ok',      'ti-cloud-check',    'Synced'],
+    syncing: ['sync-busy',    'ti-cloud-upload',   'Saving…'],
+    loading: ['sync-busy',    'ti-cloud-download', 'Loading…'],
+    offline: ['sync-offline', 'ti-cloud-off',      'Local only'],
+    error:   ['sync-error',   'ti-cloud-x',        'Sync error'],
+  };
+  const [cls, icon, text] = map[state] || map.offline;
+  el.className = `sync-chip ${cls}`;
+  el.innerHTML = `<i class="ti ${icon}"></i>${text}`;
+}
+window.setSyncStatus = setSyncStatus;
+
+// ── Write app data to Firestore ───────────────────────────
+async function syncToFirestore(data) {
+  if (!window._fsSetDoc || !window._fsDocRef) return;
+  try {
+    setSyncStatus('syncing');
+    window._localWrite = true;
+    await window._fsSetDoc(window._fsDocRef, {
+      ...data,
+      _ts: Date.now(),
+      _by: window.APP_STATE?.profile?.name || 'Unknown'
+    });
+    setSyncStatus('synced');
+  } catch(e) {
+    console.error('Firestore write error:', e);
+    setSyncStatus('error');
+  }
+}
+window.syncToFirestore = syncToFirestore;
+
+// ── Toast for incoming updates ────────────────────────────
+function showSyncToast(updatedBy) {
+  const prev = document.getElementById('sync-toast');
+  if (prev) prev.remove();
+  const t = document.createElement('div');
+  t.id = 'sync-toast';
+  t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#223241;color:#fff;padding:9px 18px;border-radius:20px;font-size:12px;z-index:9999;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,.25);font-family:var(--font);pointer-events:none';
+  t.innerHTML = `<i class="ti ti-refresh" style="font-size:14px"></i> Updated by ${escHtml(updatedBy)}`;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+// ── Firebase init ─────────────────────────────────────────
+if (CONFIGURED) {
+  try {
+    const [{ initializeApp }, { getFirestore, doc, setDoc, getDoc, onSnapshot }] = await Promise.all([
+      import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"),
+      import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"),
+    ]);
+
+    const app = initializeApp(FIREBASE_CONFIG);
+
+    // ── Realtime Database (team chat) — only if databaseURL is set ──
+    if (FIREBASE_CONFIG.databaseURL) {
+      try {
+        const { getDatabase, ref, push, onValue, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js");
+        const rtdb    = getDatabase(app);
+        const msgsRef = ref(rtdb, "solve-marketing-os/messages");
+        setFirebaseStatus(true);
+        onValue(msgsRef, (snapshot) => {
+          const msgs = [];
+          snapshot.forEach(child => msgs.push({ id: child.key, ...child.val() }));
+          window._firebaseMsgs = msgs;
+          renderFirebaseMsgs(msgs);
+        });
+        window.firebaseSend = async (text, senderName, senderId) => {
+          await push(msgsRef, { text, senderName, senderId, ts: serverTimestamp(), clientTs: Date.now() });
+        };
+      } catch(chatErr) { console.warn("RTDB chat unavailable:", chatErr); }
+    } else {
+      setFirebaseStatus(false, "Chat offline");
+    }
+
+    // ── Firestore (app data sync) ─────────────────────────
+    const firestore  = getFirestore(app);
+    const fsDocRef   = doc(firestore, "solve-os", "main");
+    window._fsDocRef = fsDocRef;
+    window._fsSetDoc = setDoc;
+
+    // Load from Firestore on startup
+    setSyncStatus('loading');
+    try {
+      const snap = await getDoc(fsDocRef);
+      const S    = window.APP_STATE;
+      if (snap.exists()) {
+        const d = snap.data();
+        ['influencers','social','newsletters','events','partners','files','todos','promoCodes'].forEach(k => {
+          if (Array.isArray(d[k])) S[k] = d[k];
+        });
+        // Mirror to localStorage for offline fallback
+        localStorage.setItem('solve-os-data', JSON.stringify({
+          influencers:S.influencers, social:S.social, newsletters:S.newsletters,
+          events:S.events, partners:S.partners, files:S.files, todos:S.todos, promoCodes:S.promoCodes
+        }));
+        if (window.render) window.render();
+      } else {
+        // First device to connect — seed Firestore with current localStorage data
+        await setDoc(fsDocRef, {
+          influencers:S.influencers, social:S.social, newsletters:S.newsletters,
+          events:S.events, partners:S.partners, files:S.files, todos:S.todos, promoCodes:S.promoCodes,
+          _ts: Date.now(), _by: 'Initial seed'
+        });
+      }
+      setSyncStatus('synced');
+    } catch(e) {
+      console.error('Firestore initial load error:', e);
+      setSyncStatus('error');
+    }
+
+    // Real-time listener — fires when any other user saves data
+    onSnapshot(fsDocRef, (snap) => {
+      if (!snap.exists()) return;
+      // Skip our own write echoes
+      if (window._localWrite) { window._localWrite = false; return; }
+      const d = snap.data();
+      const S = window.APP_STATE;
+      if (!S) return;
+      ['influencers','social','newsletters','events','partners','files','todos','promoCodes'].forEach(k => {
+        if (Array.isArray(d[k])) S[k] = d[k];
+      });
+      localStorage.setItem('solve-os-data', JSON.stringify({
+        influencers:S.influencers, social:S.social, newsletters:S.newsletters,
+        events:S.events, partners:S.partners, files:S.files, todos:S.todos, promoCodes:S.promoCodes
+      }));
+      setSyncStatus('synced');
+      if (window.render) window.render();
+      showSyncToast(d._by || 'A teammate');
+    }, (e) => {
+      console.error('Firestore listener error:', e);
+      setSyncStatus('error');
+    });
+
+  } catch(e) {
+    console.error("Firebase init error:", e);
+    setFirebaseStatus(false, "Config error");
+    setSyncStatus('error');
+  }
+} else {
+  console.info("Firebase not configured — running in local-only mode.");
+  setSyncStatus('offline');
+}
+
+// ── Chat status helper ────────────────────────────────────
+function setFirebaseStatus(connected, label) {
+  const ind      = document.getElementById("firebase-indicator");
+  const badge    = document.getElementById("firebase-chat-badge");
+  const sub      = document.getElementById("chat-status-sub");
+  const dot      = document.getElementById("chat-online-dot");
+  const setupMsg = document.getElementById("firebase-setup-msg");
+  const cls = connected ? "fs-connected" : "fs-disconnected";
+  const txt = connected ? "Live" : (label || "Offline");
+  if (ind)      { ind.className = "firebase-status " + cls; ind.innerHTML = `<span class="fs-dot"></span>${txt}`; }
+  if (badge)    { badge.className = "firebase-status " + cls; }
+  if (sub)      sub.textContent = connected ? "Real-time · End-to-end" : "Add Firebase config to go live";
+  if (dot)      dot.style.background = connected ? "#2ecc71" : "#aaa";
+  if (setupMsg && connected) setupMsg.style.display = "none";
+}
+window.setFirebaseStatus = setFirebaseStatus;
+
+// ── Chat message renderer ─────────────────────────────────
+function renderFirebaseMsgs(msgs) {
+  const box = document.getElementById("chat-messages");
+  if (!box) return;
+  const myId = window.APP_STATE?.profile?.id || "me";
+  box.innerHTML = `<div class="chat-system">Solve Branding · Team chat</div>`;
+  msgs.slice(-60).forEach(m => {
+    const mine = m.senderId === myId;
+    const time = m.clientTs ? new Date(m.clientTs).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : "";
+    box.innerHTML += `<div class="chat-msg ${mine?"mine":""}"><div><div class="bubble ${mine?"bubble-mine":"bubble-other"}">${escHtml(m.text)}</div><div class="msg-time" style="text-align:${mine?'right':'left'}">${escHtml(m.senderName||'')} ${time}</div></div></div>`;
+  });
+  box.scrollTop = box.scrollHeight;
+  if (!document.getElementById("chatPanel").classList.contains("open")) {
+    document.getElementById("unread-dot").style.display = "";
+    document.getElementById("fab-unread").style.display = "";
+  }
+}
+window.renderFirebaseMsgs = renderFirebaseMsgs;
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+window.escHtml = escHtml;
+</script>
+
+<script>
+// ── State ────────────────────────────────────────────────
+const TODAY = new Date().toISOString().slice(0,10);
+
+window.APP_STATE = {
+  view: 'dashboard',
+  socialTab: 'pending',
+  profile: JSON.parse(localStorage.getItem('solve-profile') || 'null') || {
+    id:'user-me', name:'', title:'', email:'', phone:'', location:'Salt Lake City, UT', bio:''
+  },
+  localMsgs: [],
+  influencers: [
+    {id:1,name:'@jessicasloane',fullName:'Jessica Sloane',phone:'(801) 555-0110',email:'jessica@sloanecreates.com',instagramHandle:'@jessicasloane',platform:'Instagram',followers:142000,tier:'Macro',stage:'Serviced',campaign:'Summer Glow',reach:38000,roi:3.2,fee:2500,brief:'Lifestyle + product unboxing',notes:'Contract signed',promoCodes:[{id:101,code:'JESSICA20',discount:'20% off first service',type:'influencer',active:true,notes:'Summer campaign code'}],reminder:null},
+    {id:2,name:'@urbanwanderer',fullName:'Marcus Webb',phone:'(435) 555-0234',email:'marcus@urbanwanderer.co',instagramHandle:'@urbanwanderer',platform:'TikTok',followers:89000,tier:'Mid',stage:'Paid',campaign:'City Series',reach:22000,roi:2.8,fee:1200,brief:'Short-form travel content',notes:'Deliverables received',promoCodes:[{id:102,code:'URBAN15',discount:'15% off',type:'influencer',active:true,notes:'Ongoing code'}],reminder:null},
+    {id:3,name:'@healthyroots',fullName:'Priya Nair',phone:'',email:'priya@healthyroots.io',instagramHandle:'@healthyroots',platform:'YouTube',followers:56000,tier:'Micro',stage:'Scheduled',campaign:'Wellness Q3',reach:14000,roi:2.1,fee:800,brief:'Long-form recipe video',notes:'Draft submitted',promoCodes:[],reminder:null},
+    {id:4,name:'@modernmade',fullName:'Taylor Rhodes',phone:'(702) 555-0301',email:'taylor@modernmade.studio',instagramHandle:'@modernmade',platform:'Instagram',followers:210000,tier:'Macro',stage:'Messaged',campaign:'Fall Launch',reach:0,roi:0,fee:4000,brief:'Brand story series',notes:'Outreach pending',promoCodes:[],reminder:{date:'2026-06-12',note:'Follow up',auto:true}},
+  ],
+  social: [
+    {id:1,title:'Q3 Instagram carousel — product launch',platform:'Instagram',submittedBy:'Me',status:'Pending approval',date:'Jun 12',copy:'Introducing our latest collection — crafted for those who move with intention. Swipe to explore. #newcollection',file:'carousel_draft_v2.png',imageUrl:'',driveUrl:'',revNotes:[]},
+    {id:2,title:'LinkedIn thought leadership post',platform:'LinkedIn',submittedBy:'Me',status:'Pending approval',date:'Jun 14',copy:'3 marketing lessons from our best-performing campaign this year.',file:'linkedin_post.docx',imageUrl:'',driveUrl:'',revNotes:[]},
+    {id:3,title:'TikTok behind-the-scenes reel',platform:'TikTok',submittedBy:'Me',status:'Approved',date:'Jun 8',copy:'Come behind the scenes as we prep for the biggest launch of the year.',file:'reel_bts.mp4',imageUrl:'',driveUrl:'',revNotes:[]},
+    {id:4,title:'Newsletter teaser — Twitter/X',platform:'Twitter/X',submittedBy:'Me',status:'Approved',date:'Jun 5',copy:'Big things are coming. Subscribe to be first. Link in bio.',file:'teaser_tweet.txt',imageUrl:'',driveUrl:'',revNotes:[]},
+  ],
+  newsletters: [
+    {id:1,subject:'June community update',status:'Sent',sentDate:'2026-06-01',opens:1840,clicks:312,openRate:42,roi:'$3,200',segment:'All subscribers',brief:'Monthly roundup + partner spotlight',driveUrl:''},
+    {id:2,subject:'Product launch announcement',status:'Scheduled',sentDate:'2026-06-20',opens:0,clicks:0,openRate:0,roi:'—',segment:'Engaged subscribers',brief:'Launch reveal + exclusive offer',driveUrl:''},
+    {id:3,subject:'Summer influencer collab reveal',status:'Draft',sentDate:'—',opens:0,clicks:0,openRate:0,roi:'—',segment:'TBD',brief:'Influencer crossover campaign drops',driveUrl:''},
+    {id:4,subject:'Q2 partner highlights',status:'Sent',sentDate:'2026-05-15',opens:2100,clicks:490,openRate:49,roi:'$5,800',segment:'Partner segment',brief:'Quarterly partner feature',driveUrl:''},
+  ],
+  events: [
+    {id:1,name:'SLC Summer Pop-Up',location:'Salt Lake City, UT',date:'2026-07-19',status:'Active',budget:8000,spent:4200,attendees:300,type:'Brand',owner:'Me',brief:'Outdoor brand activation + live demo',meetLink:'',recurring:false,recurringType:'none'},
+    {id:2,name:'Influencer Media Dinner',location:'Los Angeles, CA',date:'2026-08-03',status:'Planned',budget:5500,spent:0,attendees:24,type:'Influencer',owner:'Me',brief:'Private dinner for top-tier creators',meetLink:'',recurring:false,recurringType:'none'},
+    {id:3,name:'Partner Mixer — Fall',location:'Denver, CO',date:'2026-09-12',status:'Planned',budget:3000,spent:0,attendees:80,type:'Community',owner:'Me',brief:'Community partner networking event',meetLink:'',recurring:false,recurringType:'none'},
+    {id:4,name:'Subscriber Summit',location:'Remote / Zoom',date:'2026-06-28',status:'Done',budget:500,spent:480,attendees:412,type:'Digital',owner:'Admin Team',brief:'Virtual Q&A + product demo',meetLink:'https://meet.google.com/abc-defg-hij',recurring:false,recurringType:'none'},
+  ],
+  partners: [
+    {id:1,name:'Wasatch Wellness Co.',type:'Health & wellness',location:'SLC, UT',status:'Active',events:2,media:'Feature article + IG post',kpi:'2.4k reach',notes:'Co-branded wellness guide in progress'},
+    {id:2,name:'Urban Arts Collective',type:'Arts & culture',location:'SLC, UT',status:'Active',events:1,media:'Newsletter spotlight',kpi:'1.8k reach',notes:'Mural collaboration confirmed for Aug'},
+    {id:3,name:'Green Mountain Market',type:'Food & beverage',location:'Denver, CO',status:'In review',events:0,media:'TBD',kpi:'—',notes:'Partnership proposal sent Jun 10'},
+    {id:4,name:'Peak Performance Gym',type:'Fitness',location:'Provo, UT',status:'Planned',events:1,media:'Social + signage',kpi:'—',notes:'Contract review in progress'},
+  ],
+  files: [
+    {id:1,name:'Q3 Campaign Brief.pdf',type:'Brief',module:'Influencers',uploaded:'Jun 10',by:'Me',size:'420 KB'},
+    {id:2,name:'Social Content Calendar June.xlsx',type:'Calendar',module:'Social',uploaded:'Jun 1',by:'Me',size:'88 KB'},
+    {id:3,name:'Summer Newsletter Template.html',type:'Template',module:'Newsletters',uploaded:'May 28',by:'Admin Team',size:'64 KB'},
+    {id:4,name:'SLC Pop-Up Event Plan.docx',type:'Brief',module:'Events',uploaded:'Jun 5',by:'Me',size:'210 KB'},
+    {id:5,name:'Partner Proposal — Wasatch.pdf',type:'Proposal',module:'Partners',uploaded:'Jun 8',by:'Me',size:'380 KB'},
+  ],
+  users: JSON.parse(localStorage.getItem('solve-users') || 'null') || [
+    {id:'u1',name:'Jayson Greene',title:'Owner',email:'Jayson@solveallpest.com',role:'owner',color:'#046c5e'},
+    {id:'u2',name:'Alec Anderson',title:'Owner',email:'Alec@solveallpest.com',role:'owner',color:'#223241'},
+    {id:'u3',name:'Aspen Garner',title:'Marketing Manager',email:'Aspen@solveallpest.com',role:'admin',color:'#7bc796'},
+  ],
+  currentUserId: sessionStorage.getItem('solve-session') || null,
+  todos: [
+    {id:1,title:'Review Q3 Instagram carousel',label:'Social',priority:'High',dueDate:'2026-06-03',assignee:'Me',done:false},
+    {id:2,title:'Send influencer brief to @modernmade',label:'Influencers',priority:'Medium',dueDate:'2026-06-05',assignee:'Me',done:false},
+    {id:3,title:'Finalize SLC Pop-Up event plan',label:'Events',priority:'High',dueDate:TODAY,assignee:'Me',done:false},
+    {id:4,title:'Schedule Influencer Media Dinner logistics call',label:'Events',priority:'Medium',dueDate:'2026-06-10',assignee:'Me',done:false},
+    {id:5,title:'Draft Summer influencer collab newsletter',label:'Newsletters',priority:'Low',dueDate:'2026-06-15',assignee:'Me',done:false},
+  ],
+  promoCodes: [
+    {id:201,code:'SOLVE10',discount:'10% off first pest service',type:'community',active:true,notes:'General community offer — shareable anywhere',influencerId:null},
+    {id:202,code:'PEST2026',discount:'Free initial inspection',type:'community',active:true,notes:'Current seasonal promotion',influencerId:null},
+  ],
+};
+const S = window.APP_STATE;
+
+// ── Persistence ───────────────────────────────────────────
+function loadData() {
+  try {
+    const d = JSON.parse(localStorage.getItem('solve-os-data') || 'null');
+    if (!d) return;
+    ['influencers','social','newsletters','events','partners','files','todos','promoCodes'].forEach(k => {
+      if (Array.isArray(d[k])) S[k] = d[k];
+    });
+  } catch(e) {}
+}
+function persist() {
+  try {
+    const data = {
+      influencers:S.influencers, social:S.social, newsletters:S.newsletters,
+      events:S.events, partners:S.partners, files:S.files, todos:S.todos, promoCodes:S.promoCodes
+    };
+    // Always save locally (instant)
+    localStorage.setItem('solve-os-data', JSON.stringify(data));
+    // Also push to Firestore so all devices stay in sync
+    if (window.syncToFirestore) window.syncToFirestore(data);
+  } catch(e) {}
+}
+loadData();
+
+// ── Helpers ───────────────────────────────────────────────
+const fmt = n => n>=1000000?(n/1000000).toFixed(1)+'M':n>=1000?(n/1000).toFixed(0)+'K':String(n);
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const ini = name => name ? name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) : 'ME';
+const fmtDate = d => { if(!d||d==='—') return '—'; try { return new Date(d+'T00:00:00').toLocaleDateString('default',{month:'short',day:'numeric'}); } catch(e){return d;} };
+const stCls = s => ({Active:'b-active','In review':'b-review',Planned:'b-planned',Done:'b-done',Approved:'b-approved','Pending approval':'b-pending',Rejected:'b-rejected',Scheduled:'b-scheduled',Sent:'b-done',Draft:'b-draft'}[s]||'b-draft');
+const priCls = p => p==='High'?'b-accent':p==='Medium'?'b-pending':'b-draft';
+
+// ── Profile ───────────────────────────────────────────────
+function saveProfile() {
+  localStorage.setItem('solve-profile', JSON.stringify(S.profile));
+  updateProfileUI();
+}
+function updateProfileUI() {
+  const p = S.profile, i = ini(p.name)||'ME';
+  ['nav-initials','topbar-initials'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=i; });
+  const nn=document.getElementById('nav-name'), nt=document.getElementById('nav-title');
+  if(nn) nn.textContent = p.name||'My Profile';
+  if(nt) nt.textContent = p.title||'Edit profile →';
+}
+
+// ── Todos badge ───────────────────────────────────────────
+function updateTodosBadge() {
+  const n = S.todos.filter(t=>!t.done && t.dueDate<=TODAY).length;
+  const b = document.getElementById('todos-badge');
+  if(b) { b.textContent=n; b.style.display=n>0?'':'none'; }
+}
+
+// ── Nav ───────────────────────────────────────────────────
+const TITLES = {dashboard:'Dashboard',influencers:'Influencers',social:'Social content',
+  newsletters:'Newsletters',events:'Events',partners:'Community partners',
+  kpis:'KPI dashboard',calendar:'Calendar',files:'Files & briefs',todos:'To-Dos',profile:'My profile'};
+
+function nav(view) {
+  S.view = view;
+  document.querySelectorAll('.nav-item').forEach(el => {
+    el.classList.toggle('active', el.getAttribute('onclick')===`nav('${view}')`);
+  });
+  document.getElementById('page-title').textContent = TITLES[view]||view;
+  render(); window.scrollTo(0,0);
+}
+
+// ── Chat ──────────────────────────────────────────────────
+function toggleChat() {
+  const panel=document.getElementById('chatPanel'), fab=document.getElementById('chat-toggle-fab');
+  const open=panel.classList.toggle('open');
+  fab.style.display = open?'none':'flex';
+  if(open) { document.getElementById('unread-dot').style.display='none'; document.getElementById('fab-unread').style.display='none'; document.getElementById('chat-input').focus(); const b=document.getElementById('chat-messages'); if(b) b.scrollTop=b.scrollHeight; }
+}
+function sendChatMsg() {
+  const inp=document.getElementById('chat-input'), text=inp.value.trim(); if(!text) return;
+  inp.value='';
+  const name=S.profile.name||'You', id=S.profile.id||'user-me';
+  if(window.FIREBASE_CONFIGURED && window.firebaseSend) { window.firebaseSend(text,name,id); return; }
+  S.localMsgs.push({text,senderName:name,senderId:id,clientTs:Date.now()});
+  const box=document.getElementById('chat-messages'); if(!box) return;
+  const myId=S.profile.id||'user-me';
+  box.innerHTML=`<div class="chat-system">Team chat (demo mode)</div><div class="chat-system">Connect Firebase for real-time messaging</div>`;
+  S.localMsgs.slice(-40).forEach(m => {
+    const mine=m.senderId===myId, time=new Date(m.clientTs).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    box.innerHTML+=`<div class="chat-msg ${mine?'mine':''}"><div><div class="bubble ${mine?'bubble-mine':'bubble-other'}">${esc(m.text)}</div><div class="msg-time" style="text-align:${mine?'right':'left'}">${esc(m.senderName)} ${time}</div></div></div>`;
+  });
+  box.scrollTop=box.scrollHeight;
+}
+setTimeout(()=>{ document.getElementById('chat-toggle-fab').style.display='flex'; },400);
+
+// ── Render ────────────────────────────────────────────────
+function render() {
+  const ca=document.getElementById('content-area');
+  const fns={dashboard:renderDashboard,influencers:renderInfluencers,social:renderSocial,
+    newsletters:renderNewsletters,events:renderEvents,partners:renderPartners,
+    kpis:renderKPIs,calendar:renderCalendar,files:renderFiles,todos:renderTodos,profile:renderProfile};
+  ca.innerHTML=(fns[S.view]||(()=>'<div class="empty">Coming soon.</div>'))();
+  updateTodosBadge();
+}
+
+// ── Dashboard ─────────────────────────────────────────────
+function renderDashboard() {
+  const pending=S.social.filter(s=>s.status==='Pending approval').length;
+  const name=S.profile.name?`, ${S.profile.name.split(' ')[0]}`:'';
+  const todayTodos=S.todos.filter(t=>!t.done&&t.dueDate===TODAY);
+  const overdueTodos=S.todos.filter(t=>!t.done&&t.dueDate<TODAY);
+  const allDue=[...overdueTodos.map(t=>({...t,_ov:true})),...todayTodos];
+  return `
+  <div style="margin-bottom:20px">
+    <div style="font-size:20px;font-weight:500">Good morning${name} <span style="opacity:.4">☀</span></div>
+    <div style="font-size:13px;color:var(--text2);margin-top:2px">Here's what's happening at Solve Branding today.</div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-n">${S.influencers.filter(i=>i.stage==='Serviced'||i.stage==='Paid').length}</div><div class="stat-l">Active influencers</div></div>
+    <div class="stat"><div class="stat-n" style="color:var(--accent)">${pending}</div><div class="stat-l">Pending approvals</div></div>
+    <div class="stat"><div class="stat-n">${S.events.filter(e=>e.status!=='Done').length}</div><div class="stat-l">Upcoming events</div></div>
+    <div class="stat"><div class="stat-n">${fmt(S.influencers.reduce((a,i)=>a+i.followers,0))}</div><div class="stat-l">Influencer reach</div></div>
+  </div>
+  ${pending>0?`<div class="notice"><i class="ti ti-bell"></i> ${pending} post${pending>1?'s':''} awaiting approval.<button class="btn-sm" onclick="nav('social')" style="margin-left:auto">Review &rarr;</button></div>`:''}
+  <div style="margin-bottom:22px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">
+        ${overdueTodos.length>0?`<span style="color:var(--red)">⚑ ${overdueTodos.length} overdue · </span>`:''}Today's tasks${todayTodos.length>0?` (${todayTodos.length})`:''}
+      </div>
+      <button class="btn-primary btn-sm" onclick="openModal('todo')"><i class="ti ti-plus"></i> Add task</button>
+    </div>
+    ${allDue.length===0
+      ?`<div class="card" style="padding:18px;text-align:center;color:var(--text3);font-size:13px"><i class="ti ti-circle-check" style="font-size:22px;display:block;margin-bottom:6px;opacity:.3"></i>Nothing due today — you're clear!</div>`
+      :allDue.map(t=>`
+        <div class="card" style="padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="toggleTodo(${t.id})">
+          <div style="width:18px;height:18px;border-radius:4px;border:1.5px solid ${t.done?'var(--green)':'var(--border2)'};background:${t.done?'var(--green)':'transparent'};flex-shrink:0;display:flex;align-items:center;justify-content:center">
+            ${t.done?'<i class="ti ti-check" style="font-size:11px;color:#fff"></i>':''}
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:500;${t.done?'text-decoration:line-through;opacity:.5':''}">${esc(t.title)}</div>
+            <div style="display:flex;gap:6px;margin-top:3px;flex-wrap:wrap">
+              <span class="badge b-purple" style="font-size:10px">${esc(t.label)}</span>
+              <span class="badge ${priCls(t.priority)}" style="font-size:10px">${t.priority}</span>
+              ${t._ov?`<span class="badge b-rejected" style="font-size:10px">Overdue · ${fmtDate(t.dueDate)}</span>`:''}
+            </div>
+          </div>
+          <button class="btn-ghost btn-sm" onclick="event.stopPropagation();openModal('todo_edit',${t.id})"><i class="ti ti-edit" style="font-size:13px"></i></button>
+        </div>`).join('')}
+    <button class="btn-ghost" style="font-size:12px;margin-top:4px" onclick="nav('todos')">View all to-dos &rarr;</button>
+  </div>
+  <div class="grid2">
+    <div>
+      <div style="font-size:11px;font-weight:500;margin-bottom:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Recent submissions</div>
+      ${S.social.slice(0,3).map(s=>`
+        <div class="card" style="cursor:pointer" onclick="nav('social')">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+            <div style="font-size:13px;font-weight:500;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.title)}</div>
+            <span class="badge ${stCls(s.status)}">${s.status}</span>
+          </div>
+          <div class="card-meta" style="margin-top:4px"><span>${s.platform}</span><span>${s.date}</span></div>
+        </div>`).join('')}
+      <button class="btn-ghost" style="font-size:12px;margin-top:2px" onclick="nav('social')">View all &rarr;</button>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:500;margin-bottom:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Upcoming events</div>
+      ${S.events.filter(e=>e.status!=='Done').slice(0,3).map(e=>`
+        <div class="card" style="cursor:pointer" onclick="nav('events')">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+            <div style="font-size:13px;font-weight:500">${esc(e.name)}</div>
+            <span class="badge ${stCls(e.status)}">${e.status}</span>
+          </div>
+          <div class="card-meta" style="margin-top:4px">
+            <span><i class="ti ti-map-pin"></i>${e.location}</span><span>${fmtDate(e.date)}</span>
+            ${e.meetLink?`<span><a href="${esc(e.meetLink)}" target="_blank" style="color:var(--green)"><i class="ti ti-video"></i> Meet</a></span>`:''}
+          </div>
+        </div>`).join('')}
+      <button class="btn-ghost" style="font-size:12px;margin-top:2px" onclick="nav('events')">View all &rarr;</button>
+    </div>
+  </div>`;
+}
+
+// ── To-Dos page ───────────────────────────────────────────
+function renderTodos() {
+  const fl=window._todoFL||'All', fp=window._todoFP||'All', sd=window._todoSD||false;
+  const labels=['All',...new Set(S.todos.map(t=>t.label))];
+  let list=S.todos;
+  if(fl!=='All') list=list.filter(t=>t.label===fl);
+  if(fp!=='All') list=list.filter(t=>t.priority===fp);
+  if(!sd) list=list.filter(t=>!t.done);
+  const ov=list.filter(t=>!t.done&&t.dueDate<TODAY);
+  const dt=list.filter(t=>!t.done&&t.dueDate===TODAY);
+  const up=list.filter(t=>!t.done&&t.dueDate>TODAY);
+  const dn=sd?list.filter(t=>t.done):[];
+  const card=(t,sec)=>`
+    <div class="card" style="padding:10px 14px;display:flex;align-items:center;gap:10px">
+      <div style="width:18px;height:18px;border-radius:4px;border:1.5px solid ${t.done?'var(--green)':'var(--border2)'};background:${t.done?'var(--green)':'transparent'};flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer" onclick="toggleTodo(${t.id})">
+        ${t.done?'<i class="ti ti-check" style="font-size:11px;color:#fff"></i>':''}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:500;${t.done?'text-decoration:line-through;opacity:.5':''}">${esc(t.title)}</div>
+        <div style="display:flex;gap:6px;margin-top:3px;flex-wrap:wrap;align-items:center">
+          <span class="badge b-purple" style="font-size:10px">${esc(t.label)}</span>
+          <span class="badge ${priCls(t.priority)}" style="font-size:10px">${t.priority}</span>
+          ${sec==='ov'?`<span class="badge b-rejected" style="font-size:10px">Overdue · ${fmtDate(t.dueDate)}</span>`:`<span style="font-size:11px;color:var(--text3);font-family:var(--mono)">${fmtDate(t.dueDate)}</span>`}
+          <span style="font-size:11px;color:var(--text3)">· ${esc(t.assignee)}</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:4px">
+        <button class="btn-ghost btn-sm" onclick="openModal('todo_edit',${t.id})"><i class="ti ti-edit" style="font-size:13px"></i></button>
+        <button class="btn-ghost btn-sm" onclick="deleteTodo(${t.id})" style="color:var(--red)"><i class="ti ti-trash" style="font-size:13px"></i></button>
+      </div>
+    </div>`;
+  const sec=(title,items,key,col='var(--text3)')=>items.length===0?'':`
+    <div style="font-size:11px;font-weight:500;color:${col};text-transform:uppercase;letter-spacing:.05em;margin:16px 0 8px">${title} (${items.length})</div>
+    ${items.map(t=>card(t,key)).join('')}`;
+  return `
+  <div class="toolbar">
+    <select onchange="window._todoFL=this.value;render()">${labels.map(l=>`<option${l===fl?' selected':''}>${l}</option>`).join('')}</select>
+    <select onchange="window._todoFP=this.value;render()">${['All','High','Medium','Low'].map(p=>`<option${p===fp?' selected':''}>${p}</option>`).join('')}</select>
+    <label style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text2);cursor:pointer;margin-bottom:0"><input type="checkbox" ${sd?'checked':''} onchange="window._todoSD=this.checked;render()" style="width:auto"> Show done</label>
+    <button class="btn-primary btn-sm" onclick="openModal('todo')" style="margin-left:auto"><i class="ti ti-plus"></i> Add task</button>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-n" style="color:var(--red)">${S.todos.filter(t=>!t.done&&t.dueDate<TODAY).length}</div><div class="stat-l">Overdue</div></div>
+    <div class="stat"><div class="stat-n" style="color:var(--accent)">${S.todos.filter(t=>!t.done&&t.dueDate===TODAY).length}</div><div class="stat-l">Due today</div></div>
+    <div class="stat"><div class="stat-n">${S.todos.filter(t=>!t.done&&t.dueDate>TODAY).length}</div><div class="stat-l">Upcoming</div></div>
+    <div class="stat"><div class="stat-n" style="color:var(--green)">${S.todos.filter(t=>t.done).length}</div><div class="stat-l">Completed</div></div>
+  </div>
+  ${ov.length+dt.length+up.length+dn.length===0?`<div class="empty"><i class="ti ti-checkbox"></i>No tasks match this filter.</div>`
+    :sec('Overdue',ov,'ov','var(--red)')+sec('Due today',dt,'dt','var(--accent)')+sec('Upcoming',up,'up')+sec('Completed',dn,'dn','var(--green)')}`;
+}
+
+// ── Social ────────────────────────────────────────────────
+function renderSocial() {
+  const pending=S.social.filter(s=>s.status==='Pending approval');
+  const approved=S.social.filter(s=>s.status==='Approved');
+  const rejected=S.social.filter(s=>s.status==='Rejected');
+  const tab=S.socialTab;
+  const list=tab==='pending'?pending:tab==='approved'?approved:rejected;
+  return `
+  ${pending.length>0?`<div class="notice"><i class="ti ti-clock"></i>${pending.length} post${pending.length!==1?'s':''} awaiting Admin Team review.</div>`
+    :`<div class="notice notice-success"><i class="ti ti-check"></i>All caught up — no posts pending.</div>`}
+  <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+    <button class="btn-primary btn-sm" onclick="openModal('social')"><i class="ti ti-plus"></i> Submit content</button>
+  </div>
+  <div class="tab-bar">
+    <button class="tab ${tab==='pending'?'active':''}" onclick="APP_STATE.socialTab='pending';render()">Pending (${pending.length})</button>
+    <button class="tab ${tab==='approved'?'active':''}" onclick="APP_STATE.socialTab='approved';render()">Approved (${approved.length})</button>
+    <button class="tab ${tab==='rejected'?'active':''}" onclick="APP_STATE.socialTab='rejected';render()">Rejected (${rejected.length})</button>
+  </div>
+  ${list.length===0?`<div class="empty"><i class="ti ti-inbox"></i>Nothing here.</div>`:''}
+  ${list.map(s=>`
+    <div class="card" id="social-card-${s.id}">
+      <div class="card-row" style="gap:14px;align-items:flex-start">
+        <div style="width:86px;flex-shrink:0">
+          ${s.imageUrl ? `
+            <div style="width:86px;height:86px;border-radius:var(--radius-sm);overflow:hidden;background:var(--surface2);border:0.5px solid var(--border)">
+              <img src="${esc(s.imageUrl)}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML='<div style=\\'display:flex;align-items:center;justify-content:center;width:100%;height:100%\\'><i class=\\'ti ti-photo-off\\'></i></div>'">
+            </div>` : `
+            <div onclick="openModal('edit_social',${s.id})" title="Add image or Drive link" style="width:86px;height:86px;border-radius:var(--radius-sm);background:var(--surface2);border:0.5px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer">
+              <i class="ti ti-photo" style="font-size:20px;color:var(--text3)"></i>
+              <div style="font-size:9px;color:var(--text3);text-align:center">Add image</div>
+            </div>`}
+          <div style="margin-top:6px;text-align:center;font-size:10px;color:var(--text3);font-weight:500">${esc(s.platform)}</div>
+          ${s.driveUrl?`<div style="text-align:center;margin-top:4px"><a href="${esc(s.driveUrl)}" target="_blank" class="badge b-blue" style="text-decoration:none;font-size:10px"><i class="ti ti-brand-google-drive"></i> Drive</a></div>`:''}
+        </div>
+        <div class="card-body">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+            <div class="card-title" style="margin:0">${esc(s.title)}</div>
+            <span class="badge ${stCls(s.status)}">${s.status}</span>
+          </div>
+          <div class="card-meta"><span>Submitted ${s.date}</span><span>By: ${s.submittedBy}</span></div>
+          <div class="post-preview">${esc(s.copy)}</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:7px"><i class="ti ti-paperclip"></i> ${esc(s.file)}</div>
+          <div style="margin-top:10px">
+            <button class="btn-ghost btn-sm" style="font-size:12px" onclick="toggleNotes(${s.id})">
+              <i class="ti ti-message-dots"></i> Revision notes${s.revNotes&&s.revNotes.length?` (${s.revNotes.length})`:''}
+            </button>
+            <div id="notes-${s.id}" style="display:none;margin-top:8px">
+              ${(!s.revNotes||!s.revNotes.length)?`<div style="font-size:12px;color:var(--text3);margin-bottom:8px">No notes yet.</div>`
+                :s.revNotes.map(n=>`
+                  <div style="display:flex;gap:8px;margin-bottom:8px;align-items:flex-start">
+                    <div class="avatar" style="background:var(--surface2);width:26px;height:26px;font-size:10px;flex-shrink:0">${ini(n.author)}</div>
+                    <div style="flex:1;background:var(--surface2);border-radius:var(--radius-sm);padding:7px 10px">
+                      <div style="font-size:11px;font-weight:500;margin-bottom:3px">${esc(n.author)} <span style="color:var(--text3);font-weight:400">${n.ts}</span></div>
+                      <div style="font-size:13px;line-height:1.5">${esc(n.text)}</div>
+                    </div>
+                  </div>`).join('')}
+              <div style="display:flex;gap:6px;margin-top:6px">
+                <input id="note-inp-${s.id}" placeholder="Add a revision note…" style="flex:1;font-size:12px;padding:6px 10px" onkeydown="if(event.key==='Enter')addNote(${s.id})">
+                <button class="btn-primary btn-sm" onclick="addNote(${s.id})"><i class="ti ti-send"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-actions" style="flex-direction:column;gap:6px;min-width:92px">
+          ${s.status==='Pending approval'?`
+            <button class="btn-sm btn-success" onclick="approvePost(${s.id},true)"><i class="ti ti-check"></i> Approve</button>
+            <button class="btn-sm btn-danger" onclick="approvePost(${s.id},false)"><i class="ti ti-x"></i> Reject</button>`:''}
+          <button class="btn-sm" onclick="openModal('edit_social',${s.id})"><i class="ti ti-edit"></i> Edit</button>
+        </div>
+      </div>
+    </div>`).join('')}`;
+}
+function toggleNotes(id) { const el=document.getElementById(`notes-${id}`); if(el) el.style.display=el.style.display==='none'?'block':'none'; }
+function addNote(id) {
+  const inp=document.getElementById(`note-inp-${id}`); if(!inp) return;
+  const text=inp.value.trim(); if(!text) return;
+  const post=S.social.find(s=>s.id===id); if(!post) return;
+  if(!post.revNotes) post.revNotes=[];
+  const now=new Date();
+  post.revNotes.push({id:Date.now(),author:S.profile.name||'You',text,
+    ts:now.toLocaleDateString('default',{month:'short',day:'numeric'})+' '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})});
+  persist(); render();
+  setTimeout(()=>toggleNotes(id),30);
+}
+function approvePost(id,approve) {
+  const p=S.social.find(s=>s.id===id); if(p) p.status=approve?'Approved':'Rejected';
+  const count=S.social.filter(s=>s.status==='Pending approval').length;
+  const badge=document.getElementById('social-badge');
+  if(badge){badge.textContent=count;badge.style.display=count>0?'':'none';}
+  persist(); render();
+}
+
+// ── Events ────────────────────────────────────────────────
+function renderEvents() {
+  const tb=S.events.reduce((a,e)=>a+e.budget,0), ts=S.events.reduce((a,e)=>a+e.spent,0);
+  return `
+  <div class="stats">
+    <div class="stat"><div class="stat-n">${S.events.filter(e=>e.status!=='Done').length}</div><div class="stat-l">Upcoming</div></div>
+    <div class="stat"><div class="stat-n">${S.events.reduce((a,e)=>a+e.attendees,0).toLocaleString()}</div><div class="stat-l">Total attendees</div></div>
+    <div class="stat"><div class="stat-n">$${(tb/1000).toFixed(0)}K</div><div class="stat-l">Total budget</div></div>
+    <div class="stat"><div class="stat-n">$${(ts/1000).toFixed(1)}K</div><div class="stat-l">Spent to date</div></div>
+  </div>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+    <button class="btn-primary btn-sm" onclick="openModal('event')"><i class="ti ti-plus"></i> Add event</button>
+  </div>
+  ${S.events.map(e=>`
+    <div class="card">
+      <div class="card-row">
+        <div class="card-body">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+            <div class="card-title" style="margin:0">${esc(e.name)}</div>
+            <span class="badge ${stCls(e.status)}">${e.status}</span>
+            <span class="badge b-purple">${e.type}</span>
+          </div>
+          <div class="card-meta">
+            <span><i class="ti ti-map-pin"></i>${e.location}</span>
+            <span><i class="ti ti-calendar"></i>${fmtDate(e.date)}</span>
+            <span><i class="ti ti-users"></i>${e.attendees} attendees</span>
+            <span>Budget: <strong>$${e.budget.toLocaleString()}</strong></span>
+            ${e.spent>0?`<span style="color:var(--amber)">Spent: $${e.spent.toLocaleString()}</span>`:''}
+            <span>Owner: ${e.owner}</span>
+          </div>
+          <div style="font-size:12px;color:var(--text3);margin-top:4px">${esc(e.brief)}</div>
+          ${e.meetLink?`<div style="margin-top:8px"><a href="${esc(e.meetLink)}" target="_blank" class="btn btn-sm btn-success" style="display:inline-flex;gap:5px;font-size:12px"><i class="ti ti-video"></i> Join Google Meet</a></div>`:''}
+          ${e.spent>0?`<div class="prog-bar"><div class="prog-fill" style="width:${Math.min(100,Math.round(e.spent/e.budget*100))}%;background:var(--amber)"></div></div>`:''}
+        </div>
+        <div class="card-actions">
+          <button class="btn-sm" onclick="openModal('briefEvent',${e.id})"><i class="ti ti-file-text"></i></button>
+          <button class="btn-sm" onclick="openModal('edit_event',${e.id})"><i class="ti ti-edit"></i></button>
+        </div>
+      </div>
+    </div>`).join('')}`;
+}
+
+// ── Influencers ───────────────────────────────────────────
+const STAGES = ['Messaged','Talking','Scheduled Service','Serviced/Content Scheduled','Needs to be paid','Paid'];
+const STAGE_COLOR = {'Messaged':'var(--blue)','Talking':'var(--amber)','Scheduled Service':'var(--purple)','Serviced/Content Scheduled':'var(--accent)','Needs to be paid':'var(--red)','Paid':'var(--green)'};
+const STAGE_BG    = {'Messaged':'var(--blue-bg)','Talking':'var(--amber-bg)','Scheduled Service':'var(--purple-bg)','Serviced/Content Scheduled':'rgba(4,108,94,.1)','Needs to be paid':'var(--red-bg)','Paid':'var(--green-bg)'};
+
+// ── Reminder helpers ──────────────────────────────────────
+function dateOffsetStr(days, from) {
+  const d = new Date((from || TODAY) + 'T00:00:00');
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0,10);
+}
+function makeAutoReminder(stage) {
+  if (stage !== 'Messaged') return null;
+  return {date: dateOffsetStr(2), note: 'Follow up', auto: true};
+}
+function reminderChipHtml(inf) {
+  if (inf.reminder?.date) {
+    const overdue = inf.reminder.date < TODAY;
+    const style = overdue ? 'background:var(--amber-bg);color:var(--amber)' : '';
+    return `<span class="reminder-chip has-reminder" style="${style}" onclick="event.stopPropagation();openModal('reminder',${inf.id})" title="Edit reminder">
+      <i class="ti ti-bell${overdue?'-ringing':''}"></i> ${fmtDate(inf.reminder.date)} · ${esc(inf.reminder.note)}
+    </span>`;
+  }
+  return `<span class="reminder-chip no-reminder" onclick="event.stopPropagation();openModal('reminder',${inf.id})" title="Add reminder">
+    <i class="ti ti-bell-plus"></i> Add reminder
+  </span>`;
+}
+
+function renderInfluencers() {
+  const tab  = window._infTab || 'board';
+  const qFil = window._infQ  || 'All';
+  // Apply quarter filter to the working set
+  const qList = qFil === 'All' ? S.influencers : S.influencers.filter(i=>(i.quarter||'')===qFil);
+  const fees   = qList.reduce((a,i)=>a+i.fee,0);
+  const roiL   = qList.filter(i=>i.roi>0);
+  const allCodes = S.influencers.flatMap(i=>i.promoCodes||[]).length + S.promoCodes.length;
+  const quarters = ['Q1','Q2','Q3','Q4'];
+  const stats = `
+  <div class="stats">
+    <div class="stat"><div class="stat-n">${qList.filter(i=>i.stage==='Serviced/Content Scheduled'||i.stage==='Paid').length}</div><div class="stat-l">${qFil==='All'?'Active':'Active in '+qFil}</div></div>
+    <div class="stat"><div class="stat-n">${fmt(qList.reduce((a,i)=>a+i.followers,0))}</div><div class="stat-l">Total followers</div></div>
+    <div class="stat"><div class="stat-n">$${(fees/1000).toFixed(1)}K</div><div class="stat-l">Total fees${qFil!=='All'?' ('+qFil+')':''}</div></div>
+    <div class="stat"><div class="stat-n">${allCodes}</div><div class="stat-l">Promo codes</div></div>
+  </div>`;
+  const qBar = `
+  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+    <span style="font-size:11px;color:var(--text3);font-weight:500">Quarter:</span>
+    ${['All',...quarters].map(q=>`
+      <button onclick="window._infQ='${q}';render()" style="font-size:11px;padding:3px 10px;border-radius:20px;border:0.5px solid ${qFil===q?'var(--accent)':'var(--border2)'};background:${qFil===q?'var(--accent)':'var(--surface)'};color:${qFil===q?'#fff':'var(--text2)'};cursor:pointer;font-family:var(--font)">${q==='All'?'All Active':q}</button>`).join('')}
+  </div>`;
+  const tabBar = `
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+    <div class="tab-bar" style="margin:0;border:none">
+      <button class="tab ${tab==='board'?'active':''}" onclick="window._infTab='board';render()"><i class="ti ti-layout-columns"></i> Board</button>
+      <button class="tab ${tab==='list'?'active':''}" onclick="window._infTab='list';render()"><i class="ti ti-list"></i> List</button>
+      <button class="tab ${tab==='promos'?'active':''}" onclick="window._infTab='promos';render()"><i class="ti ti-tag"></i> Promo codes</button>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button id="sheets-sync-btn" class="btn-sm" onclick="loadInfluencersFromSheets()" title="Pull from Google Sheet"><i class="ti ti-table-import"></i> Sync Sheets</button>
+      <button id="clicki-sync-all-btn" class="btn-sm" onclick="syncAllClicki()" title="Pull latest stats from Clicki for all influencers" style="color:var(--blue)"><i class="ti ti-refresh"></i> Sync Clicki</button>
+      <button class="btn-primary btn-sm" onclick="openModal('influencer')"><i class="ti ti-plus"></i> Add influencer</button>
+    </div>
+  </div>`;
+  if (tab === 'board') return stats + qBar + tabBar + renderInfluencerBoard(qList);
+  if (tab === 'list')  return stats + qBar + tabBar + renderInfluencerList(qList);
+  return stats + qBar + tabBar + renderInfluencerPromos();
+}
+
+function renderInfluencerBoard(qList) {
+  const pool = qList || S.influencers;
+  return `<div class="kanban-board">
+    ${STAGES.map(stage => {
+      const items = pool.filter(i=>(i.stage||'Messaged')===stage);
+      return `<div class="kanban-col">
+        <div class="kanban-col-hdr" style="color:${STAGE_COLOR[stage]}">
+          <span>${stage}</span>
+          <span style="background:${STAGE_BG[stage]};color:${STAGE_COLOR[stage]};font-size:10px;font-weight:600;padding:1px 7px;border-radius:20px">${items.length}</span>
+        </div>
+        ${items.map(inf=>`
+          <div class="kanban-card" onclick="editInfluencer(${inf.id})">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px;margin-bottom:2px">
+              <div class="kc-handle">${esc(inf.instagramHandle||inf.name)}</div>
+              ${inf.quarter?`<span style="font-size:9px;font-weight:600;padding:1px 6px;border-radius:10px;background:var(--surface2);color:var(--text2);flex-shrink:0;margin-top:1px">${esc(inf.quarter)}</span>`:''}
+            </div>
+            ${inf.fullName?`<div class="kc-name">${esc(inf.fullName)}</div>`:''}
+            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">
+              <span class="badge b-purple" style="font-size:10px">${inf.platform}</span>
+              <span class="badge b-accent" style="font-size:10px">${inf.tier}</span>
+              ${(inf.promoCodes||[]).length?`<span class="badge b-blue" style="font-size:10px"><i class="ti ti-tag"></i> ${inf.promoCodes.length}</span>`:''}
+            </div>
+            <div class="kc-meta">
+              <span>${fmt(inf.followers)}</span>
+              <span style="margin-left:auto;font-weight:500">$${inf.fee.toLocaleString()}</span>
+            </div>
+            ${inf.clicki ? `
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:8px;background:var(--surface2);border-radius:var(--radius-sm);padding:6px 8px">
+              <div style="text-align:center">
+                <div style="font-size:12px;font-weight:600;color:var(--blue)">${(inf.clicki.clicks||0).toLocaleString()}</div>
+                <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em">Clicks</div>
+              </div>
+              <div style="text-align:center;border-left:0.5px solid var(--border);border-right:0.5px solid var(--border)">
+                <div style="font-size:12px;font-weight:600;color:var(--accent)">${(inf.clicki.conversions||0).toLocaleString()}</div>
+                <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em">Conv.</div>
+              </div>
+              <div style="text-align:center">
+                <div style="font-size:12px;font-weight:600;color:var(--green)">$${(inf.clicki.commission||0).toLocaleString()}</div>
+                <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em">Earned</div>
+              </div>
+            </div>` : ''}
+            <div style="display:flex;align-items:center;gap:5px;margin-top:8px">
+              <select style="font-size:11px;padding:3px 6px;flex:1;border-radius:var(--radius-sm)" onchange="moveStage(${inf.id},this.value)" onclick="event.stopPropagation()">
+                ${STAGES.map(s=>`<option${s===stage?' selected':''}>${s}</option>`).join('')}
+              </select>
+              <button onclick="event.stopPropagation();syncClickiCard(${inf.id})" title="Sync Clicki stats" id="clicki-btn-${inf.id}" style="flex-shrink:0;padding:3px 7px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface2);cursor:pointer;font-size:11px;color:var(--text2)"><i class="ti ti-refresh"></i></button>
+            </div>
+            <div style="margin-top:7px">${reminderChipHtml(inf)}</div>
+          </div>`).join('')}
+        ${items.length===0?`<div class="kc-empty">No influencers</div>`:''}
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function renderInfluencerList(qList) {
+  const fPlat = window._infFP||'All', fStage = window._infFS||'All';
+  let list = qList || S.influencers;
+  if (fPlat!=='All') list = list.filter(i=>i.platform===fPlat);
+  if (fStage!=='All') list = list.filter(i=>(i.stage||'Messaged')===fStage);
+  return `
+  <div class="toolbar" style="margin-bottom:14px">
+    <select onchange="window._infFP=this.value;render()">
+      ${['All','Instagram','TikTok','YouTube','Facebook','Pinterest'].map(p=>`<option${p===fPlat?' selected':''}>${p==='All'?'All platforms':p}</option>`).join('')}
+    </select>
+    <select onchange="window._infFS=this.value;render()">
+      ${['All',...STAGES].map(s=>`<option${s===fStage?' selected':''}>${s==='All'?'All stages':s}</option>`).join('')}
+    </select>
+  </div>
+  ${list.length===0?`<div class="empty"><i class="ti ti-user-star"></i>No influencers match this filter.</div>`:
+  list.map(inf=>`
+    <div class="card">
+      <div class="card-row">
+        <div class="avatar" style="background:var(--purple-bg);color:var(--purple);font-size:12px;width:38px;height:38px;flex-shrink:0">${(inf.platform||'?')[0]}</div>
+        <div class="card-body">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <div class="card-title" style="margin:0">${esc(inf.instagramHandle||inf.name)}</div>
+            ${inf.fullName?`<span style="font-size:12px;color:var(--text2)">${esc(inf.fullName)}</span>`:''}
+            <span class="badge" style="background:${STAGE_BG[inf.stage||'Messaged']};color:${STAGE_COLOR[inf.stage||'Messaged']}">${inf.stage||'Messaged'}</span>
+            <span class="badge b-accent">${inf.tier}</span>
+            ${inf.quarter?`<span class="badge b-draft">${esc(inf.quarter)}</span>`:''}
+          </div>
+          <div class="card-meta" style="margin-top:6px">
+            <span><i class="ti ti-users"></i> ${fmt(inf.followers)}</span>
+            <span>${inf.platform}</span>
+            ${inf.email?`<span><i class="ti ti-mail"></i>${esc(inf.email)}</span>`:''}
+            ${inf.phone?`<span><i class="ti ti-phone"></i>${esc(inf.phone)}</span>`:''}
+            <span>Campaign: <strong>${esc(inf.campaign)}</strong></span>
+            ${inf.roi>0?`<span class="kpi-up"><i class="ti ti-trending-up"></i> ${inf.roi}x ROI</span>`:''}
+            <span>Fee: <strong>$${inf.fee.toLocaleString()}</strong></span>
+            ${inf.clicki?`<span style="color:var(--blue)"><i class="ti ti-cursor"></i> ${(inf.clicki.clicks||0).toLocaleString()} clicks</span><span style="color:var(--accent)"><i class="ti ti-repeat"></i> ${(inf.clicki.conversions||0).toLocaleString()} conv.</span><span style="color:var(--green)"><i class="ti ti-cash"></i> $${(inf.clicki.commission||0).toLocaleString()} earned</span>`:''}
+          </div>
+          ${(inf.promoCodes||[]).length?`<div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap">${inf.promoCodes.map(c=>`<span class="badge ${c.active?'b-active':'b-draft'}" style="font-family:var(--mono);font-size:10px"><i class="ti ti-tag"></i> ${esc(c.code)}</span>`).join('')}</div>`:''}
+          <div style="font-size:12px;color:var(--text3);margin-top:4px">${esc(inf.brief)}${inf.notes?' · '+esc(inf.notes):''}</div>
+          <div style="margin-top:7px">${reminderChipHtml(inf)}</div>
+          ${inf.reach>0?`<div class="prog-bar"><div class="prog-fill" style="width:${Math.min(100,Math.round(inf.reach/inf.followers*100))}%;background:var(--purple)"></div></div>`:''}
+        </div>
+        <div class="card-actions">
+          <button class="btn-sm" onclick="editInfluencer(${inf.id})"><i class="ti ti-edit"></i> Edit</button>
+        </div>
+      </div>
+    </div>`).join('')}`;
+}
+
+function renderInfluencerPromos() {
+  const allInfluencerCodes = S.influencers.flatMap(i=>(i.promoCodes||[]).map(c=>({...c,_infHandle:i.instagramHandle||i.name,_infId:i.id})));
+  const combined = [
+    ...S.promoCodes.map(c=>({...c,_infHandle:'Community',_infId:null})),
+    ...allInfluencerCodes,
+  ];
+  return `
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div style="font-size:13px;color:var(--text2)">${combined.length} codes total · ${combined.filter(c=>c.active).length} active</div>
+    <button class="btn-primary btn-sm" onclick="openModal('addPromoCode')"><i class="ti ti-plus"></i> Add code</button>
+  </div>
+  ${combined.length===0?`<div class="empty"><i class="ti ti-tag"></i>No promo codes yet.</div>`:''}
+  <div style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:8px">Community codes</div>
+  ${S.promoCodes.map(c=>`
+    <div class="promo-card">
+      <div class="promo-code">${esc(c.code)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:500">${esc(c.discount)}</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:2px">${esc(c.notes||'')}</div>
+      </div>
+      <span class="badge ${c.active?'b-active':'b-draft'}">${c.active?'Active':'Inactive'}</span>
+      <div style="display:flex;gap:5px">
+        <button class="btn-sm btn-ghost" onclick="toggleGlobalPromo(${c.id})" title="${c.active?'Deactivate':'Activate'}"><i class="ti ti-${c.active?'eye-off':'eye'}"></i></button>
+        <button class="btn-sm btn-ghost" onclick="deleteGlobalPromo(${c.id})" style="color:var(--red)"><i class="ti ti-trash"></i></button>
+      </div>
+    </div>`).join('')}
+  <div style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin:16px 0 8px">Influencer codes</div>
+  ${allInfluencerCodes.length===0?`<div style="font-size:12px;color:var(--text3);padding:12px 0">No influencer codes yet — add them inside each influencer's edit card.</div>`:''}
+  ${allInfluencerCodes.map(c=>`
+    <div class="promo-card">
+      <div class="promo-code">${esc(c.code)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:500">${esc(c.discount)}</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:2px">
+          <span style="color:var(--purple);font-weight:500">${esc(c._infHandle)}</span>${c.notes?' · '+esc(c.notes):''}
+        </div>
+      </div>
+      <span class="badge ${c.active?'b-active':'b-draft'}">${c.active?'Active':'Inactive'}</span>
+      <button class="btn-sm btn-ghost" onclick="editInfluencer(${c._infId})" title="Edit influencer"><i class="ti ti-edit"></i></button>
+    </div>`).join('')}`;
+}
+
+function moveStage(id, stage) {
+  const inf = S.influencers.find(i=>i.id===id);
+  if (!inf) return;
+  inf.stage = stage;
+  if (stage === 'Messaged' && !inf.reminder) {
+    inf.reminder = makeAutoReminder('Messaged');
+  }
+  if (stage === 'Needs to be paid') {
+    // Auto-add payment event to Marketing OS calendar (7 days from today)
+    const payDate = dateOffsetStr(7);
+    const eventName = `Pay ${inf.instagramHandle||inf.name}`;
+    const alreadyExists = S.events.some(e=>e.name===eventName&&e.date===payDate);
+    if (!alreadyExists) {
+      S.events.push({
+        id: Date.now(), name: eventName,
+        date: payDate, location: '', type: 'Payment',
+        status: 'Planned', budget: inf.fee, spent: 0, attendees: 0,
+        owner: 'Jayson Greene', brief: `Influencer payment due for ${inf.instagramHandle||inf.name}. Fee: $${inf.fee.toLocaleString()}`,
+        meetLink: '', recurring: false, recurringType: 'none'
+      });
+    }
+    // Build Google Calendar link for Jayson
+    const gcStart = payDate.replace(/-/g,'');
+    const gcEnd   = dateOffsetStr(8).replace(/-/g,'');
+    const gcTitle = encodeURIComponent(eventName);
+    const gcDetails = encodeURIComponent(`Payment due for influencer ${inf.instagramHandle||inf.name}\nFee: $${inf.fee.toLocaleString()}\nCampaign: ${inf.campaign||'—'}`);
+    const gcUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${gcTitle}&dates=${gcStart}/${gcEnd}&details=${gcDetails}`;
+    // Show notification toast with Google Calendar link
+    const prev = document.getElementById('pay-toast');
+    if (prev) prev.remove();
+    const toast = document.createElement('div');
+    toast.id = 'pay-toast';
+    toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--amber);color:var(--text1);padding:12px 18px;border-radius:var(--radius);font-size:12px;z-index:9999;box-shadow:0 4px 24px rgba(0,0,0,.2);font-family:var(--font);max-width:340px;width:90%';
+    toast.innerHTML = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><i class="ti ti-cash" style="color:var(--amber);font-size:16px"></i><strong>Payment reminder created</strong></div>
+      <div style="color:var(--text2);margin-bottom:10px">Added to the Marketing OS calendar for ${payDate}. Send to Jayson's Gmail:</div>
+      <a href="${gcUrl}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:6px;background:var(--accent);color:#fff;padding:7px 14px;border-radius:var(--radius-sm);text-decoration:none;font-weight:500;font-size:12px"><i class="ti ti-brand-google"></i> Add to Jayson's Google Calendar</a>
+      <button onclick="document.getElementById('pay-toast').remove()" style="position:absolute;top:8px;right:10px;background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px">×</button>`;
+    document.body.appendChild(toast);
+    setTimeout(()=>{const t=document.getElementById('pay-toast');if(t)t.remove();},15000);
+  }
+  persist(); render();
+}
+function editInfluencer(id) {
+  const inf = S.influencers.find(i=>i.id===id);
+  if (!inf) return;
+  openModal('influencer_edit', id);
+}
+
+// ── Newsletters ───────────────────────────────────────────
+function renderNewsletters() {
+  const sent=S.newsletters.filter(n=>n.status==='Sent');
+  const avgOpen=sent.length?Math.round(sent.reduce((a,n)=>a+n.openRate,0)/sent.length):0;
+  return `
+  <div class="stats">
+    <div class="stat"><div class="stat-n">${sent.length}</div><div class="stat-l">Sent</div></div>
+    <div class="stat"><div class="stat-n">${avgOpen}%</div><div class="stat-l">Avg open rate</div></div>
+    <div class="stat"><div class="stat-n">${S.newsletters.reduce((a,n)=>a+n.clicks,0).toLocaleString()}</div><div class="stat-l">Total clicks</div></div>
+    <div class="stat"><div class="stat-n">$9.0K</div><div class="stat-l">Newsletter ROI</div></div>
+  </div>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+    <button class="btn-primary btn-sm" onclick="openModal('newsletter')"><i class="ti ti-plus"></i> New campaign</button>
+  </div>
+  ${S.newsletters.map(n=>`
+    <div class="card">
+      <div class="card-row">
+        <div class="card-body">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+            <div class="card-title" style="margin:0">${esc(n.subject)}</div>
+            <span class="badge ${stCls(n.status)}">${n.status}</span>
+          </div>
+          <div class="card-meta">
+            <span><i class="ti ti-calendar"></i>${fmtDate(n.sentDate)}</span>
+            <span>Segment: ${n.segment}</span>
+            ${n.opens>0?`<span><i class="ti ti-mail-opened"></i>${n.opens.toLocaleString()} opens · ${n.openRate}%</span>`:''}
+            ${n.clicks>0?`<span><i class="ti ti-cursor"></i>${n.clicks.toLocaleString()} clicks</span>`:''}
+            ${n.roi!=='—'?`<span class="kpi-up"><i class="ti ti-trending-up"></i>${n.roi}</span>`:''}
+          </div>
+          <div style="font-size:12px;color:var(--text3);margin-top:4px">${esc(n.brief)}</div>
+          ${n.driveUrl?`<div style="margin-top:6px"><a href="${esc(n.driveUrl)}" target="_blank" class="badge b-blue" style="text-decoration:none;font-size:11px"><i class="ti ti-brand-google-drive"></i> Open in Drive</a></div>`:''}
+          ${n.openRate>0?`<div class="prog-bar"><div class="prog-fill" style="width:${n.openRate}%;background:var(--green)"></div></div>`:''}
+        </div>
+        <div class="card-actions">
+          <button class="btn-sm" onclick="openModal('edit_newsletter',n.id)"><i class="ti ti-edit"></i></button>
+          <button class="btn-sm" onclick="deleteNewsletter(${n.id})" style="color:var(--red)" title="Delete"><i class="ti ti-trash"></i></button>
+        </div>
+      </div>
+    </div>`).join('')}`;
+}
+
+// ── Partners ──────────────────────────────────────────────
+function renderPartners() {
+  return `
+  <div class="stats">
+    <div class="stat"><div class="stat-n">${S.partners.filter(p=>p.status==='Active').length}</div><div class="stat-l">Active</div></div>
+    <div class="stat"><div class="stat-n">${S.partners.length}</div><div class="stat-l">Total</div></div>
+    <div class="stat"><div class="stat-n">${S.partners.reduce((a,p)=>a+p.events,0)}</div><div class="stat-l">Co-events</div></div>
+    <div class="stat"><div class="stat-n">4.2K</div><div class="stat-l">Combined reach</div></div>
+  </div>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+    <button class="btn-primary btn-sm" onclick="openModal('partner')"><i class="ti ti-plus"></i> Add partner</button>
+  </div>
+  ${S.partners.map(p=>`
+    <div class="card">
+      <div class="card-row">
+        <div class="card-body">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+            <div class="card-title" style="margin:0">${esc(p.name)}</div>
+            <span class="badge ${stCls(p.status)}">${p.status}</span>
+            <span class="badge b-purple">${p.type}</span>
+          </div>
+          <div class="card-meta">
+            <span><i class="ti ti-map-pin"></i>${p.location}</span>
+            <span><i class="ti ti-calendar-event"></i>${p.events} co-event${p.events!==1?'s':''}</span>
+            <span>Media: ${p.media}</span>
+            ${p.kpi!=='—'?`<span class="kpi-up"><i class="ti ti-trending-up"></i>${p.kpi}</span>`:''}
+          </div>
+          <div style="font-size:12px;color:var(--text3);margin-top:4px">${esc(p.notes)}</div>
+        </div>
+        <div class="card-actions">
+          <button class="btn-sm" onclick="openModal('edit_partner',${p.id})"><i class="ti ti-edit"></i></button>
+        </div>
+      </div>
+    </div>`).join('')}`;
+}
+
+// ── GHL data loader ───────────────────────────────────────
+async function loadGHLData() {
+  const status = document.getElementById('ghl-status');
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  try {
+    const res = await fetch('/api/ghl?ep=summary');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const d = await res.json();
+
+    set('ghl-contacts', (d.totalContacts     || 0).toLocaleString());
+    set('ghl-new',      (d.newThisMonth       || 0).toLocaleString());
+    set('ghl-nl',       (d.newsletterContacts || 0).toLocaleString());
+    set('ghl-aff',      (d.affiliateContacts  || 0).toLocaleString());
+
+    const campEl = document.getElementById('ghl-campaigns');
+    if (campEl) {
+      if (!d.campaigns?.length) {
+        campEl.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:6px 0">No campaigns found — confirm tag names in api/ghl.js match your GHL setup.</div>';
+      } else {
+        campEl.innerHTML = d.campaigns.map(c => `
+          <div class="kpi-row">
+            <span style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.name)}</span>
+            <span style="display:flex;gap:10px;font-size:12px;font-family:var(--font)">
+              ${c.openRate  ? `<span class="kpi-up">${c.openRate}% open</span>` : ''}
+              ${c.clickRate ? `<span>${c.clickRate}% click</span>` : ''}
+              ${c.sentCount ? `<span style="color:var(--text3)">${c.sentCount.toLocaleString()} sent</span>` : ''}
+            </span>
+          </div>`).join('');
+      }
+    }
+
+    if (status) {
+      const t = new Date(d.fetchedAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      status.innerHTML = `<span style="color:var(--green)">● Live · ${t}</span>`;
+    }
+  } catch (err) {
+    if (status) status.innerHTML = `<span style="color:var(--red)">⚠ ${err.message.includes('Failed to fetch') ? 'Deploy to Vercel to enable live data' : err.message}</span>`;
+    console.error('GHL:', err);
+  }
+}
+
+// ── Instagram data loader ─────────────────────────────────
+async function loadInstagramData() {
+  const block = document.getElementById('ig-block');
+  try {
+    const res = await fetch('/api/instagram');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const d = await res.json();
+
+    if (!d.configured) {
+      if (block) block.innerHTML = `
+        <div class="kpi-title"><i class="ti ti-brand-instagram"></i>Instagram — not connected</div>
+        <div class="notice notice-info" style="margin:0">
+          <i class="ti ti-info-circle"></i>
+          <span>Share the auth link with your page admin: <strong>/api/instagram/auth</strong> — they authorize once and tokens are captured automatically.</span>
+        </div>`;
+      return;
+    }
+    if (d.error) throw new Error(d.message || d.error);
+
+    const fmt = n => n >= 1000000 ? (n/1000000).toFixed(1)+'M' : n >= 1000 ? (n/1000).toFixed(1)+'K' : String(n);
+    const t = new Date(d.fetchedAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+
+    if (block) block.innerHTML = `
+      <div class="kpi-title" style="display:flex;align-items:center">
+        <i class="ti ti-brand-instagram"></i>Instagram @${esc(d.username)}
+        <span style="margin-left:auto;font-size:10px;color:var(--green);font-family:var(--mono)">● Live · ${t}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:8px">
+        <div>
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Followers</div>
+          <div style="font-size:24px;font-weight:600;font-family:var(--font);letter-spacing:-.03em">${fmt(d.followers)}</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Monthly reach</div>
+          <div style="font-size:24px;font-weight:600;font-family:var(--font);letter-spacing:-.03em;color:var(--green)">${fmt(d.reach)}</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Impressions</div>
+          <div style="font-size:24px;font-weight:600;font-family:var(--font);letter-spacing:-.03em">${fmt(d.impressions)}</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Engagement rate</div>
+          <div style="font-size:24px;font-weight:600;font-family:var(--font);letter-spacing:-.03em;color:var(--accent)">${d.engagementRate}%</div>
+        </div>
+      </div>
+      ${d.recentPosts?.length ? `
+      <div class="divider"></div>
+      <div style="font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Recent posts</div>
+      ${d.recentPosts.map(p => `
+        <div class="kpi-row">
+          <span style="max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2)">${esc(p.caption || p.type)}</span>
+          <span style="display:flex;gap:10px;font-family:var(--font);font-size:12px">
+            <span>♥ ${p.likes.toLocaleString()}</span>
+            <span style="color:var(--text3)">💬 ${p.comments}</span>
+            ${p.url ? `<a href="${esc(p.url)}" target="_blank" style="color:var(--accent);font-size:11px">View</a>` : ''}
+          </span>
+        </div>`).join('')}` : ''}`;
+
+  } catch (err) {
+    if (block) block.innerHTML = `
+      <div class="kpi-title"><i class="ti ti-brand-instagram"></i>Instagram</div>
+      <div style="font-size:12px;color:var(--red)">⚠ ${esc(err.message)} — <a href="/api/instagram/auth" target="_blank">Re-authorize</a></div>`;
+    console.error('Instagram:', err);
+  }
+}
+
+// ── Sheets loader (influencers) ───────────────────────────
+async function loadInfluencersFromSheets() {
+  const btn = document.getElementById('sheets-sync-btn');
+  if (btn) { btn.textContent = 'Syncing…'; btn.disabled = true; }
+  try {
+    // First get tab names so we can find the right one
+    const metaRes = await fetch('/api/sheets?tab=meta');
+    const meta = await metaRes.json();
+    if (meta.error) throw new Error(meta.error);
+
+    // Use first tab, or find one with "influencer" in the name
+    const tabs = meta.sheets || [];
+    const target = tabs.find(t => t.title.toLowerCase().includes('influencer')) || tabs[0];
+    if (!target) throw new Error('No sheets found');
+
+    const dataRes = await fetch(`/api/sheets?tab=${encodeURIComponent(target.title)}`);
+    const data = await dataRes.json();
+    if (data.error) throw new Error(data.error);
+
+    if (!data.rows?.length) throw new Error('Sheet appears empty');
+
+    // Map sheet columns to influencer data shape
+    // Flexible: tries common column name variations
+    const col = (row, ...keys) => {
+      for (const k of keys) {
+        const found = Object.keys(row).find(h => h.toLowerCase().includes(k.toLowerCase()));
+        if (found && row[found]) return row[found];
+      }
+      return '';
+    };
+
+    const imported = data.rows.map((row, i) => ({
+      id: Date.now() + i,
+      name:       col(row, 'handle', 'name', 'username', 'influencer'),
+      platform:   col(row, 'platform', 'channel', 'network') || 'Instagram',
+      followers:  parseInt(String(col(row, 'followers', 'follower', 'subscribers')).replace(/[^0-9]/g, '')) || 0,
+      tier:       col(row, 'tier', 'level', 'category') || 'Micro',
+      status:     col(row, 'status', 'stage') || 'Active',
+      campaign:   col(row, 'campaign', 'project', 'initiative') || 'TBD',
+      reach:      parseInt(String(col(row, 'reach', 'avg reach', 'views')).replace(/[^0-9]/g, '')) || 0,
+      roi:        parseFloat(col(row, 'roi', 'return')) || 0,
+      fee:        parseInt(String(col(row, 'fee', 'rate', 'cost', 'pay')).replace(/[^0-9]/g, '')) || 0,
+      brief:      col(row, 'brief', 'deliverable', 'notes', 'description') || '—',
+      notes:      col(row, 'note', 'comment', 'remark') || '',
+    })).filter(inf => inf.name);
+
+    if (!imported.length) throw new Error('Could not map any rows — check column headers');
+
+    S.influencers = imported;
+    persist();
+    render();
+
+    const notice = document.createElement('div');
+    notice.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--nav-bg);color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;z-index:200;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,.2)';
+    notice.innerHTML = `<i class="ti ti-check"></i> Synced ${imported.length} influencers from "${target.title}"`;
+    document.body.appendChild(notice);
+    setTimeout(() => notice.remove(), 4000);
+
+  } catch (err) {
+    alert('Sheets sync error: ' + err.message);
+    console.error('Sheets:', err);
+    if (btn) { btn.textContent = 'Sync from Sheets'; btn.disabled = false; }
+  }
+}
+
+// ── KPIs ──────────────────────────────────────────────────
+function renderKPIs() {
+  const q = window._kpiQ || 'Q2';
+  const qNums = {Q1:['01','02','03'],Q2:['04','05','06'],Q3:['07','08','09'],Q4:['10','11','12']};
+  const qMonths = qNums[q] || qNums.Q2;
+  // Filter newsletters by quarter
+  const qNL = S.newsletters.filter(n=>{ if(!n.sentDate||n.sentDate==='—') return false; const m=n.sentDate.slice(5,7); return qMonths.includes(m); });
+  const qEvents = S.events.filter(e=>{ if(!e.date) return false; const m=e.date.slice(5,7); return qMonths.includes(m); });
+  const nlOpens = qNL.reduce((a,n)=>a+n.opens,0);
+  const nlAvgOpen = qNL.filter(n=>n.openRate>0).length ? Math.round(qNL.filter(n=>n.openRate>0).reduce((a,n)=>a+n.openRate,0)/qNL.filter(n=>n.openRate>0).length) : 0;
+  setTimeout(loadGHLData, 60);
+  setTimeout(loadInstagramData, 120);
+  return `
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+    <div class="tab-bar" style="margin:0">
+      ${['Q1','Q2','Q3','Q4'].map(qi=>`<button class="tab ${qi===q?'active':''}" onclick="window._kpiQ='${qi}';render()">${qi} 2026</button>`).join('')}
+    </div>
+    <button class="btn-primary btn-sm" onclick="generateKPIReport()"><i class="ti ti-file-analytics"></i> Generate AI Report</button>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-n">${S.influencers.filter(i=>i.stage==='Serviced'||i.stage==='Paid').length}</div><div class="stat-l">Active influencers</div></div>
+    <div class="stat"><div class="stat-n">${nlAvgOpen}%</div><div class="stat-l">Avg open rate (${q})</div></div>
+    <div class="stat"><div class="stat-n">${S.influencers.filter(i=>i.roi>0).length>0?(S.influencers.filter(i=>i.roi>0).reduce((a,i)=>a+i.roi,0)/S.influencers.filter(i=>i.roi>0).length).toFixed(1)+'x':'—'}</div><div class="stat-l">Avg influencer ROI</div></div>
+    <div class="stat"><div class="stat-n">${qEvents.length}</div><div class="stat-l">Events in ${q}</div></div>
+  </div>
+
+  <!-- GoHighLevel live block -->
+  <div class="kpi-block" style="margin-bottom:16px">
+    <div class="kpi-title" style="display:flex;align-items:center">
+      <i class="ti ti-building-skyscraper"></i>GoHighLevel — Marketing
+      <span id="ghl-status" style="margin-left:auto;font-size:10px;color:var(--text3);font-family:var(--mono)">Loading…</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:8px">
+      <div>
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Total contacts</div>
+        <div id="ghl-contacts" style="font-size:24px;font-weight:600;font-family:var(--font);letter-spacing:-.03em">—</div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">New this month</div>
+        <div id="ghl-new" style="font-size:24px;font-weight:600;font-family:var(--font);letter-spacing:-.03em;color:var(--green)">—</div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Newsletter subscribers</div>
+        <div id="ghl-nl" style="font-size:24px;font-weight:600;font-family:var(--font);letter-spacing:-.03em">—</div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Affiliates</div>
+        <div id="ghl-aff" style="font-size:24px;font-weight:600;font-family:var(--font);letter-spacing:-.03em">—</div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div style="font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Email campaigns</div>
+    <div id="ghl-campaigns" style="color:var(--text3);font-size:12px">Loading…</div>
+  </div>
+
+  <!-- Instagram live block -->
+  <div class="kpi-block" style="margin-bottom:16px" id="ig-block">
+    <div class="kpi-title"><i class="ti ti-brand-instagram"></i>Instagram <span style="margin-left:auto;font-size:10px;color:var(--text3);font-family:var(--mono)">Loading…</span></div>
+    <div style="font-size:12px;color:var(--text3)">Fetching data…</div>
+  </div>
+
+  <div class="grid2">
+    <div class="kpi-block">
+      <div class="kpi-title"><i class="ti ti-brand-instagram"></i>Social engagement</div>
+      <div class="kpi-row"><span>Instagram reach</span><span class="kpi-val kpi-up">38K</span></div>
+      <div class="kpi-row"><span>TikTok views</span><span class="kpi-val kpi-up">22K</span></div>
+      <div class="kpi-row"><span>LinkedIn impressions</span><span class="kpi-val">14.2K</span></div>
+      <div class="kpi-row"><span>Avg engagement rate</span><span class="kpi-val kpi-up">4.8%</span></div>
+      <div class="kpi-row"><span>Story views</span><span class="kpi-val">8.1K</span></div>
+    </div>
+    <div class="kpi-block">
+      <div class="kpi-title"><i class="ti ti-mail"></i>Newsletter performance — ${q}</div>
+      <div class="kpi-row"><span>Newsletters sent</span><span class="kpi-val">${qNL.filter(n=>n.status==='Sent').length}</span></div>
+      <div class="kpi-row"><span>Avg open rate</span><span class="kpi-val ${nlAvgOpen>30?'kpi-up':''}">${nlAvgOpen}%</span></div>
+      <div class="kpi-row"><span>Total opens</span><span class="kpi-val">${nlOpens.toLocaleString()}</span></div>
+      <div class="kpi-row"><span>Total clicks</span><span class="kpi-val">${qNL.reduce((a,n)=>a+n.clicks,0).toLocaleString()}</span></div>
+      ${qNL.map(n=>`<div class="kpi-row"><span style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2)">${esc(n.subject)}</span><span class="kpi-val">${n.openRate>0?n.openRate+'% open':esc(n.status)}</span></div>`).join('')}
+      ${qNL.length===0?`<div style="font-size:12px;color:var(--text3);padding:8px 0">No newsletters sent in ${q} yet.</div>`:''}
+    </div>
+    <div class="kpi-block">
+      <div class="kpi-title"><i class="ti ti-user-star"></i>Influencer KPIs</div>
+      ${S.influencers.map(i=>`<div class="kpi-row"><span>${esc(i.instagramHandle||i.name)}</span><span class="kpi-val">${fmt(i.followers)}${i.roi>0?' · <span class="kpi-up">'+i.roi+'x</span>':''}</span></div>`).join('')}
+    </div>
+    <div class="kpi-block">
+      <div class="kpi-title"><i class="ti ti-calendar-event"></i>Events & community</div>
+      <div class="kpi-row"><span>Events this quarter</span><span class="kpi-val">4</span></div>
+      <div class="kpi-row"><span>Total attendees</span><span class="kpi-val kpi-up">816</span></div>
+      <div class="kpi-row"><span>Active partners</span><span class="kpi-val">2</span></div>
+      <div class="kpi-row"><span>Partner media reach</span><span class="kpi-val">4.2K</span></div>
+      <div class="kpi-row"><span>Budget utilization</span><span class="kpi-val">$4.7K / $17K</span></div>
+    </div>
+  </div>`;
+}
+
+// ── Calendar ──────────────────────────────────────────────
+function buildCalMonth(yr, mo, compact) {
+  const now = new Date();
+  const firstDay = new Date(yr,mo,1).getDay(), daysInMo = new Date(yr,mo+1,0).getDate();
+  const calEvs = [];
+  // Events (including recurring)
+  S.events.forEach(e => {
+    try {
+      const orig = new Date(e.date+'T00:00:00');
+      const addIfMatch = d => { if(d.getFullYear()===yr&&d.getMonth()===mo) calEvs.push({day:d.getDate(),label:(e.recurring?'↻ ':'')+e.name,cls:'ce-red',meet:e.meetLink}); };
+      addIfMatch(new Date(orig));
+      if (e.recurring && e.recurringType && e.recurringType!=='none') {
+        let next = new Date(orig);
+        for(let i=0;i<24;i++) {
+          if(e.recurringType==='weekly') next=new Date(next.getTime()+7*864e5);
+          else if(e.recurringType==='monthly'){next=new Date(next);next.setMonth(next.getMonth()+1);}
+          else if(e.recurringType==='quarterly'){next=new Date(next);next.setMonth(next.getMonth()+3);}
+          else break;
+          if(next.getFullYear()>yr+2) break;
+          addIfMatch(new Date(next));
+        }
+      }
+    } catch(err){}
+  });
+  // Scheduled newsletters
+  S.newsletters.filter(n=>n.status==='Scheduled').forEach(n=>{
+    try{const d=new Date(n.sentDate+'T00:00:00');if(d.getFullYear()===yr&&d.getMonth()===mo)calEvs.push({day:d.getDate(),label:n.subject,cls:'ce-amber'});}catch(err){}
+  });
+  // To-dos
+  S.todos.filter(t=>!t.done).forEach(t=>{
+    try{const d=new Date(t.dueDate+'T00:00:00');if(d.getFullYear()===yr&&d.getMonth()===mo)calEvs.push({day:d.getDate(),label:'✓ '+t.title,cls:'ce-purple',todoId:t.id});}catch(err){}
+  });
+  // Influencer reminders
+  S.influencers.filter(i=>i.reminder?.date).forEach(inf=>{
+    try{const d=new Date(inf.reminder.date+'T00:00:00');if(d.getFullYear()===yr&&d.getMonth()===mo)calEvs.push({day:d.getDate(),label:'🔔 '+(inf.instagramHandle||inf.name)+' · '+inf.reminder.note,cls:'ce-blue'});}catch(err){}
+  });
+  // Today marker
+  if(yr===now.getFullYear()&&mo===now.getMonth()) calEvs.push({day:now.getDate(),label:'Today',cls:'ce-green'});
+  let cells='';
+  for(let i=0;i<firstDay;i++) cells+=`<div class="cal-day other-month"></div>`;
+  for(let d=1;d<=daysInMo;d++){
+    const isToday=yr===now.getFullYear()&&mo===now.getMonth()&&d===now.getDate();
+    const dateStr=`${yr}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const evs=calEvs.filter(e=>e.day===d);
+    cells+=`<div class="cal-day${isToday?' today':''}" onclick="openModal('todo','${dateStr}')" title="Add task for ${dateStr}">
+      <div class="cal-num">${d}</div>
+      ${evs.map(e=>`<div class="cal-event ${e.cls}" title="${esc(e.label)}" ${e.todoId?`onclick="event.stopPropagation();openModal('todo_edit',${e.todoId})" style="cursor:pointer"`:''}>
+        ${esc(e.label)}${e.meet?` <a href="${esc(e.meet)}" target="_blank" onclick="event.stopPropagation()" style="color:inherit" title="Join Meet">📹</a>`:''}
+      </div>`).join('')}
+    </div>`;
+  }
+  const moLabel = new Date(yr,mo,1).toLocaleString('default',{month:'long'});
+  return `<div ${compact?'class="cal-compact" style="min-width:0"':''}>
+    ${compact?`<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--text1)">${moLabel} ${yr}</div>`:''}
+    <div class="cal-grid" ${compact?'style="gap:2px"':''}>
+      ${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div class="cal-day-hdr">${compact?d.slice(0,1):d}</div>`).join('')}
+      ${cells}
+    </div>
+  </div>`;
+}
+
+function renderCalendar() {
+  const now=new Date(), calView=window._calView||'month';
+  let content='';
+  if(calView==='quarter'){
+    const months=[];
+    for(let i=0;i<3;i++){
+      const d=new Date(now.getFullYear(),now.getMonth()+i,1);
+      months.push({yr:d.getFullYear(),mo:d.getMonth()});
+    }
+    content=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;overflow-x:auto">${months.map(m=>buildCalMonth(m.yr,m.mo,true)).join('')}</div>`;
+  } else {
+    content=buildCalMonth(now.getFullYear(),now.getMonth(),false);
+  }
+  return `
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+    <div style="font-size:16px;font-weight:500">${calView==='quarter'?'Next 3 months':now.toLocaleString('default',{month:'long'})+' '+now.getFullYear()}</div>
+    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+      <div class="tab-bar" style="margin:0">
+        <button class="tab ${calView==='month'?'active':''}" onclick="window._calView='month';render()"><i class="ti ti-calendar-month"></i> Month</button>
+        <button class="tab ${calView==='quarter'?'active':''}" onclick="window._calView='quarter';render()"><i class="ti ti-calendar-stats"></i> Quarter</button>
+      </div>
+      <button class="btn-primary btn-sm" onclick="openModal('event')"><i class="ti ti-plus"></i> Add event</button>
+    </div>
+  </div>
+  ${content}
+  <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;font-size:12px">
+    ${[['ce-red','Events'],['ce-green','Today'],['ce-amber','Newsletters'],['ce-purple','To-Dos (click to open)'],['ce-blue','🔔 Reminders']].map(([c,l])=>`<div style="display:flex;align-items:center;gap:5px"><div class="cal-event ${c}">${l}</div></div>`).join('')}
+    <div style="color:var(--text3);font-size:11px;display:flex;align-items:center;gap:4px"><i class="ti ti-click"></i> Click any date to add a task</div>
+  </div>`;
+}
+
+// ── Files ─────────────────────────────────────────────────
+function renderFiles() {
+  const tc={Brief:'b-accent',Template:'b-purple',Proposal:'b-blue',Calendar:'b-active',Reference:'b-draft',Report:'b-active',KPIs:'b-accent'};
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <div style="font-size:13px;color:var(--text2)">${S.files.length} files</div>
+    <button class="btn-primary btn-sm" onclick="openModal('file')"><i class="ti ti-upload"></i> Upload file</button>
+  </div>
+  <div class="toolbar">
+    <select><option>All modules</option><option>Influencers</option><option>Social</option><option>Newsletters</option><option>Events</option><option>Partners</option></select>
+    <input type="text" placeholder="Search files…" style="width:180px">
+  </div>
+  ${S.files.map(f=>`
+    <div class="card" style="padding:11px 14px">
+      <div class="card-row" style="align-items:center">
+        <div style="width:34px;height:34px;border-radius:var(--radius-sm);background:var(--surface2);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <i class="ti ti-file" style="font-size:18px;color:var(--text2)"></i>
+        </div>
+        <div class="card-body">
+          <div style="font-size:13px;font-weight:500">${esc(f.name)}</div>
+          <div class="card-meta" style="margin-top:3px">
+            <span class="badge ${tc[f.type]||'b-draft'}">${f.type}</span>
+            <span>${f.module}</span><span>Uploaded ${f.uploaded} by ${f.by}</span>
+            <span style="font-family:var(--mono);font-size:11px">${f.size}</span>
+          </div>
+        </div>
+        <div class="card-actions">
+          ${f.driveUrl?`<a href="${esc(f.driveUrl)}" target="_blank" class="btn-sm btn-primary" title="Open in Drive" style="display:inline-flex;align-items:center;gap:4px;text-decoration:none;font-size:12px"><i class="ti ti-brand-google-drive"></i> Open</a>`:''}
+          ${f._reportHtml?`<button class="btn-sm" title="View report" onclick="viewSavedReport(${f.id})"><i class="ti ti-eye"></i></button>`:''}
+          <button class="btn-sm" onclick="deleteFile(${f.id})" style="color:var(--red)" title="Delete"><i class="ti ti-trash"></i></button>
+        </div>
+      </div>
+    </div>`).join('')}`;
+}
+
+// ── Profile ───────────────────────────────────────────────
+function renderProfile() {
+  const p=S.profile, i=ini(p.name)||'ME';
+  return `
+  <div class="profile-hero">
+    <div class="profile-av">${i}</div>
+    <div class="profile-info">
+      <div class="profile-name">${esc(p.name)||'Your name'}</div>
+      <div class="profile-role">${esc(p.title)||'Add your job title'}</div>
+      ${p.email?`<div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:6px"><i class="ti ti-mail"></i> ${esc(p.email)}</div>`:''}
+    </div>
+    <button class="btn-sm" onclick="openModal('editProfile')" style="background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.2);color:#fff;position:relative;z-index:1"><i class="ti ti-edit"></i> Edit</button>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <div style="font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);margin-bottom:14px">Contact information</div>
+      ${p.name?`<div class="kpi-row"><span style="color:var(--text2)"><i class="ti ti-user"></i> Name</span><span class="kpi-val">${esc(p.name)}</span></div>`:''}
+      ${p.title?`<div class="kpi-row"><span style="color:var(--text2)"><i class="ti ti-briefcase"></i> Title</span><span class="kpi-val">${esc(p.title)}</span></div>`:''}
+      ${p.email?`<div class="kpi-row"><span style="color:var(--text2)"><i class="ti ti-mail"></i> Email</span><span class="kpi-val" style="color:var(--accent)">${esc(p.email)}</span></div>`:''}
+      ${p.phone?`<div class="kpi-row"><span style="color:var(--text2)"><i class="ti ti-phone"></i> Phone</span><span class="kpi-val">${esc(p.phone)}</span></div>`:''}
+      ${p.location?`<div class="kpi-row"><span style="color:var(--text2)"><i class="ti ti-map-pin"></i> Location</span><span class="kpi-val">${esc(p.location)}</span></div>`:''}
+      ${!p.name&&!p.email?`<div class="empty" style="padding:20px"><i class="ti ti-user-plus"></i>Add your contact info</div>`:''}
+      <button class="btn-primary btn-sm" style="margin-top:12px;width:100%;justify-content:center" onclick="openModal('editProfile')"><i class="ti ti-edit"></i> Edit profile</button>
+    </div>
+    <div class="card">
+      <div style="font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);margin-bottom:14px">About</div>
+      ${p.bio?`<p style="font-size:13px;line-height:1.7">${esc(p.bio)}</p>`:`<div class="empty" style="padding:20px"><i class="ti ti-writing"></i>Add a short bio</div>`}
+      <div class="divider"></div>
+      <div style="font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);margin-bottom:10px">Team</div>
+      <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin-bottom:6px;padding-top:4px">Admin Team</div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--border)">
+        <div class="avatar" style="background:var(--accent);color:#fff;width:36px;height:36px;font-size:12px">JG</div>
+        <div><div style="font-size:13px;font-weight:500">Jayson Greene</div><div style="font-size:12px;color:var(--text2)">Owner</div></div>
+        <button class="btn-sm btn-ghost" style="margin-left:auto" onclick="toggleChat()"><i class="ti ti-message-circle"></i> Chat</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--border)">
+        <div class="avatar" style="background:var(--brand-primary);color:#fff;width:36px;height:36px;font-size:12px">AA</div>
+        <div><div style="font-size:13px;font-weight:500">Alec Anderson</div><div style="font-size:12px;color:var(--text2)">Owner</div></div>
+        <button class="btn-sm btn-ghost" style="margin-left:auto" onclick="toggleChat()"><i class="ti ti-message-circle"></i> Chat</button>
+      </div>
+      ${p.name?`<div style="display:flex;align-items:center;gap:10px;padding:8px 0">
+        <div class="avatar" style="background:var(--accent);color:#fff;width:36px;height:36px;font-size:12px">${ini(p.name)}</div>
+        <div><div style="font-size:13px;font-weight:500">${esc(p.name)} <span style="font-size:11px;color:var(--text3)">(you)</span></div><div style="font-size:12px;color:var(--text2)">${esc(p.title)||'—'}</div></div>
+      </div>`:''}
+    </div>
+  </div>`;
+}
+
+// ── Modals ────────────────────────────────────────────────
+function openModal(type, id) {
+  const wrap=document.getElementById('modalOverlay'), box=document.getElementById('modalBox');
+  let html='';
+  if(type==='editProfile') {
+    const p=S.profile;
+    html=`<h3>Edit profile</h3>
+    <div class="fg-row"><div class="fg"><label>Full name</label><input id="p-name" value="${esc(p.name)}" placeholder="Your full name"></div><div class="fg"><label>Job title</label><input id="p-title" value="${esc(p.title)}" placeholder="e.g. Marketing Manager"></div></div>
+    <div class="fg-row"><div class="fg"><label>Email</label><input id="p-email" type="email" value="${esc(p.email)}" placeholder="you@solvebranding.com"></div><div class="fg"><label>Phone</label><input id="p-phone" value="${esc(p.phone)}" placeholder="+1 (801) 555-0100"></div></div>
+    <div class="fg"><label>Location</label><input id="p-loc" value="${esc(p.location)}"></div>
+    <div class="fg"><label>Short bio</label><textarea id="p-bio">${esc(p.bio)}</textarea></div>
+    <div class="modal-footer"><button onclick="closeModal()">Cancel</button><button class="btn-primary" onclick="saveProfileForm()"><i class="ti ti-check"></i> Save</button></div>`;
+  } else if(type==='todo') {
+    html=`<h3>Add task</h3>
+    <div class="fg"><label>Task title</label><input id="t-title" placeholder="What needs to be done?"></div>
+    <div class="fg-row"><div class="fg"><label>Label</label><select id="t-label"><option>Social</option><option>Influencers</option><option>Newsletters</option><option>Events</option><option>Partners</option><option>General</option></select></div><div class="fg"><label>Priority</label><select id="t-pri"><option>High</option><option>Medium</option><option>Low</option></select></div></div>
+    <div class="fg-row"><div class="fg"><label>Due date</label><input type="date" id="t-due" value="${(typeof id==='string'&&id.includes('-'))?id:TODAY}"></div><div class="fg"><label>Assignee</label><select id="t-assignee"><option>Me</option><option>Jayson Greene</option><option>Alec Anderson</option></select></div></div>
+    <div class="modal-footer"><button onclick="closeModal()">Cancel</button><button class="btn-primary" onclick="saveTodo()">Add task</button></div>`;
+  } else if(type==='todo_edit') {
+    const t=S.todos.find(x=>x.id===id); if(!t){closeModal();return;}
+    html=`<h3>Edit task</h3>
+    <div class="fg"><label>Task title</label><input id="t-title" value="${esc(t.title)}"></div>
+    <div class="fg-row"><div class="fg"><label>Label</label><select id="t-label">${['Social','Influencers','Newsletters','Events','Partners','General'].map(l=>`<option${l===t.label?' selected':''}>${l}</option>`).join('')}</select></div><div class="fg"><label>Priority</label><select id="t-pri">${['High','Medium','Low'].map(p=>`<option${p===t.priority?' selected':''}>${p}</option>`).join('')}</select></div></div>
+    <div class="fg-row"><div class="fg"><label>Due date</label><input type="date" id="t-due" value="${t.dueDate}"></div><div class="fg"><label>Assignee</label><select id="t-assignee"><option${t.assignee==='Me'?' selected':''}>Me</option><option${t.assignee==='Jayson Greene'?' selected':''}>Jayson Greene</option><option${t.assignee==='Alec Anderson'?' selected':''}>Alec Anderson</option></select></div></div>
+    <div class="modal-footer"><button onclick="closeModal()">Cancel</button><button class="btn-primary" onclick="saveTodoEdit(${t.id})">Save</button></div>`;
+  } else if(type==='influencer') {
+    html=`<h3>Add influencer</h3>
+    <div class="fg-row"><div class="fg"><label>Instagram handle</label><input id="m-handle" placeholder="@handle"></div><div class="fg"><label>Full name</label><input id="m-fullname" placeholder="Real name (optional)"></div></div>
+    <div class="fg-row"><div class="fg"><label>Phone</label><input id="m-phone" placeholder="(801) 555-0100"></div><div class="fg"><label>Email</label><input id="m-email" type="email" placeholder="email@example.com"></div></div>
+    <div class="fg-row"><div class="fg"><label>Platform</label><select id="m-plat"><option>Instagram</option><option>TikTok</option><option>YouTube</option><option>Facebook</option><option>Pinterest</option></select></div><div class="fg"><label>Tier</label><select id="m-tier"><option>Nano</option><option>Micro</option><option>Mid</option><option>Macro</option><option>Mega</option></select></div></div>
+    <div class="fg-row"><div class="fg"><label>Followers</label><input id="m-followers" placeholder="50000"></div><div class="fg"><label>Fee ($)</label><input id="m-fee" placeholder="1000"></div></div>
+    <div class="fg-row"><div class="fg"><label>Stage</label><select id="m-stage">${STAGES.map(s=>`<option>${s}</option>`).join('')}</select></div><div class="fg"><label>Quarter hired</label><select id="m-quarter"><option value="">— None —</option><option>Q1</option><option>Q2</option><option>Q3</option><option>Q4</option></select></div></div>
+    <div class="fg"><label>Campaign</label><input id="m-campaign" placeholder="Campaign name"></div>
+    <div class="fg"><label>Brief / deliverables</label><textarea id="m-brief" placeholder="What are they creating?" style="min-height:56px"></textarea></div>
+    <div class="fg"><label>Notes</label><input id="m-notes" placeholder="Any notes…"></div>
+    <div class="modal-footer"><button onclick="closeModal()">Cancel</button><button class="btn-primary" onclick="saveInfluencer()"><i class="ti ti-check"></i> Add influencer</button></div>`;
+  } else if(type==='social') {
+    html=`<h3>Submit content for approval</h3>
+    <div class="fg"><label>Title</label><input id="m-title" placeholder="e.g. Q3 product launch carousel"></div>
+    <div class="fg"><label>Platform</label><select id="m-plat"><option>Instagram</option><option>TikTok</option><option>LinkedIn</option><option>Twitter/X</option><option>Facebook</option></select></div>
+    <div class="fg"><label>Post copy</label><textarea id="m-copy" placeholder="Paste your caption here…"></textarea></div>
+    <div class="fg"><label>Attachment name</label><input id="m-file" placeholder="e.g. carousel_v1.png"></div>
+    <div class="fg"><label>Image URL <span style="font-weight:400;color:var(--text3)">optional · for preview thumbnail</span></label><input id="m-img" placeholder="https://..."></div>
+    <div class="fg"><label>Google Drive link <span style="font-weight:400;color:var(--text3)">optional · for content review</span></label><input id="m-drive" placeholder="https://drive.google.com/..."></div>
+    <div class="modal-footer"><button onclick="closeModal()">Cancel</button><button class="btn-primary" onclick="savePost()">Submit for approval</button></div>`;
+  } else if(type==='newsletter') {
+    html=`<h3>New newsletter campaign</h3>
+    <div class="fg"><label>Subject line</label><input id="m-subject" placeholder="Your subject line…"></div>
+    <div class="fg-row"><div class="fg"><label>Send date</label><input type="date" id="m-date"></div><div class="fg"><label>Status</label><select id="m-status"><option>Draft</option><option>Scheduled</option></select></div></div>
+    <div class="fg"><label>Audience segment</label><input id="m-seg" placeholder="e.g. All subscribers"></div>
+    <div class="fg"><label>Brief</label><textarea id="m-brief" placeholder="What's in this issue?"></textarea></div>
+    <div class="fg"><label>Google Drive link <span style="font-weight:400;color:var(--text3)">optional · link to newsletter file</span></label><input id="m-nl-drive" placeholder="https://drive.google.com/..."></div>
+    <div class="modal-footer"><button onclick="closeModal()">Cancel</button><button class="btn-primary" onclick="saveNewsletter()">Save</button></div>`;
+  } else if(type==='event') {
+    html=`<h3>Add event</h3>
+    <div class="fg"><label>Event name</label><input id="m-name" placeholder="Event name"></div>
+    <div class="fg-row"><div class="fg"><label>Location</label><input id="m-loc" placeholder="City, State"></div><div class="fg"><label>Date</label><input type="date" id="m-date"></div></div>
+    <div class="fg-row"><div class="fg"><label>Budget ($)</label><input id="m-budget" placeholder="5000"></div><div class="fg"><label>Expected attendees</label><input id="m-att" placeholder="100"></div></div>
+    <div class="fg-row"><div class="fg"><label>Type</label><select id="m-type"><option>Brand</option><option>Influencer</option><option>Community</option><option>Digital</option></select></div><div class="fg"><label>Recurring</label><select id="m-recurring"><option value="none">One-time</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option></select></div></div>
+    <div class="fg"><label>Google Meet link <span style="font-weight:400;color:var(--text3)">(optional)</span></label><input id="m-meet" type="url" placeholder="https://meet.google.com/xxx-xxxx-xxx"></div>
+    <div class="fg"><label>Brief</label><textarea id="m-brief" placeholder="Event description and goals…"></textarea></div>
+    <div class="modal-footer"><button onclick="closeModal()">Cancel</button><button class="btn-primary" onclick="saveEvent()">Save event</button></div>`;
+  } else if(type==='partner') {
+    html=`<h3>Add community partner</h3>
+    <div class="fg"><label>Organization name</label><input id="m-name" placeholder="Partner organization"></div>
+    <div class="fg-row"><div class="fg"><label>Type</label><input id="m-type" placeholder="e.g. Arts & culture"></div><div class="fg"><label>Location</label><input id="m-loc" placeholder="City, State"></div></div>
+    <div class="fg"><label>Media / deliverables</label><input id="m-media" placeholder="e.g. Newsletter + IG post"></div>
+    <div class="fg"><label>Notes</label><textarea id="m-notes" placeholder="Partnership notes…"></textarea></div>
+    <div class="modal-footer"><button onclick="closeModal()">Cancel</button><button class="btn-primary" onclick="savePartner()">Save</button></div>`;
+  } else if(type==='file') {
+    html=`<h3>Add file</h3>
+    <div class="fg">
+      <label>Google Drive link</label>
+      <input id="m-drive-url" placeholder="Paste your Google Drive share link here…" type="url">
+      <div style="font-size:11px;color:var(--text3);margin-top:5px;display:flex;align-items:center;gap:4px"><i class="ti ti-info-circle"></i> In Google Drive: right-click file → Share → Copy link</div>
+    </div>
+    <div class="fg"><label>File name</label><input id="m-name" placeholder="e.g. Q3 Campaign Brief.pdf"></div>
+    <div class="fg-row">
+      <div class="fg"><label>Module</label><select id="m-module"><option>Influencers</option><option>Social</option><option>Newsletters</option><option>Events</option><option>Partners</option><option>General</option></select></div>
+      <div class="fg"><label>Type</label><select id="m-ftype"><option>Brief</option><option>Template</option><option>Proposal</option><option>Calendar</option><option>Reference</option></select></div>
+    </div>
+    <div class="fg"><label>File size <span style="font-weight:400;color:var(--text3)">(optional)</span></label><input id="m-size" placeholder="e.g. 1.2 MB"></div>
+    <div class="modal-footer"><button onclick="closeModal()">Cancel</button><button class="btn-primary" onclick="saveFile()"><i class="ti ti-brand-google-drive"></i> Add file</button></div>`;
+  } else if(type==='influencer_edit') {
+    const inf=S.influencers.find(i=>i.id===id); if(!inf){closeModal();return;}
+    const promoRows=(inf.promoCodes||[]).map(c=>`
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--border)">
+        <span class="promo-code" style="font-size:12px">${esc(c.code)}</span>
+        <span style="flex:1;font-size:12px;color:var(--text2)">${esc(c.discount)}</span>
+        <span class="badge ${c.active?'b-active':'b-draft'}" style="cursor:pointer" onclick="toggleInfluencerPromo(${inf.id},${c.id})">${c.active?'Active':'Off'}</span>
+        <button class="btn-ghost btn-sm" onclick="removeInfluencerPromo(${inf.id},${c.id})" style="color:var(--red);padding:2px 6px"><i class="ti ti-trash" style="font-size:12px"></i></button>
+      </div>`).join('');
+    html=`<h3 style="margin-bottom:18px">${esc(inf.instagramHandle||inf.name)}</h3>
+    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Contact info</div>
+    <div class="fg-row"><div class="fg"><label>Instagram handle</label><input id="ei-handle" value="${esc(inf.instagramHandle||inf.name)}"></div><div class="fg"><label>Full name</label><input id="ei-fullname" value="${esc(inf.fullName||'')}"></div></div>
+    <div class="fg-row"><div class="fg"><label>Phone</label><input id="ei-phone" value="${esc(inf.phone||'')}"></div><div class="fg"><label>Email</label><input id="ei-email" type="email" value="${esc(inf.email||'')}"></div></div>
+    <div class="divider" style="margin:12px 0 14px"></div>
+    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Platform & pipeline</div>
+    <div class="fg-row"><div class="fg"><label>Platform</label><select id="ei-plat">${['Instagram','TikTok','YouTube','Facebook','Pinterest'].map(p=>`<option${p===inf.platform?' selected':''}>${p}</option>`).join('')}</select></div><div class="fg"><label>Tier</label><select id="ei-tier">${['Nano','Micro','Mid','Macro','Mega'].map(t=>`<option${t===inf.tier?' selected':''}>${t}</option>`).join('')}</select></div></div>
+    <div class="fg-row"><div class="fg"><label>Followers</label><input id="ei-followers" value="${inf.followers}"></div><div class="fg"><label>Fee ($)</label><input id="ei-fee" value="${inf.fee}"></div></div>
+    <div class="fg-row"><div class="fg"><label>Stage</label><select id="ei-stage">${STAGES.map(s=>`<option${s===(inf.stage||'Messaged')?' selected':''}>${s}</option>`).join('')}</select></div><div class="fg"><label>Quarter hired</label><select id="ei-quarter"><option value="">— None —</option>${['Q1','Q2','Q3','Q4'].map(q=>`<option${q===(inf.quarter||'')?' selected':''}>${q}</option>`).join('')}</select></div></div>
+    <div class="divider" style="margin:12px 0 14px"></div>
+    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Campaign</div>
+    <div class="fg"><label>Campaign</label><input id="ei-campaign" value="${esc(inf.campaign)}"></div>
+    <div class="fg"><label>Brief / deliverables</label><textarea id="ei-brief" style="min-height:52px">${esc(inf.brief)}</textarea></div>
+    <div class="fg"><label>Notes</label><input id="ei-notes" value="${esc(inf.notes)}"></div>
+    <div class="divider" style="margin:12px 0 14px"></div>
+    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">🔔 Reminder</div>
+    <div class="fg-row">
+      <div class="fg"><label>Date <span style="font-weight:400;color:var(--text3)">(leave blank to clear)</span></label><input type="date" id="ei-rem-date" value="${inf.reminder?.date||''}"></div>
+      <div class="fg"><label>Note</label><input id="ei-rem-note" value="${esc(inf.reminder?.note||'')}" placeholder="e.g. Follow up, Check in…"></div>
+    </div>
+    <div class="divider" style="margin:12px 0 14px"></div>
+    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Promo codes <span style="font-weight:400;color:var(--text3);font-size:10px;text-transform:none">(${(inf.promoCodes||[]).length})</span></div>
+    <div id="promo-list-${inf.id}">${promoRows||'<div style="font-size:12px;color:var(--text3);padding:4px 0">No codes yet.</div>'}</div>
+    <div style="display:flex;gap:6px;margin-top:10px;align-items:flex-end">
+      <div class="fg" style="flex:1.2;margin:0"><label style="margin-bottom:3px">Code</label><input id="np-code" placeholder="e.g. JESSICA20" style="text-transform:uppercase"></div>
+      <div class="fg" style="flex:1.5;margin:0"><label style="margin-bottom:3px">Discount / offer</label><input id="np-discount" placeholder="e.g. 20% off first service"></div>
+      <button class="btn-primary btn-sm" style="height:36px;flex-shrink:0" onclick="addInfluencerPromo(${inf.id})"><i class="ti ti-plus"></i> Add</button>
+    </div>
+    <div class="modal-footer" style="margin-top:16px">
+      <button class="btn-danger btn-sm" onclick="deleteInfluencer(${inf.id})"><i class="ti ti-trash"></i> Delete</button>
+      <button onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveInfluencerEdit(${inf.id})"><i class="ti ti-check"></i> Save changes</button>
+    </div>`;
+  } else if(type==='reminder') {
+    const inf=S.influencers.find(i=>i.id===id); if(!inf){closeModal();return;}
+    const r=inf.reminder;
+    html=`<h3 style="display:flex;align-items:center;gap:8px"><i class="ti ti-bell" style="color:var(--blue)"></i> Reminder — ${esc(inf.instagramHandle||inf.name)}</h3>
+    ${r?.auto?`<div class="notice notice-info" style="margin-bottom:14px"><i class="ti ti-info-circle"></i> Auto-set +2 days from creation. You can adjust below.</div>`:''}
+    <div class="fg"><label>Reminder date</label><input type="date" id="rm-date" value="${r?.date||''}"></div>
+    <div class="fg"><label>Note</label><input id="rm-note" value="${esc(r?.note||'Follow up')}" placeholder="e.g. Follow up, Schedule service…"></div>
+    <div class="modal-footer">
+      ${r?`<button class="btn-danger btn-sm" onclick="clearReminder(${inf.id})"><i class="ti ti-bell-off"></i> Remove</button>`:''}
+      <button onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveReminder(${inf.id})"><i class="ti ti-check"></i> Save reminder</button>
+    </div>`;
+  } else if(type==='addPromoCode') {
+    html=`<h3>Add community promo code</h3>
+    <div class="fg-row"><div class="fg"><label>Promo code</label><input id="gpc-code" placeholder="e.g. SOLVE20" style="text-transform:uppercase"></div><div class="fg"><label>Discount / offer</label><input id="gpc-discount" placeholder="e.g. 20% off first service"></div></div>
+    <div class="fg"><label>Notes <span style="font-weight:400;color:var(--text3)">(optional)</span></label><input id="gpc-notes" placeholder="Where / how it's used…"></div>
+    <div class="modal-footer"><button onclick="closeModal()">Cancel</button><button class="btn-primary" onclick="saveGlobalPromo()"><i class="ti ti-check"></i> Add code</button></div>`;
+  } else if(type==='brief_inf') {
+    const inf=S.influencers.find(i=>i.id===id); if(!inf){closeModal();return;}
+    html=`<h3>${esc(inf.instagramHandle||inf.name)} — Brief</h3>
+    ${[['Handle',inf.instagramHandle||inf.name],['Full name',inf.fullName||'—'],['Phone',inf.phone||'—'],['Email',inf.email||'—'],['Campaign',inf.campaign],['Platform',inf.platform],['Tier',inf.tier],['Followers',fmt(inf.followers)],['Deliverable',inf.brief],['Fee','$'+inf.fee.toLocaleString()],['Stage',inf.stage||'Messaged'],['Notes',inf.notes||'—']].map(([k,v])=>`<div style="padding:8px 0;border-bottom:0.5px solid var(--border);display:flex;gap:16px"><span style="font-size:12px;font-weight:500;color:var(--text2);min-width:90px">${k}</span><span style="font-size:13px">${esc(String(v))}</span></div>`).join('')}
+    <div class="modal-footer"><button onclick="closeModal()">Close</button></div>`;
+  } else if(type==='briefEvent') {
+    const ev=S.events.find(e=>e.id===id); if(!ev){closeModal();return;}
+    html=`<h3>${esc(ev.name)} — Brief</h3>
+    ${[['Location',ev.location],['Date',fmtDate(ev.date)],['Type',ev.type],['Budget','$'+ev.budget.toLocaleString()],['Spent','$'+ev.spent.toLocaleString()],['Attendees',ev.attendees],['Owner',ev.owner],['Description',ev.brief]].map(([k,v])=>`<div style="padding:8px 0;border-bottom:0.5px solid var(--border);display:flex;gap:16px"><span style="font-size:12px;font-weight:500;color:var(--text2);min-width:90px">${k}</span><span style="font-size:13px">${esc(String(v))}</span></div>`).join('')}
+    ${ev.meetLink?`<div style="margin-top:14px"><a href="${esc(ev.meetLink)}" target="_blank" class="btn btn-success btn-sm"><i class="ti ti-video"></i> Join Google Meet</a></div>`:''}
+    <div class="modal-footer"><button onclick="closeModal()">Close</button></div>`;
+  } else if(type==='edit_social') {
+    const s=S.social.find(x=>x.id===id); if(!s){closeModal();return;}
+    html=`<h3>Edit post</h3>
+    <div class="fg"><label>Title</label><input id="es-title" value="${esc(s.title)}"></div>
+    <div class="fg-row"><div class="fg"><label>Platform</label><select id="es-plat">${['Instagram','TikTok','LinkedIn','Twitter/X','Facebook'].map(p=>`<option${p===s.platform?' selected':''}>${p}</option>`).join('')}</select></div><div class="fg"><label>Status</label><select id="es-status">${['Pending approval','Approved','Rejected'].map(st=>`<option${st===s.status?' selected':''}>${st}</option>`).join('')}</select></div></div>
+    <div class="fg"><label>Post copy</label><textarea id="es-copy" style="min-height:80px">${esc(s.copy)}</textarea></div>
+    <div class="fg"><label>Image URL <span style="font-weight:400;color:var(--text3)">direct link or Google Drive preview URL</span></label><input id="es-img" value="${esc(s.imageUrl||'')}" placeholder="https://..."></div>
+    <div class="fg"><label>Google Drive link <span style="font-weight:400;color:var(--text3)">share URL for the content file</span></label><input id="es-drive" value="${esc(s.driveUrl||'')}" placeholder="https://drive.google.com/..."></div>
+    <div class="fg"><label>Attachment name</label><input id="es-file" value="${esc(s.file)}"></div>
+    <div class="modal-footer">
+      <button class="btn-danger btn-sm" onclick="deletePost(${s.id})"><i class="ti ti-trash"></i></button>
+      <button onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveEditSocial(${s.id})"><i class="ti ti-check"></i> Save</button>
+    </div>`;
+  } else if(type==='edit_newsletter') {
+    const n=S.newsletters.find(x=>x.id===id); if(!n){closeModal();return;}
+    html=`<h3>Edit newsletter</h3>
+    <div class="fg"><label>Subject line</label><input id="en-sub" value="${esc(n.subject)}"></div>
+    <div class="fg-row"><div class="fg"><label>Send date</label><input type="date" id="en-date" value="${n.sentDate==='—'?'':n.sentDate}"></div><div class="fg"><label>Status</label><select id="en-status">${['Draft','Scheduled','Sent'].map(st=>`<option${st===n.status?' selected':''}>${st}</option>`).join('')}</select></div></div>
+    <div class="fg"><label>Audience segment</label><input id="en-seg" value="${esc(n.segment)}"></div>
+    <div class="fg"><label>Brief</label><textarea id="en-brief">${esc(n.brief)}</textarea></div>
+    <div class="fg-row"><div class="fg"><label>Opens</label><input id="en-opens" type="number" value="${n.opens}"></div><div class="fg"><label>Clicks</label><input id="en-clicks" type="number" value="${n.clicks}"></div><div class="fg"><label>Open rate %</label><input id="en-rate" type="number" value="${n.openRate}"></div></div>
+    <div class="fg-row"><div class="fg"><label>ROI</label><input id="en-roi" value="${esc(n.roi)}"></div></div>
+    <div class="fg"><label>Google Drive link <span style="font-weight:400;color:var(--text3)">link to newsletter file</span></label><input id="en-drive" value="${esc(n.driveUrl||'')}" placeholder="https://drive.google.com/..."></div>
+    <div class="modal-footer">
+      <button class="btn-danger btn-sm" onclick="deleteNewsletter(${n.id})"><i class="ti ti-trash"></i></button>
+      <button onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveEditNewsletter(${n.id})"><i class="ti ti-check"></i> Save</button>
+    </div>`;
+  } else if(type==='edit_event') {
+    const ev=S.events.find(x=>x.id===id); if(!ev){closeModal();return;}
+    html=`<h3>Edit event</h3>
+    <div class="fg"><label>Event name</label><input id="ee-name" value="${esc(ev.name)}"></div>
+    <div class="fg-row"><div class="fg"><label>Location</label><input id="ee-loc" value="${esc(ev.location)}"></div><div class="fg"><label>Date</label><input type="date" id="ee-date" value="${ev.date}"></div></div>
+    <div class="fg-row"><div class="fg"><label>Budget ($)</label><input id="ee-budget" type="number" value="${ev.budget}"></div><div class="fg"><label>Spent ($)</label><input id="ee-spent" type="number" value="${ev.spent}"></div><div class="fg"><label>Attendees</label><input id="ee-att" type="number" value="${ev.attendees}"></div></div>
+    <div class="fg-row"><div class="fg"><label>Type</label><select id="ee-type">${['Brand','Influencer','Community','Digital'].map(t=>`<option${t===ev.type?' selected':''}>${t}</option>`).join('')}</select></div><div class="fg"><label>Status</label><select id="ee-status">${['Active','Planned','Done'].map(st=>`<option${st===ev.status?' selected':''}>${st}</option>`).join('')}</select></div></div>
+    <div class="fg-row"><div class="fg"><label>Owner</label><input id="ee-owner" value="${esc(ev.owner)}"></div><div class="fg"><label>Recurring</label><select id="ee-rec">${['none','weekly','monthly','quarterly'].map(r=>`<option value="${r}"${r===(ev.recurringType||'none')?' selected':''}>${r==='none'?'One-time':r.charAt(0).toUpperCase()+r.slice(1)}</option>`).join('')}</select></div></div>
+    <div class="fg"><label>Google Meet link</label><input id="ee-meet" type="url" value="${esc(ev.meetLink||'')}"></div>
+    <div class="fg"><label>Brief</label><textarea id="ee-brief">${esc(ev.brief)}</textarea></div>
+    <div class="modal-footer">
+      <button class="btn-danger btn-sm" onclick="deleteEvent(${ev.id})"><i class="ti ti-trash"></i></button>
+      <button onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveEditEvent(${ev.id})"><i class="ti ti-check"></i> Save</button>
+    </div>`;
+  } else if(type==='edit_partner') {
+    const p=S.partners.find(x=>x.id===id); if(!p){closeModal();return;}
+    html=`<h3>Edit partner</h3>
+    <div class="fg"><label>Organization name</label><input id="ep-name" value="${esc(p.name)}"></div>
+    <div class="fg-row"><div class="fg"><label>Type</label><input id="ep-type" value="${esc(p.type)}"></div><div class="fg"><label>Location</label><input id="ep-loc" value="${esc(p.location)}"></div></div>
+    <div class="fg"><label>Status</label><select id="ep-status">${['Active','In review','Planned'].map(st=>`<option${st===p.status?' selected':''}>${st}</option>`).join('')}</select></div>
+    <div class="fg-row"><div class="fg"><label>Co-events</label><input id="ep-events" type="number" value="${p.events}"></div><div class="fg"><label>Reach / KPI</label><input id="ep-kpi" value="${esc(p.kpi)}"></div></div>
+    <div class="fg"><label>Media / deliverables</label><input id="ep-media" value="${esc(p.media)}"></div>
+    <div class="fg"><label>Notes</label><textarea id="ep-notes">${esc(p.notes)}</textarea></div>
+    <div class="modal-footer">
+      <button class="btn-danger btn-sm" onclick="deletePartner(${p.id})"><i class="ti ti-trash"></i></button>
+      <button onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveEditPartner(${p.id})"><i class="ti ti-check"></i> Save</button>
+    </div>`;
+  } else if(type==='edit_stub') {
+    html=`<h3>Edit record</h3><div class="notice notice-info" style="margin-bottom:0"><i class="ti ti-info-circle"></i>Full editing coming in the next update.</div><div class="modal-footer"><button onclick="closeModal()">Close</button></div>`;
+  }
+  box.innerHTML=html; wrap.classList.add('open');
+}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open');}
+document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('modalOverlay'))closeModal();});
+
+// ── Save handlers ─────────────────────────────────────────
+function saveProfileForm(){
+  S.profile.name=document.getElementById('p-name').value.trim();
+  S.profile.title=document.getElementById('p-title').value.trim();
+  S.profile.email=document.getElementById('p-email').value.trim();
+  S.profile.phone=document.getElementById('p-phone').value.trim();
+  S.profile.location=document.getElementById('p-loc').value.trim();
+  S.profile.bio=document.getElementById('p-bio').value.trim();
+  saveProfile(); closeModal(); render();
+}
+function saveTodo(){
+  const title=document.getElementById('t-title').value.trim(); if(!title)return;
+  S.todos.push({id:Date.now(),title,label:document.getElementById('t-label').value,priority:document.getElementById('t-pri').value,dueDate:document.getElementById('t-due').value,assignee:document.getElementById('t-assignee').value,done:false});
+  persist(); closeModal(); render();
+}
+function saveTodoEdit(id){
+  const t=S.todos.find(x=>x.id===id); if(!t)return;
+  t.title=document.getElementById('t-title').value.trim();
+  t.label=document.getElementById('t-label').value;
+  t.priority=document.getElementById('t-pri').value;
+  t.dueDate=document.getElementById('t-due').value;
+  t.assignee=document.getElementById('t-assignee').value;
+  persist(); closeModal(); render();
+}
+function toggleTodo(id){const t=S.todos.find(x=>x.id===id);if(t){t.done=!t.done;persist();render();}}
+function deleteTodo(id){S.todos=S.todos.filter(t=>t.id!==id);persist();render();}
+function saveInfluencer(){
+  const handle=document.getElementById('m-handle').value.trim(); if(!handle)return;
+  S.influencers.push({
+    id:Date.now(),
+    name:handle,
+    instagramHandle:handle,
+    fullName:document.getElementById('m-fullname').value.trim(),
+    phone:document.getElementById('m-phone').value.trim(),
+    email:document.getElementById('m-email').value.trim(),
+    platform:document.getElementById('m-plat').value,
+    tier:document.getElementById('m-tier').value,
+    followers:parseInt(document.getElementById('m-followers').value)||0,
+    fee:parseInt(document.getElementById('m-fee').value)||0,
+    stage:document.getElementById('m-stage').value||'Messaged',
+    quarter:document.getElementById('m-quarter').value||'',
+    campaign:document.getElementById('m-campaign').value||'TBD',
+    brief:document.getElementById('m-brief').value||'—',
+    notes:document.getElementById('m-notes').value||'',
+    reach:0, roi:0, promoCodes:[],
+    reminder: (document.getElementById('m-stage').value||'Messaged') === 'Messaged' ? makeAutoReminder('Messaged') : null,
+  });
+  persist(); closeModal(); render();
+}
+function saveInfluencerEdit(id){
+  const inf=S.influencers.find(i=>i.id===id); if(!inf)return;
+  const handle=document.getElementById('ei-handle').value.trim(); if(!handle)return;
+  inf.name=handle; inf.instagramHandle=handle;
+  inf.fullName=document.getElementById('ei-fullname').value.trim();
+  inf.phone=document.getElementById('ei-phone').value.trim();
+  inf.email=document.getElementById('ei-email').value.trim();
+  inf.platform=document.getElementById('ei-plat').value;
+  inf.tier=document.getElementById('ei-tier').value;
+  inf.followers=parseInt(document.getElementById('ei-followers').value)||0;
+  inf.fee=parseInt(document.getElementById('ei-fee').value)||0;
+  inf.stage=document.getElementById('ei-stage').value;
+  inf.quarter=document.getElementById('ei-quarter').value||'';
+  inf.campaign=document.getElementById('ei-campaign').value;
+  inf.brief=document.getElementById('ei-brief').value;
+  inf.notes=document.getElementById('ei-notes').value;
+  const remDate=document.getElementById('ei-rem-date').value;
+  const remNote=document.getElementById('ei-rem-note').value.trim();
+  inf.reminder = remDate ? {date:remDate, note:remNote||'Reminder', auto:false} : null;
+  persist(); closeModal(); render();
+}
+function deleteInfluencer(id){
+  if(!confirm('Remove this influencer? This cannot be undone.'))return;
+  S.influencers=S.influencers.filter(i=>i.id!==id);
+  persist(); closeModal(); render();
+}
+
+// ── Clicki affiliate sync ─────────────────────────────────
+async function syncClickiCard(id) {
+  const inf = S.influencers.find(i=>i.id===id);
+  if (!inf) return;
+  const btn = document.getElementById('clicki-btn-'+id);
+  if (btn) { btn.innerHTML='<i class="ti ti-loader-2" style="animation:spin .8s linear infinite"></i>'; btn.disabled=true; }
+  try {
+    // Use first active promo code, email, or handle as identifier
+    const promoCode   = (inf.promoCodes||[]).find(c=>c.active)?.code || (inf.promoCodes||[])[0]?.code || '';
+    const promoterEmail = inf.email || '';
+    const res = await fetch('/api/clicki', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ promoterId: String(inf.id), promoterEmail, promoCode })
+    });
+    const json = await res.json();
+    if (json.error && !json.data) {
+      alert('Clicki sync error: ' + json.error + (json.raw ? '\n\nAPI response: '+json.raw : ''));
+    } else if (json.data) {
+      inf.clicki = { clicks: json.data.clicks, conversions: json.data.conversions, commission: json.data.commission, synced: new Date().toLocaleString() };
+      persist(); render();
+    }
+  } catch(e) {
+    alert('Clicki sync failed: ' + e.message);
+  } finally {
+    if (btn) { btn.innerHTML='<i class="ti ti-refresh"></i>'; btn.disabled=false; }
+  }
+}
+async function syncAllClicki() {
+  const btn = document.getElementById('clicki-sync-all-btn');
+  if (btn) { btn.innerHTML='<i class="ti ti-loader-2" style="animation:spin .8s linear infinite"></i> Syncing…'; btn.disabled=true; }
+  for (const inf of S.influencers) { await syncClickiCard(inf.id); }
+  if (btn) { btn.innerHTML='<i class="ti ti-refresh"></i> Sync Clicki'; btn.disabled=false; }
+}
+function addInfluencerPromo(infId){
+  const inf=S.influencers.find(i=>i.id===infId); if(!inf)return;
+  const code=document.getElementById('np-code').value.trim().toUpperCase();
+  const discount=document.getElementById('np-discount').value.trim();
+  if(!code)return;
+  if(!inf.promoCodes)inf.promoCodes=[];
+  inf.promoCodes.push({id:Date.now(),code,discount:discount||'—',type:'influencer',active:true,notes:''});
+  persist();
+  // Refresh promo list in modal without closing
+  const list=document.getElementById(`promo-list-${infId}`);
+  if(list){
+    list.innerHTML=inf.promoCodes.map(c=>`
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--border)">
+        <span class="promo-code" style="font-size:12px">${esc(c.code)}</span>
+        <span style="flex:1;font-size:12px;color:var(--text2)">${esc(c.discount)}</span>
+        <span class="badge ${c.active?'b-active':'b-draft'}" style="cursor:pointer" onclick="toggleInfluencerPromo(${infId},${c.id})">${c.active?'Active':'Off'}</span>
+        <button class="btn-ghost btn-sm" onclick="removeInfluencerPromo(${infId},${c.id})" style="color:var(--red);padding:2px 6px"><i class="ti ti-trash" style="font-size:12px"></i></button>
+      </div>`).join('');
+  }
+  document.getElementById('np-code').value='';
+  document.getElementById('np-discount').value='';
+}
+function toggleInfluencerPromo(infId,codeId){
+  const inf=S.influencers.find(i=>i.id===infId); if(!inf)return;
+  const code=inf.promoCodes.find(c=>c.id===codeId); if(!code)return;
+  code.active=!code.active; persist();
+  const list=document.getElementById(`promo-list-${infId}`);
+  if(list){
+    list.innerHTML=inf.promoCodes.map(c=>`
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--border)">
+        <span class="promo-code" style="font-size:12px">${esc(c.code)}</span>
+        <span style="flex:1;font-size:12px;color:var(--text2)">${esc(c.discount)}</span>
+        <span class="badge ${c.active?'b-active':'b-draft'}" style="cursor:pointer" onclick="toggleInfluencerPromo(${infId},${c.id})">${c.active?'Active':'Off'}</span>
+        <button class="btn-ghost btn-sm" onclick="removeInfluencerPromo(${infId},${c.id})" style="color:var(--red);padding:2px 6px"><i class="ti ti-trash" style="font-size:12px"></i></button>
+      </div>`).join('');
+  }
+}
+function removeInfluencerPromo(infId,codeId){
+  const inf=S.influencers.find(i=>i.id===infId); if(!inf)return;
+  inf.promoCodes=inf.promoCodes.filter(c=>c.id!==codeId); persist();
+  const list=document.getElementById(`promo-list-${infId}`);
+  if(list){
+    list.innerHTML=inf.promoCodes.length
+      ? inf.promoCodes.map(c=>`
+          <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--border)">
+            <span class="promo-code" style="font-size:12px">${esc(c.code)}</span>
+            <span style="flex:1;font-size:12px;color:var(--text2)">${esc(c.discount)}</span>
+            <span class="badge ${c.active?'b-active':'b-draft'}" style="cursor:pointer" onclick="toggleInfluencerPromo(${infId},${c.id})">${c.active?'Active':'Off'}</span>
+            <button class="btn-ghost btn-sm" onclick="removeInfluencerPromo(${infId},${c.id})" style="color:var(--red);padding:2px 6px"><i class="ti ti-trash" style="font-size:12px"></i></button>
+          </div>`).join('')
+      : '<div style="font-size:12px;color:var(--text3);padding:4px 0">No codes yet.</div>';
+  }
+}
+function saveReminder(infId){
+  const inf=S.influencers.find(i=>i.id===infId); if(!inf)return;
+  const date=document.getElementById('rm-date').value;
+  const note=document.getElementById('rm-note').value.trim();
+  inf.reminder = date ? {date, note:note||'Reminder', auto:false} : null;
+  persist(); closeModal(); render();
+}
+function clearReminder(infId){
+  const inf=S.influencers.find(i=>i.id===infId); if(!inf)return;
+  inf.reminder=null; persist(); closeModal(); render();
+}
+function saveGlobalPromo(){
+  const code=document.getElementById('gpc-code').value.trim().toUpperCase(); if(!code)return;
+  S.promoCodes.push({id:Date.now(),code,discount:document.getElementById('gpc-discount').value.trim()||'—',type:'community',active:true,notes:document.getElementById('gpc-notes').value.trim(),influencerId:null});
+  persist(); closeModal(); render();
+}
+function toggleGlobalPromo(id){
+  const c=S.promoCodes.find(x=>x.id===id); if(c){c.active=!c.active;persist();render();}
+}
+function deleteGlobalPromo(id){
+  S.promoCodes=S.promoCodes.filter(x=>x.id!==id); persist(); render();
+}
+function savePost(){
+  const title=document.getElementById('m-title').value.trim(); if(!title)return;
+  const now=new Date();
+  S.social.unshift({id:Date.now(),title,platform:document.getElementById('m-plat').value,submittedBy:S.profile.name||'Me',status:'Pending approval',date:`${now.toLocaleString('default',{month:'short'})} ${now.getDate()}`,copy:document.getElementById('m-copy').value||'',file:document.getElementById('m-file').value||'No attachment',imageUrl:(document.getElementById('m-img')||{}).value?.trim()||'',driveUrl:(document.getElementById('m-drive')||{}).value?.trim()||'',revNotes:[]});
+  const count=S.social.filter(s=>s.status==='Pending approval').length;
+  const badge=document.getElementById('social-badge');
+  if(badge){badge.textContent=count;badge.style.display='';}
+  persist(); S.socialTab='pending'; closeModal(); render();
+}
+function saveNewsletter(){
+  const sub=document.getElementById('m-subject').value.trim(); if(!sub)return;
+  S.newsletters.push({id:Date.now(),subject:sub,status:document.getElementById('m-status').value,sentDate:document.getElementById('m-date').value||'—',opens:0,clicks:0,openRate:0,roi:'—',segment:document.getElementById('m-seg').value||'TBD',brief:document.getElementById('m-brief').value||'',driveUrl:(document.getElementById('m-nl-drive')||{}).value?.trim()||''});
+  persist(); closeModal(); render();
+}
+function saveEvent(){
+  const name=document.getElementById('m-name').value.trim(); if(!name)return;
+  const recType=(document.getElementById('m-recurring')||{}).value||'none';
+  S.events.push({id:Date.now(),name,location:document.getElementById('m-loc').value||'TBD',date:document.getElementById('m-date').value||'',status:'Planned',budget:parseInt(document.getElementById('m-budget').value)||0,spent:0,attendees:parseInt(document.getElementById('m-att').value)||0,type:document.getElementById('m-type').value,owner:S.profile.name||'Me',brief:document.getElementById('m-brief').value||'',meetLink:document.getElementById('m-meet').value.trim()||'',recurring:recType!=='none',recurringType:recType});
+  persist(); closeModal(); render();
+}
+function savePartner(){
+  const name=document.getElementById('m-name').value.trim(); if(!name)return;
+  S.partners.push({id:Date.now(),name,type:document.getElementById('m-type').value||'General',location:document.getElementById('m-loc').value||'TBD',status:'Planned',events:0,media:document.getElementById('m-media').value||'TBD',kpi:'—',notes:document.getElementById('m-notes').value||''});
+  persist(); closeModal(); render();
+}
+function saveFile() {
+  const name = document.getElementById('m-name').value.trim();
+  if (!name) { alert('Please enter a file name.'); return; }
+  const driveUrl = document.getElementById('m-drive-url').value.trim();
+  const now = new Date();
+  S.files.unshift({
+    id: Date.now(), name,
+    type:    document.getElementById('m-ftype').value,
+    module:  document.getElementById('m-module').value,
+    uploaded:`${now.toLocaleString('default',{month:'short'})} ${now.getDate()}`,
+    by:      S.profile?.name || 'Me',
+    size:    document.getElementById('m-size').value.trim() || '—',
+    driveUrl
+  });
+  persist(); closeModal(); render();
+}
+function deleteFile(id) {
+  if (!confirm('Remove this file?')) return;
+  S.files = S.files.filter(x => x.id !== id);
+  persist(); render();
+}
+function viewSavedReport(id){
+  const f=S.files.find(x=>x.id===id); if(!f||!f._reportHtml)return;
+  const wrap=document.getElementById('modalOverlay'), box=document.getElementById('modalBox');
+  box.innerHTML=`<h3 style="display:flex;align-items:center;gap:8px"><i class="ti ti-file-analytics" style="color:var(--accent)"></i> ${esc(f.name)}</h3>
+    <div style="max-height:65vh;overflow-y:auto;margin:-4px -6px;padding:4px 6px">${f._reportHtml}</div>
+    <div class="modal-footer"><button onclick="closeModal()">Close</button><button class="btn-primary" onclick="printReport()"><i class="ti ti-printer"></i> Print / Save PDF</button></div>`;
+  wrap.classList.add('open');
+}
+
+// ── AI KPI Report ─────────────────────────────────────────
+async function generateKPIReport() {
+  const q = window._kpiQ || 'Q2';
+  const qNums = {Q1:['01','02','03'],Q2:['04','05','06'],Q3:['07','08','09'],Q4:['10','11','12']};
+  const qM = qNums[q]||qNums.Q2;
+  const qNL = S.newsletters.filter(n=>n.sentDate&&n.sentDate!=='—'&&qM.includes(n.sentDate.slice(5,7)));
+  const qEvts = S.events.filter(e=>e.date&&qM.includes(e.date.slice(5,7)));
+  const activeInf = S.influencers.filter(i=>i.stage==='Serviced'||i.stage==='Paid');
+  const roiInf = S.influencers.filter(i=>i.roi>0);
+  const kpiData = {
+    quarter:`${q} 2026`,
+    influencers:{total:S.influencers.length,active:activeInf.length,totalFollowers:S.influencers.reduce((a,i)=>a+i.followers,0),totalFees:S.influencers.reduce((a,i)=>a+i.fee,0),avgROI:roiInf.length?(roiInf.reduce((a,i)=>a+i.roi,0)/roiInf.length).toFixed(2)+'x':'n/a',stages:STAGES.map(s=>({stage:s,count:S.influencers.filter(i=>i.stage===s).length}))},
+    social:{total:S.social.length,approved:S.social.filter(s=>s.status==='Approved').length,pending:S.social.filter(s=>s.status==='Pending approval').length,platforms:[...new Set(S.social.map(s=>s.platform))]},
+    newsletters:{sent:qNL.filter(n=>n.status==='Sent').length,totalOpens:qNL.reduce((a,n)=>a+n.opens,0),totalClicks:qNL.reduce((a,n)=>a+n.clicks,0),avgOpenRate:qNL.filter(n=>n.openRate>0).length?Math.round(qNL.filter(n=>n.openRate>0).reduce((a,n)=>a+n.openRate,0)/qNL.filter(n=>n.openRate>0).length)+'%':'0%'},
+    events:{total:qEvts.length,upcoming:qEvts.filter(e=>e.status!=='Done').length,totalAttendees:qEvts.reduce((a,e)=>a+e.attendees,0),totalBudget:qEvts.reduce((a,e)=>a+e.budget,0),totalSpent:qEvts.reduce((a,e)=>a+e.spent,0)},
+    partners:{active:S.partners.filter(p=>p.status==='Active').length,total:S.partners.length},
+    todos:{open:S.todos.filter(t=>!t.done).length,overdue:S.todos.filter(t=>!t.done&&t.dueDate<TODAY).length,done:S.todos.filter(t=>t.done).length},
+  };
+  const wrap=document.getElementById('modalOverlay'), box=document.getElementById('modalBox');
+  box.innerHTML=`<h3><i class="ti ti-file-analytics"></i> Generating ${q} 2026 KPI Report…</h3>
+    <div style="display:flex;align-items:center;gap:14px;padding:24px 0">
+      <div style="width:24px;height:24px;border:2.5px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0"></div>
+      <div style="color:var(--text2);font-size:13px">Analyzing data and generating AI insights…</div>
+    </div>`;
+  wrap.classList.add('open');
+  let insights='';
+  try {
+    const res=await fetch('/api/kpi-report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kpiData,quarter:`${q} 2026`})});
+    if(res.ok){const d=await res.json();insights=d.insights||'';}
+    else insights='Deploy to Vercel with ANTHROPIC_API_KEY set to enable AI insights.';
+  } catch(e){insights='Add ANTHROPIC_API_KEY to Vercel environment variables to enable AI insights.';}
+  const reportDate=new Date().toLocaleDateString('default',{month:'long',day:'numeric',year:'numeric'});
+  const reportHtml=`<div style="font-family:var(--font,sans-serif)">
+    <div style="font-size:20px;font-weight:700;margin-bottom:2px">Marketing KPI Report — ${q} 2026</div>
+    <div style="color:var(--text2,#666);margin-bottom:18px;font-size:12px">Generated ${reportDate} · Solve All Pest / Solve Branding</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      <div style="border:1px solid var(--border,#e5e5e5);border-radius:8px;padding:12px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;color:var(--accent,#046c5e)">Influencers</div>
+        <div style="font-size:13px;line-height:1.8"><b>${kpiData.influencers.active}</b> active / ${kpiData.influencers.total} total<br><b>${fmt(kpiData.influencers.totalFollowers)}</b> combined followers<br>$${kpiData.influencers.totalFees.toLocaleString()} in fees · ${kpiData.influencers.avgROI} avg ROI</div>
+      </div>
+      <div style="border:1px solid var(--border,#e5e5e5);border-radius:8px;padding:12px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;color:#046c5e">Social Content (${q})</div>
+        <div style="font-size:13px;line-height:1.8"><b>${kpiData.social.approved}</b> posts approved<br><b>${kpiData.social.pending}</b> pending review<br>${kpiData.social.platforms.join(', ')}</div>
+      </div>
+      <div style="border:1px solid var(--border,#e5e5e5);border-radius:8px;padding:12px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;color:#046c5e">Newsletters (${q})</div>
+        <div style="font-size:13px;line-height:1.8"><b>${kpiData.newsletters.sent}</b> sent · <b>${kpiData.newsletters.avgOpenRate}</b> avg open rate<br>${kpiData.newsletters.totalOpens.toLocaleString()} opens · ${kpiData.newsletters.totalClicks.toLocaleString()} clicks</div>
+      </div>
+      <div style="border:1px solid var(--border,#e5e5e5);border-radius:8px;padding:12px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;color:#046c5e">Events (${q})</div>
+        <div style="font-size:13px;line-height:1.8"><b>${kpiData.events.upcoming}</b> upcoming · ${kpiData.events.totalAttendees.toLocaleString()} attendees<br>$${kpiData.events.totalSpent.toLocaleString()} spent of $${kpiData.events.totalBudget.toLocaleString()} budget<br><b>${kpiData.partners.active}</b> active community partners</div>
+      </div>
+    </div>
+    <div style="border:1px solid var(--border,#e5e5e5);border-radius:8px;padding:14px;background:var(--surface2,#f6f6f4)">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--accent,#046c5e);margin-bottom:10px">⚡ AI Analytics Insights</div>
+      <div style="font-size:13px;line-height:1.85;white-space:pre-wrap">${esc(insights)}</div>
+    </div>
+  </div>`;
+  const now2=new Date();
+  S.files.unshift({id:Date.now(),name:`KPI Report — ${q} 2026.pdf`,type:'Report',module:'KPIs',uploaded:now2.toLocaleString('default',{month:'short'})+' '+now2.getDate(),by:S.profile.name||'Me',size:'Generated',_reportHtml:reportHtml});
+  persist();
+  box.innerHTML=`<h3 style="display:flex;align-items:center;gap:8px"><i class="ti ti-file-analytics" style="color:var(--accent)"></i> ${q} 2026 KPI Report</h3>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:14px">Generated ${reportDate} · Saved to Files & Briefs</div>
+    <div style="max-height:58vh;overflow-y:auto;padding-right:4px">${reportHtml}</div>
+    <div class="modal-footer">
+      <button onclick="closeModal()">Close</button>
+      <button class="btn-sm" onclick="closeModal();nav('files')"><i class="ti ti-folder"></i> View in Files</button>
+      <button class="btn-primary" onclick="printReport()"><i class="ti ti-printer"></i> Print / Save PDF</button>
+    </div>`;
+}
+function printReport(){
+  const content=document.querySelector('#modalBox > div[style*="max-height"]')?.innerHTML||document.querySelector('#modalBox > div')?.innerHTML||'';
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><title>KPI Report — Solve All Pest</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>*{box-sizing:border-box}body{font-family:Poppins,sans-serif;max-width:760px;margin:40px auto;color:#1a1a1a;font-size:13px;line-height:1.6;padding:0 20px}b{font-weight:600}@media print{body{margin:20px}}</style>
+    </head><body>${content}</body></html>`);
+  win.document.close();
+  setTimeout(()=>win.print(),600);
+}
+// Spin animation for report loader
+if(!document.getElementById('spin-style')){const s=document.createElement('style');s.id='spin-style';s.textContent='@keyframes spin{to{transform:rotate(360deg)}}';document.head.appendChild(s);}
+
+// ── Edit / delete handlers ────────────────────────────────
+function saveEditSocial(id){
+  const s=S.social.find(x=>x.id===id); if(!s)return;
+  s.title=document.getElementById('es-title').value.trim()||s.title;
+  s.platform=document.getElementById('es-plat').value;
+  s.status=document.getElementById('es-status').value;
+  s.copy=document.getElementById('es-copy').value;
+  s.imageUrl=document.getElementById('es-img').value.trim();
+  s.driveUrl=document.getElementById('es-drive').value.trim();
+  s.file=document.getElementById('es-file').value.trim()||s.file;
+  const count=S.social.filter(x=>x.status==='Pending approval').length;
+  const badge=document.getElementById('social-badge');
+  if(badge){badge.textContent=count;badge.style.display=count>0?'':'none';}
+  persist(); closeModal(); render();
+}
+function deletePost(id){
+  if(!confirm('Delete this post? This cannot be undone.'))return;
+  S.social=S.social.filter(x=>x.id!==id); persist(); closeModal(); render();
+}
+function saveEditNewsletter(id){
+  const n=S.newsletters.find(x=>x.id===id); if(!n)return;
+  n.subject=document.getElementById('en-sub').value.trim()||n.subject;
+  n.sentDate=document.getElementById('en-date').value||'—';
+  n.status=document.getElementById('en-status').value;
+  n.segment=document.getElementById('en-seg').value;
+  n.brief=document.getElementById('en-brief').value;
+  n.opens=parseInt(document.getElementById('en-opens').value)||0;
+  n.clicks=parseInt(document.getElementById('en-clicks').value)||0;
+  n.openRate=parseInt(document.getElementById('en-rate').value)||0;
+  n.roi=document.getElementById('en-roi').value.trim()||'—';
+  n.driveUrl=document.getElementById('en-drive').value.trim();
+  persist(); closeModal(); render();
+}
+function deleteNewsletter(id){
+  if(!confirm('Delete this newsletter? This cannot be undone.'))return;
+  S.newsletters=S.newsletters.filter(x=>x.id!==id); persist(); closeModal(); render();
+}
+function saveEditEvent(id){
+  const ev=S.events.find(x=>x.id===id); if(!ev)return;
+  ev.name=document.getElementById('ee-name').value.trim()||ev.name;
+  ev.location=document.getElementById('ee-loc').value||'TBD';
+  ev.date=document.getElementById('ee-date').value||ev.date;
+  ev.budget=parseInt(document.getElementById('ee-budget').value)||0;
+  ev.spent=parseInt(document.getElementById('ee-spent').value)||0;
+  ev.attendees=parseInt(document.getElementById('ee-att').value)||0;
+  ev.type=document.getElementById('ee-type').value;
+  ev.status=document.getElementById('ee-status').value;
+  ev.owner=document.getElementById('ee-owner').value.trim();
+  ev.meetLink=document.getElementById('ee-meet').value.trim();
+  ev.brief=document.getElementById('ee-brief').value;
+  ev.recurringType=document.getElementById('ee-rec').value;
+  ev.recurring=ev.recurringType!=='none';
+  persist(); closeModal(); render();
+}
+function deleteEvent(id){
+  if(!confirm('Delete this event? This cannot be undone.'))return;
+  S.events=S.events.filter(x=>x.id!==id); persist(); closeModal(); render();
+}
+function saveEditPartner(id){
+  const p=S.partners.find(x=>x.id===id); if(!p)return;
+  p.name=document.getElementById('ep-name').value.trim()||p.name;
+  p.type=document.getElementById('ep-type').value;
+  p.location=document.getElementById('ep-loc').value;
+  p.status=document.getElementById('ep-status').value;
+  p.events=parseInt(document.getElementById('ep-events').value)||0;
+  p.kpi=document.getElementById('ep-kpi').value.trim()||'—';
+  p.media=document.getElementById('ep-media').value;
+  p.notes=document.getElementById('ep-notes').value;
+  persist(); closeModal(); render();
+}
+function deletePartner(id){
+  if(!confirm('Delete this partner? This cannot be undone.'))return;
+  S.partners=S.partners.filter(x=>x.id!==id); persist(); closeModal(); render();
+}
+
+// ── User / session helpers ────────────────────────────────
+function persistUsers() {
+  localStorage.setItem('solve-users', JSON.stringify(S.users));
+}
+function getCurrentUser() {
+  return S.users.find(u => u.id === S.currentUserId) || null;
+}
+function isAdmin() {
+  const u = getCurrentUser(); return u && u.role === 'admin';
+}
+
+// ── Login / logout ────────────────────────────────────────
+function showLogin() {
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('main-app').style.display = 'none';
+  renderLoginCards();
+}
+function renderLoginCards() {
+  const el = document.getElementById('login-cards');
+  if (!el) return;
+  el.innerHTML = S.users.map(u => `
+    <div class="login-card" onclick="loginAs('${u.id}')">
+      <div class="login-av" style="background:${u.color||'var(--accent)'}">${ini(u.name)}</div>
+      <div class="login-name">${esc(u.name)}</div>
+      <div class="login-title">${esc(u.title)}</div>
+      <div class="login-role-chip">${u.role==='admin'?'Full access':'Review access'}</div>
+    </div>`).join('');
+}
+function loginAs(userId) {
+  const u = S.users.find(x => x.id === userId);
+  if (!u) return;
+  S.currentUserId = userId;
+  sessionStorage.setItem('solve-session', userId);
+  S.profile = { id: u.id, name: u.name, title: u.title, email: u.email, phone: u.phone||'', location: u.location||'', bio: u.bio||'' };
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('main-app').style.display = 'flex';
+  updateProfileUI();
+  render();
+}
+function logout() {
+  S.currentUserId = null;
+  sessionStorage.removeItem('solve-session');
+  showLogin();
+}
+
+// ── User management modals ────────────────────────────────
+function openAddUserModal(editId) {
+  const u = editId ? S.users.find(x => x.id === editId) : null;
+  const wrap = document.getElementById('modalOverlay'), box = document.getElementById('modalBox');
+  box.innerHTML = `<h3>${u ? 'Edit user' : 'Add user'}</h3>
+    <div class="fg-row">
+      <div class="fg"><label>Full name</label><input id="u-name" value="${esc(u?.name||'')}" placeholder="Full name"></div>
+      <div class="fg"><label>Job title</label><input id="u-title" value="${esc(u?.title||'')}" placeholder="e.g. Owner"></div>
+    </div>
+    <div class="fg"><label>Email</label><input id="u-email" type="email" value="${esc(u?.email||'')}" placeholder="name@solveallpest.com"></div>
+    <div class="fg"><label>Access level</label>
+      <select id="u-role">
+        <option value="admin" ${(!u||u.role==='admin')?'selected':''}>Admin — full access (add, edit, manage everything)</option>
+        <option value="owner" ${u?.role==='owner'?'selected':''}>Owner — review access (approve content, view data, read-only)</option>
+      </select>
+    </div>
+    <div class="fg"><label>Avatar color</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+        ${['#046c5e','#223241','#7bc796','#534ab7','#854f0b','#a32d2d','#185fa5'].map(c=>`
+          <div onclick="document.getElementById('u-color').value='${c}';document.querySelectorAll('.color-swatch').forEach(s=>s.style.outline='none');this.style.outline='2px solid #fff'"
+            class="color-swatch" style="width:28px;height:28px;border-radius:50%;background:${c};cursor:pointer;${(u?.color||'#046c5e')===c?'outline:2px solid #fff':''}"></div>`).join('')}
+      </div>
+      <input type="hidden" id="u-color" value="${u?.color||'#046c5e'}">
+    </div>
+    ${u ? `<div style="margin-top:4px"><button class="btn-danger btn-sm" onclick="deleteUser('${u.id}')"><i class="ti ti-trash"></i> Remove user</button></div>` : ''}
+    <div class="modal-footer">
+      <button onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="${u?`saveEditUser('${u.id}')`:'saveNewUser()'}">${u?'Save changes':'Add user'}</button>
+    </div>`;
+  wrap.classList.add('open');
+}
+function saveNewUser() {
+  const name = document.getElementById('u-name').value.trim(); if (!name) return;
+  S.users.push({ id: 'u'+Date.now(), name, title: document.getElementById('u-title').value.trim(),
+    email: document.getElementById('u-email').value.trim(), role: document.getElementById('u-role').value,
+    color: document.getElementById('u-color').value });
+  persistUsers(); closeModal();
+  renderLoginCards();
+  if (S.view === 'users') render();
+}
+function saveEditUser(id) {
+  const u = S.users.find(x => x.id === id); if (!u) return;
+  u.name  = document.getElementById('u-name').value.trim();
+  u.title = document.getElementById('u-title').value.trim();
+  u.email = document.getElementById('u-email').value.trim();
+  u.role  = document.getElementById('u-role').value;
+  u.color = document.getElementById('u-color').value;
+  if (S.currentUserId === id) {
+    S.profile.name = u.name; S.profile.title = u.title; S.profile.email = u.email;
+    saveProfile();
+  }
+  persistUsers(); closeModal(); renderLoginCards();
+  if (S.view === 'users' || S.view === 'profile') render();
+}
+function deleteUser(id) {
+  if (S.currentUserId === id) { alert("You can't delete the account you're logged in as."); return; }
+  S.users = S.users.filter(u => u.id !== id);
+  persistUsers(); closeModal(); renderLoginCards();
+  if (S.view === 'users') render();
+}
+
+// ── Manage-users modal (from login screen) ────────────────
+function openManageUsersFromLogin() {
+  const wrap = document.getElementById('modalOverlay'), box = document.getElementById('modalBox');
+  box.innerHTML = `<h3>Manage users</h3>
+    ${S.users.map(u=>`
+      <div class="user-card">
+        <div class="login-av" style="background:${u.color};width:38px;height:38px;font-size:13px;flex-shrink:0">${ini(u.name)}</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:500">${esc(u.name)}</div>
+          <div style="font-size:12px;color:var(--text2)">${esc(u.title)} · ${u.role==='admin'?'Full access':'Review access'}</div>
+        </div>
+        <button class="btn-sm" onclick="closeModal();openAddUserModal('${u.id}')"><i class="ti ti-edit"></i></button>
+      </div>`).join('')}
+    <button class="btn-primary btn-sm" style="margin-top:10px;width:100%;justify-content:center" onclick="closeModal();openAddUserModal()"><i class="ti ti-plus"></i> Add user</button>
+    <div class="modal-footer"><button onclick="closeModal()">Close</button></div>`;
+  wrap.classList.add('open');
+}
+
+// ── Render users page ─────────────────────────────────────
+function renderUsers() {
+  return `
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+    <div style="font-size:13px;color:var(--text2)">${S.users.length} users</div>
+    <button class="btn-primary btn-sm" onclick="openAddUserModal()"><i class="ti ti-plus"></i> Add user</button>
+  </div>
+  ${S.users.map(u=>`
+    <div class="user-card">
+      <div class="login-av" style="background:${u.color};width:46px;height:46px;font-size:16px;flex-shrink:0;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--mono);font-weight:500">${ini(u.name)}</div>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:500">${esc(u.name)} ${u.id===S.currentUserId?'<span style="font-size:11px;color:var(--text3)">(you)</span>':''}</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:2px">${esc(u.title)}</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:1px">${esc(u.email)}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        <span class="badge ${u.role==='admin'?'b-active':'b-purple'}">${u.role==='admin'?'Admin':'Owner'}</span>
+        <button class="btn-sm" onclick="openAddUserModal('${u.id}')"><i class="ti ti-edit"></i> Edit</button>
+      </div>
+    </div>`).join('')}`;
+}
+
+// ── Patch openModal to handle manageUsers ─────────────────
+const _origOpenModal = openModal;
+window.openModal = function(type, id) {
+  if (type === 'manageUsers') { openManageUsersFromLogin(); return; }
+  if (type === 'addUser') { openAddUserModal(); return; }
+  if (type === 'editUser') { openAddUserModal(id); return; }
+  _origOpenModal(type, id);
+};
+
+// ── Patch nav for users page ──────────────────────────────
+const _origNav = nav;
+window.nav = function(view) {
+  if (view === 'users') {
+    S.view = 'users';
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(el => { if(el.getAttribute('onclick')===`nav('users')`) el.classList.add('active'); });
+    document.getElementById('page-title').textContent = 'Users';
+    document.getElementById('content-area').innerHTML = renderUsers();
+    window.scrollTo(0,0);
+    return;
+  }
+  _origNav(view);
+};
+
+// ── Patch render to respect role access ───────────────────
+const _origRender = render;
+window.render = function() {
+  const u = getCurrentUser();
+  if (u && u.role === 'owner') {
+    // Hide add buttons for owners — they see everything but can't add records
+    _origRender();
+    document.querySelectorAll('.btn-primary.btn-sm').forEach(btn => {
+      const txt = btn.textContent.trim();
+      if (txt.startsWith('Add') || txt.startsWith('Submit') || txt.startsWith('New') || txt.startsWith('Upload')) {
+        btn.style.display = 'none';
+      }
+    });
+  } else {
+    _origRender();
+  }
+};
+
+// ── Init ──────────────────────────────────────────────────
+// Add Users link to nav
+(function addUsersNav() {
+  const profileItem = document.querySelector('.nav-item[onclick="nav(\'profile\')"]');
+  if (profileItem) {
+    const usersItem = document.createElement('div');
+    usersItem.className = 'nav-item';
+    usersItem.setAttribute('onclick', "nav('users')");
+    usersItem.innerHTML = '<i class="ti ti-users"></i>Users';
+    profileItem.parentNode.insertBefore(usersItem, profileItem);
+  }
+})();
+
+if (S.currentUserId && S.users.find(u => u.id === S.currentUserId)) {
+  const u = getCurrentUser();
+  S.profile = { id: u.id, name: u.name, title: u.title, email: u.email, phone: u.phone||'', location: u.location||'', bio: u.bio||'' };
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('main-app').style.display = 'flex';
+  updateProfileUI();
+  render();
+} else {
+  showLogin();
+}
+</script>
+</body>
+</html>
