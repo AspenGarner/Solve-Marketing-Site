@@ -114,7 +114,7 @@ label{font-size:12px;color:var(--text2);display:block;margin-bottom:4px;font-wei
 .kpi-up{color:var(--green)}.kpi-dn{color:var(--red)}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
 .cal-day-hdr{text-align:center;font-size:11px;color:var(--text3);padding:5px 0;font-weight:500;text-transform:uppercase;letter-spacing:.04em}
-.cal-day{min-height:58px;max-height:90px;overflow:hidden;border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:5px 7px;font-size:11px;background:var(--surface)}
+.cal-day{min-height:58px;border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:5px 7px;font-size:11px;background:var(--surface)}
 .cal-compact .cal-day{min-height:36px;max-height:62px;overflow:hidden;padding:3px 4px;font-size:10px}
 .cal-compact .cal-num{font-size:10px;margin-bottom:1px}
 .cal-compact .cal-event{font-size:9px;padding:0 3px}
@@ -1183,7 +1183,8 @@ function moveStage(id, stage) {
   if (stage === 'Needs to be paid') {
     // Auto-add payment event to Marketing OS calendar (7 days from today)
     const payDate = dateOffsetStr(7);
-    const eventName = `Pay ${inf.instagramHandle||inf.name}`;
+    const displayName = [inf.firstName,inf.lastName].filter(Boolean).join(' ') || inf.fullName || inf.instagramHandle || inf.name;
+    const eventName = `Needs to be Paid Reminder: ${displayName} · $${inf.fee.toLocaleString()}`;
     const alreadyExists = S.events.some(e=>e.name===eventName&&e.date===payDate);
     if (!alreadyExists) {
       S.events.push({
@@ -1632,9 +1633,9 @@ function buildCalMonth(yr, mo, compact) {
     const compactDayStyle = compact ? 'min-height:32px;padding:2px 3px;font-size:9px' : '';
     const compactNumStyle = compact ? 'font-size:9px;margin-bottom:1px' : '';
     const compactEvStyle  = compact ? 'font-size:8px;padding:0 2px;margin-bottom:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap' : '';
-    const MAX_EVS = compact ? 2 : 3;
+    const MAX_EVS = compact ? 2 : evs.length;
     const visEvs = evs.slice(0, MAX_EVS);
-    const moreCount = evs.length - MAX_EVS;
+    const moreCount = compact ? evs.length - MAX_EVS : 0;
     cells+=`<div class="cal-day${isToday?' today':''}" style="${compactDayStyle}" onclick="openModal('todo','${dateStr}')" title="Add task for ${dateStr}">
       <div class="cal-num" style="${compactNumStyle}">${d}</div>
       ${visEvs.map(e=>`<div class="cal-event ${e.cls}" style="${compactEvStyle}" title="${esc(e.label)}" ${e.todoId?`onclick="event.stopPropagation();openModal('todo_edit',${e.todoId})" style="cursor:pointer;${compactEvStyle}"`:''}>
