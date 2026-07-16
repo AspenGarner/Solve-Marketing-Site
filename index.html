@@ -114,8 +114,8 @@ label{font-size:12px;color:var(--text2);display:block;margin-bottom:4px;font-wei
 .kpi-up{color:var(--green)}.kpi-dn{color:var(--red)}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
 .cal-day-hdr{text-align:center;font-size:11px;color:var(--text3);padding:5px 0;font-weight:500;text-transform:uppercase;letter-spacing:.04em}
-.cal-day{min-height:58px;border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:5px 7px;font-size:11px;background:var(--surface)}
-.cal-compact .cal-day{min-height:36px;padding:3px 4px;font-size:10px}
+.cal-day{min-height:58px;max-height:90px;overflow:hidden;border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:5px 7px;font-size:11px;background:var(--surface)}
+.cal-compact .cal-day{min-height:36px;max-height:62px;overflow:hidden;padding:3px 4px;font-size:10px}
 .cal-compact .cal-num{font-size:10px;margin-bottom:1px}
 .cal-compact .cal-event{font-size:9px;padding:0 3px}
 .cal-compact .cal-day-hdr{font-size:9px;padding:3px 0}
@@ -238,7 +238,7 @@ label{font-size:12px;color:var(--text2);display:block;margin-bottom:4px;font-wei
 
 <!-- ── Login Screen ────────────────────────────────────── -->
 <div class="login-screen" id="login-screen">
-  <div class="login-logo">Solve Branding</div>
+  <div class="login-logo">Solve Marketing</div>
   <div class="login-sub">Marketing OS · v2.0</div>
   <div class="login-prompt">Select your profile to continue</div>
   <div class="login-cards" id="login-cards"></div>
@@ -1207,11 +1207,27 @@ function moveStage(id, stage) {
     toast.id = 'pay-toast';
     toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--amber);color:var(--text1);padding:12px 18px;border-radius:var(--radius);font-size:12px;z-index:9999;box-shadow:0 4px 24px rgba(0,0,0,.2);font-family:var(--font);max-width:340px;width:90%';
     toast.innerHTML = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><i class="ti ti-cash" style="color:var(--amber);font-size:16px"></i><strong>Payment reminder created</strong></div>
-      <div style="color:var(--text2);margin-bottom:10px">Added to the Marketing OS calendar for ${payDate}. Send to Jayson's Gmail:</div>
+      <div style="color:var(--text2);margin-bottom:8px">Calendar event added for ${payDate}. Email reminder sending to Jayson…</div>
       <a href="${gcUrl}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:6px;background:var(--accent);color:#fff;padding:7px 14px;border-radius:var(--radius-sm);text-decoration:none;font-weight:500;font-size:12px"><i class="ti ti-brand-google"></i> Add to Jayson's Google Calendar</a>
       <button onclick="document.getElementById('pay-toast').remove()" style="position:absolute;top:8px;right:10px;background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px">×</button>`;
     document.body.appendChild(toast);
     setTimeout(()=>{const t=document.getElementById('pay-toast');if(t)t.remove();},15000);
+    // Send automated email to Jayson
+    const user = S.users?.find(u=>u.id===window._session?.userId);
+    fetch('/api/send-email', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        influencerName: [inf.firstName, inf.lastName].filter(Boolean).join(' ') || inf.fullName || inf.name,
+        instagramHandle: inf.instagramHandle || inf.name,
+        fee: inf.fee,
+        payDate,
+        addedBy: user?.name || 'Aspen',
+      })
+    }).then(r=>r.json()).then(d=>{
+      const t=document.getElementById('pay-toast');
+      if(t){const msg=t.querySelector('div:nth-child(2)');if(msg)msg.textContent=d.error?`Calendar event added for ${payDate}. Email error: ${d.error}`:`Calendar event added for ${payDate}. Email sent to Jayson ✓`;}
+    }).catch(()=>{});
   }
   persist(); render();
 }
@@ -1611,11 +1627,15 @@ function buildCalMonth(yr, mo, compact) {
     const compactDayStyle = compact ? 'min-height:32px;padding:2px 3px;font-size:9px' : '';
     const compactNumStyle = compact ? 'font-size:9px;margin-bottom:1px' : '';
     const compactEvStyle  = compact ? 'font-size:8px;padding:0 2px;margin-bottom:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap' : '';
+    const MAX_EVS = compact ? 2 : 3;
+    const visEvs = evs.slice(0, MAX_EVS);
+    const moreCount = evs.length - MAX_EVS;
     cells+=`<div class="cal-day${isToday?' today':''}" style="${compactDayStyle}" onclick="openModal('todo','${dateStr}')" title="Add task for ${dateStr}">
       <div class="cal-num" style="${compactNumStyle}">${d}</div>
-      ${evs.map(e=>`<div class="cal-event ${e.cls}" style="${compactEvStyle}" title="${esc(e.label)}" ${e.todoId?`onclick="event.stopPropagation();openModal('todo_edit',${e.todoId})" style="cursor:pointer;${compactEvStyle}"`:''}>
+      ${visEvs.map(e=>`<div class="cal-event ${e.cls}" style="${compactEvStyle}" title="${esc(e.label)}" ${e.todoId?`onclick="event.stopPropagation();openModal('todo_edit',${e.todoId})" style="cursor:pointer;${compactEvStyle}"`:''}>
         ${compact ? esc(e.label).slice(0,18)+(esc(e.label).length>18?'…':'') : esc(e.label)}${e.meet&&!compact?` <a href="${esc(e.meet)}" target="_blank" onclick="event.stopPropagation()" style="color:inherit" title="Join Meet">📹</a>`:''}
       </div>`).join('')}
+      ${moreCount>0?`<div style="font-size:9px;color:var(--text3);padding:1px 3px;font-weight:500">+${moreCount} more</div>`:''}
     </div>`;
   }
   const moLabel = new Date(yr,mo,1).toLocaleString('default',{month:'long'});
