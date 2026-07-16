@@ -1612,10 +1612,13 @@ function buildCalMonth(yr, mo, compact) {
     const isToday=yr===now.getFullYear()&&mo===now.getMonth()&&d===now.getDate();
     const dateStr=`${yr}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const evs=calEvs.filter(e=>e.day===d);
-    cells+=`<div class="cal-day${isToday?' today':''}" onclick="openModal('todo','${dateStr}')" title="Add task for ${dateStr}">
-      <div class="cal-num">${d}</div>
-      ${evs.map(e=>`<div class="cal-event ${e.cls}" title="${esc(e.label)}" ${e.todoId?`onclick="event.stopPropagation();openModal('todo_edit',${e.todoId})" style="cursor:pointer"`:''}>
-        ${esc(e.label)}${e.meet?` <a href="${esc(e.meet)}" target="_blank" onclick="event.stopPropagation()" style="color:inherit" title="Join Meet">📹</a>`:''}
+    const compactDayStyle = compact ? 'min-height:32px;padding:2px 3px;font-size:9px' : '';
+    const compactNumStyle = compact ? 'font-size:9px;margin-bottom:1px' : '';
+    const compactEvStyle  = compact ? 'font-size:8px;padding:0 2px;margin-bottom:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap' : '';
+    cells+=`<div class="cal-day${isToday?' today':''}" style="${compactDayStyle}" onclick="openModal('todo','${dateStr}')" title="Add task for ${dateStr}">
+      <div class="cal-num" style="${compactNumStyle}">${d}</div>
+      ${evs.map(e=>`<div class="cal-event ${e.cls}" style="${compactEvStyle}" title="${esc(e.label)}" ${e.todoId?`onclick="event.stopPropagation();openModal('todo_edit',${e.todoId})" style="cursor:pointer;${compactEvStyle}"`:''}>
+        ${compact ? esc(e.label).slice(0,18)+(esc(e.label).length>18?'…':'') : esc(e.label)}${e.meet&&!compact?` <a href="${esc(e.meet)}" target="_blank" onclick="event.stopPropagation()" style="color:inherit" title="Join Meet">📹</a>`:''}
       </div>`).join('')}
     </div>`;
   }
