@@ -997,15 +997,13 @@ function renderInfluencers() {
   // Apply quarter filter to the working set
   const qList = qFil === 'All' ? S.influencers : S.influencers.filter(i=>(i.quarter||'')===qFil);
   const fees   = qList.reduce((a,i)=>a+i.fee,0);
-  const roiL   = qList.filter(i=>i.roi>0);
-  const allCodes = S.influencers.flatMap(i=>i.promoCodes||[]).length + S.promoCodes.length;
   const quarters = ['Q1','Q2','Q3','Q4'];
   const stats = `
   <div class="stats">
     <div class="stat"><div class="stat-n">${qList.filter(i=>i.stage==='Serviced/Content Scheduled'||i.stage==='Paid').length}</div><div class="stat-l">${qFil==='All'?'Active':'Active in '+qFil}</div></div>
     <div class="stat"><div class="stat-n">${fmt(qList.reduce((a,i)=>a+i.followers,0))}</div><div class="stat-l">Total followers</div></div>
     <div class="stat"><div class="stat-n">$${(fees/1000).toFixed(1)}K</div><div class="stat-l">Total fees${qFil!=='All'?' ('+qFil+')':''}</div></div>
-    <div class="stat"><div class="stat-n">${allCodes}</div><div class="stat-l">Promo codes</div></div>
+    <div class="stat"><div class="stat-n">${qList.length}</div><div class="stat-l">Influencers${qFil!=='All'?' in '+qFil:''}</div></div>
   </div>`;
   const qBar = `
   <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:12px">
@@ -1018,7 +1016,6 @@ function renderInfluencers() {
     <div class="tab-bar" style="margin:0;border:none">
       <button class="tab ${tab==='board'?'active':''}" onclick="window._infTab='board';render()"><i class="ti ti-layout-columns"></i> Board</button>
       <button class="tab ${tab==='list'?'active':''}" onclick="window._infTab='list';render()"><i class="ti ti-list"></i> List</button>
-      <button class="tab ${tab==='promos'?'active':''}" onclick="window._infTab='promos';render()"><i class="ti ti-tag"></i> Promo codes</button>
     </div>
     <div style="display:flex;gap:6px;flex-wrap:wrap">
       <button id="sheets-sync-btn" class="btn-sm" onclick="loadInfluencersFromSheets()" title="Pull from Google Sheet"><i class="ti ti-table-import"></i> Sync Sheets</button>
@@ -1026,9 +1023,8 @@ function renderInfluencers() {
       <button class="btn-primary btn-sm" onclick="openModal('influencer')"><i class="ti ti-plus"></i> Add influencer</button>
     </div>
   </div>`;
-  if (tab === 'board') return stats + qBar + tabBar + renderInfluencerBoard(qList);
   if (tab === 'list')  return stats + qBar + tabBar + renderInfluencerList(qList);
-  return stats + qBar + tabBar + renderInfluencerPromos();
+  return stats + qBar + tabBar + renderInfluencerBoard(qList);
 }
 
 function renderInfluencerBoard(qList) {
@@ -1047,11 +1043,11 @@ function renderInfluencerBoard(qList) {
               <div class="kc-handle">${esc(inf.instagramHandle||inf.name)}</div>
               ${inf.quarter?`<span style="font-size:9px;font-weight:600;padding:1px 6px;border-radius:10px;background:var(--surface2);color:var(--text2);flex-shrink:0;margin-top:1px">${esc(inf.quarter)}</span>`:''}
             </div>
-            ${inf.fullName?`<div class="kc-name">${esc(inf.fullName)}</div>`:''}
+            ${(inf.firstName||inf.lastName||inf.fullName)?`<div class="kc-name">${esc((inf.firstName&&inf.lastName)?inf.firstName+' '+inf.lastName:(inf.firstName||inf.lastName||inf.fullName||''))}</div>`:''}
             <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">
               <span class="badge b-purple" style="font-size:10px">${inf.platform}</span>
               <span class="badge b-accent" style="font-size:10px">${inf.tier}</span>
-              ${(inf.promoCodes||[]).length?`<span class="badge b-blue" style="font-size:10px"><i class="ti ti-tag"></i> ${inf.promoCodes.length}</span>`:''}
+              ${inf.campaign?`<span class="badge b-draft" style="font-size:10px">${esc(inf.campaign)}</span>`:''}
             </div>
             <div class="kc-meta">
               <span>${fmt(inf.followers)}</span>
@@ -1108,7 +1104,7 @@ function renderInfluencerList(qList) {
         <div class="card-body">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <div class="card-title" style="margin:0">${esc(inf.instagramHandle||inf.name)}</div>
-            ${inf.fullName?`<span style="font-size:12px;color:var(--text2)">${esc(inf.fullName)}</span>`:''}
+            ${(inf.firstName||inf.lastName||inf.fullName)?`<span style="font-size:12px;color:var(--text2)">${esc((inf.firstName&&inf.lastName)?inf.firstName+' '+inf.lastName:(inf.firstName||inf.lastName||inf.fullName||''))}</span>`:''}
             <span class="badge" style="background:${STAGE_BG[inf.stage||'Messaged']};color:${STAGE_COLOR[inf.stage||'Messaged']}">${inf.stage||'Messaged'}</span>
             <span class="badge b-accent">${inf.tier}</span>
             ${inf.quarter?`<span class="badge b-draft">${esc(inf.quarter)}</span>`:''}
@@ -1118,12 +1114,13 @@ function renderInfluencerList(qList) {
             <span>${inf.platform}</span>
             ${inf.email?`<span><i class="ti ti-mail"></i>${esc(inf.email)}</span>`:''}
             ${inf.phone?`<span><i class="ti ti-phone"></i>${esc(inf.phone)}</span>`:''}
-            <span>Campaign: <strong>${esc(inf.campaign)}</strong></span>
-            ${inf.roi>0?`<span class="kpi-up"><i class="ti ti-trending-up"></i> ${inf.roi}x ROI</span>`:''}
+            ${inf.address?`<span><i class="ti ti-map-pin"></i>${esc(inf.address)}</span>`:''}
+            ${inf.campaign?`<span>Campaign: <strong>${esc(inf.campaign)}</strong></span>`:''}
+            ${inf.serviceDate?`<span><i class="ti ti-calendar"></i> Service: ${esc(inf.serviceDate)}</span>`:''}
+            ${inf.affiliateLink?`<span><i class="ti ti-link"></i> <a href="${esc(inf.affiliateLink)}" target="_blank" onclick="event.stopPropagation()" style="color:var(--blue)">Affiliate link</a></span>`:''}
             <span>Fee: <strong>$${inf.fee.toLocaleString()}</strong></span>
             ${inf.clicki?`<span style="color:var(--blue)"><i class="ti ti-cursor"></i> ${(inf.clicki.clicks||0).toLocaleString()} clicks</span><span style="color:var(--accent)"><i class="ti ti-repeat"></i> ${(inf.clicki.conversions||0).toLocaleString()} conv.</span><span style="color:var(--green)"><i class="ti ti-cash"></i> $${(inf.clicki.commission||0).toLocaleString()} earned</span>`:''}
           </div>
-          ${(inf.promoCodes||[]).length?`<div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap">${inf.promoCodes.map(c=>`<span class="badge ${c.active?'b-active':'b-draft'}" style="font-family:var(--mono);font-size:10px"><i class="ti ti-tag"></i> ${esc(c.code)}</span>`).join('')}</div>`:''}
           <div style="font-size:12px;color:var(--text3);margin-top:4px">${esc(inf.brief)}${inf.notes?' · '+esc(inf.notes):''}</div>
           <div style="margin-top:7px">${reminderChipHtml(inf)}</div>
           ${inf.reach>0?`<div class="prog-bar"><div class="prog-fill" style="width:${Math.min(100,Math.round(inf.reach/inf.followers*100))}%;background:var(--purple)"></div></div>`:''}
@@ -1773,12 +1770,20 @@ function openModal(type, id) {
     <div class="modal-footer"><button onclick="closeModal()">Cancel</button><button class="btn-primary" onclick="saveTodoEdit(${t.id})">Save</button></div>`;
   } else if(type==='influencer') {
     html=`<h3>Add influencer</h3>
-    <div class="fg-row"><div class="fg"><label>Instagram handle</label><input id="m-handle" placeholder="@handle"></div><div class="fg"><label>Full name</label><input id="m-fullname" placeholder="Real name (optional)"></div></div>
-    <div class="fg-row"><div class="fg"><label>Phone</label><input id="m-phone" placeholder="(801) 555-0100"></div><div class="fg"><label>Email</label><input id="m-email" type="email" placeholder="email@example.com"></div></div>
+    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Contact info</div>
+    <div class="fg-row"><div class="fg"><label>First name</label><input id="m-firstname" placeholder="First name"></div><div class="fg"><label>Last name</label><input id="m-lastname" placeholder="Last name"></div></div>
+    <div class="fg"><label>Instagram handle</label><input id="m-handle" placeholder="@handle"></div>
+    <div class="fg-row"><div class="fg"><label>Phone</label><input id="m-phone" placeholder="(555) 555-0100"></div><div class="fg"><label>Email</label><input id="m-email" type="email" placeholder="email@example.com"></div></div>
+    <div class="fg"><label>Address</label><input id="m-address" placeholder="Street, City, State ZIP"></div>
+    <div class="divider" style="margin:12px 0 14px"></div>
+    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Platform & pipeline</div>
     <div class="fg-row"><div class="fg"><label>Platform</label><select id="m-plat"><option>Instagram</option><option>TikTok</option><option>YouTube</option><option>Facebook</option><option>Pinterest</option></select></div><div class="fg"><label>Tier</label><select id="m-tier"><option>Nano</option><option>Micro</option><option>Mid</option><option>Macro</option><option>Mega</option></select></div></div>
-    <div class="fg-row"><div class="fg"><label>Followers</label><input id="m-followers" placeholder="50000"></div><div class="fg"><label>Fee ($)</label><input id="m-fee" placeholder="1000"></div></div>
+    <div class="fg-row"><div class="fg"><label>Following count</label><input id="m-followers" placeholder="50000"></div><div class="fg"><label>Fee ($)</label><input id="m-fee" placeholder="1000"></div></div>
     <div class="fg-row"><div class="fg"><label>Stage</label><select id="m-stage">${STAGES.map(s=>`<option>${s}</option>`).join('')}</select></div><div class="fg"><label>Quarter hired</label><select id="m-quarter"><option value="">— None —</option><option>Q1</option><option>Q2</option><option>Q3</option><option>Q4</option></select></div></div>
-    <div class="fg"><label>Campaign</label><input id="m-campaign" placeholder="Campaign name"></div>
+    <div class="divider" style="margin:12px 0 14px"></div>
+    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Campaign</div>
+    <div class="fg-row"><div class="fg"><label>Campaign</label><select id="m-campaign"><option value="">— Select —</option><option>In house Tampa</option><option>In house Orlando</option><option>Orlando Weekly</option></select></div><div class="fg"><label>Service date</label><input type="date" id="m-servicedate"></div></div>
+    <div class="fg"><label>Affiliate link</label><input id="m-affiliatelink" placeholder="https://…" type="url"></div>
     <div class="fg"><label>Brief / deliverables</label><textarea id="m-brief" placeholder="What are they creating?" style="min-height:56px"></textarea></div>
     <div class="fg"><label>Notes</label><input id="m-notes" placeholder="Any notes…"></div>
     <div class="modal-footer"><button onclick="closeModal()">Cancel</button><button class="btn-primary" onclick="saveInfluencer()"><i class="ti ti-check"></i> Add influencer</button></div>`;
@@ -1831,40 +1836,31 @@ function openModal(type, id) {
     <div class="modal-footer"><button onclick="closeModal()">Cancel</button><button class="btn-primary" onclick="saveFile()"><i class="ti ti-brand-google-drive"></i> Add file</button></div>`;
   } else if(type==='influencer_edit') {
     const inf=S.influencers.find(i=>i.id===id); if(!inf){closeModal();return;}
-    const promoRows=(inf.promoCodes||[]).map(c=>`
-      <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--border)">
-        <span class="promo-code" style="font-size:12px">${esc(c.code)}</span>
-        <span style="flex:1;font-size:12px;color:var(--text2)">${esc(c.discount)}</span>
-        <span class="badge ${c.active?'b-active':'b-draft'}" style="cursor:pointer" onclick="toggleInfluencerPromo(${inf.id},${c.id})">${c.active?'Active':'Off'}</span>
-        <button class="btn-ghost btn-sm" onclick="removeInfluencerPromo(${inf.id},${c.id})" style="color:var(--red);padding:2px 6px"><i class="ti ti-trash" style="font-size:12px"></i></button>
-      </div>`).join('');
+    const _firstName = inf.firstName || (inf.fullName?inf.fullName.split(' ')[0]:'');
+    const _lastName  = inf.lastName  || (inf.fullName?inf.fullName.split(' ').slice(1).join(' '):'');
+    const _campOpts  = ['In house Tampa','In house Orlando','Orlando Weekly'];
     html=`<h3 style="margin-bottom:18px">${esc(inf.instagramHandle||inf.name)}</h3>
     <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Contact info</div>
-    <div class="fg-row"><div class="fg"><label>Instagram handle</label><input id="ei-handle" value="${esc(inf.instagramHandle||inf.name)}"></div><div class="fg"><label>Full name</label><input id="ei-fullname" value="${esc(inf.fullName||'')}"></div></div>
+    <div class="fg-row"><div class="fg"><label>First name</label><input id="ei-firstname" value="${esc(_firstName)}"></div><div class="fg"><label>Last name</label><input id="ei-lastname" value="${esc(_lastName)}"></div></div>
+    <div class="fg"><label>Instagram handle</label><input id="ei-handle" value="${esc(inf.instagramHandle||inf.name)}"></div>
     <div class="fg-row"><div class="fg"><label>Phone</label><input id="ei-phone" value="${esc(inf.phone||'')}"></div><div class="fg"><label>Email</label><input id="ei-email" type="email" value="${esc(inf.email||'')}"></div></div>
+    <div class="fg"><label>Address</label><input id="ei-address" value="${esc(inf.address||'')}"></div>
     <div class="divider" style="margin:12px 0 14px"></div>
     <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Platform & pipeline</div>
     <div class="fg-row"><div class="fg"><label>Platform</label><select id="ei-plat">${['Instagram','TikTok','YouTube','Facebook','Pinterest'].map(p=>`<option${p===inf.platform?' selected':''}>${p}</option>`).join('')}</select></div><div class="fg"><label>Tier</label><select id="ei-tier">${['Nano','Micro','Mid','Macro','Mega'].map(t=>`<option${t===inf.tier?' selected':''}>${t}</option>`).join('')}</select></div></div>
-    <div class="fg-row"><div class="fg"><label>Followers</label><input id="ei-followers" value="${inf.followers}"></div><div class="fg"><label>Fee ($)</label><input id="ei-fee" value="${inf.fee}"></div></div>
+    <div class="fg-row"><div class="fg"><label>Following count</label><input id="ei-followers" value="${inf.followers}"></div><div class="fg"><label>Fee ($)</label><input id="ei-fee" value="${inf.fee}"></div></div>
     <div class="fg-row"><div class="fg"><label>Stage</label><select id="ei-stage">${STAGES.map(s=>`<option${s===(inf.stage||'Messaged')?' selected':''}>${s}</option>`).join('')}</select></div><div class="fg"><label>Quarter hired</label><select id="ei-quarter"><option value="">— None —</option>${['Q1','Q2','Q3','Q4'].map(q=>`<option${q===(inf.quarter||'')?' selected':''}>${q}</option>`).join('')}</select></div></div>
     <div class="divider" style="margin:12px 0 14px"></div>
     <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Campaign</div>
-    <div class="fg"><label>Campaign</label><input id="ei-campaign" value="${esc(inf.campaign)}"></div>
-    <div class="fg"><label>Brief / deliverables</label><textarea id="ei-brief" style="min-height:52px">${esc(inf.brief)}</textarea></div>
-    <div class="fg"><label>Notes</label><input id="ei-notes" value="${esc(inf.notes)}"></div>
+    <div class="fg-row"><div class="fg"><label>Campaign</label><select id="ei-campaign"><option value="">— Select —</option>${_campOpts.map(c=>`<option${c===(inf.campaign||'')?' selected':''}>${c}</option>`).join('')}</select></div><div class="fg"><label>Service date</label><input type="date" id="ei-servicedate" value="${esc(inf.serviceDate||'')}"></div></div>
+    <div class="fg"><label>Affiliate link</label><input id="ei-affiliatelink" type="url" value="${esc(inf.affiliateLink||'')}" placeholder="https://…"></div>
+    <div class="fg"><label>Brief / deliverables</label><textarea id="ei-brief" style="min-height:52px">${esc(inf.brief||'')}</textarea></div>
+    <div class="fg"><label>Notes</label><input id="ei-notes" value="${esc(inf.notes||'')}"></div>
     <div class="divider" style="margin:12px 0 14px"></div>
     <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">🔔 Reminder</div>
     <div class="fg-row">
       <div class="fg"><label>Date <span style="font-weight:400;color:var(--text3)">(leave blank to clear)</span></label><input type="date" id="ei-rem-date" value="${inf.reminder?.date||''}"></div>
       <div class="fg"><label>Note</label><input id="ei-rem-note" value="${esc(inf.reminder?.note||'')}" placeholder="e.g. Follow up, Check in…"></div>
-    </div>
-    <div class="divider" style="margin:12px 0 14px"></div>
-    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Promo codes <span style="font-weight:400;color:var(--text3);font-size:10px;text-transform:none">(${(inf.promoCodes||[]).length})</span></div>
-    <div id="promo-list-${inf.id}">${promoRows||'<div style="font-size:12px;color:var(--text3);padding:4px 0">No codes yet.</div>'}</div>
-    <div style="display:flex;gap:6px;margin-top:10px;align-items:flex-end">
-      <div class="fg" style="flex:1.2;margin:0"><label style="margin-bottom:3px">Code</label><input id="np-code" placeholder="e.g. JESSICA20" style="text-transform:uppercase"></div>
-      <div class="fg" style="flex:1.5;margin:0"><label style="margin-bottom:3px">Discount / offer</label><input id="np-discount" placeholder="e.g. 20% off first service"></div>
-      <button class="btn-primary btn-sm" style="height:36px;flex-shrink:0" onclick="addInfluencerPromo(${inf.id})"><i class="ti ti-plus"></i> Add</button>
     </div>
     <div class="modal-footer" style="margin-top:16px">
       <button class="btn-danger btn-sm" onclick="deleteInfluencer(${inf.id})"><i class="ti ti-trash"></i> Delete</button>
@@ -1993,21 +1989,28 @@ function toggleTodo(id){const t=S.todos.find(x=>x.id===id);if(t){t.done=!t.done;
 function deleteTodo(id){S.todos=S.todos.filter(t=>t.id!==id);persist();render();}
 function saveInfluencer(){
   const handle=document.getElementById('m-handle').value.trim(); if(!handle)return;
+  const firstName=document.getElementById('m-firstname').value.trim();
+  const lastName=document.getElementById('m-lastname').value.trim();
   S.influencers.push({
     id:Date.now(),
     name:handle,
     instagramHandle:handle,
-    fullName:document.getElementById('m-fullname').value.trim(),
+    firstName,
+    lastName,
+    fullName:[firstName,lastName].filter(Boolean).join(' '),
     phone:document.getElementById('m-phone').value.trim(),
     email:document.getElementById('m-email').value.trim(),
+    address:document.getElementById('m-address').value.trim(),
     platform:document.getElementById('m-plat').value,
     tier:document.getElementById('m-tier').value,
     followers:parseInt(document.getElementById('m-followers').value)||0,
     fee:parseInt(document.getElementById('m-fee').value)||0,
     stage:document.getElementById('m-stage').value||'Messaged',
     quarter:document.getElementById('m-quarter').value||'',
-    campaign:document.getElementById('m-campaign').value||'TBD',
-    brief:document.getElementById('m-brief').value||'—',
+    campaign:document.getElementById('m-campaign').value||'',
+    serviceDate:document.getElementById('m-servicedate').value||'',
+    affiliateLink:document.getElementById('m-affiliatelink').value.trim(),
+    brief:document.getElementById('m-brief').value||'',
     notes:document.getElementById('m-notes').value||'',
     reach:0, roi:0, promoCodes:[],
     reminder: (document.getElementById('m-stage').value||'Messaged') === 'Messaged' ? makeAutoReminder('Messaged') : null,
@@ -2017,10 +2020,15 @@ function saveInfluencer(){
 function saveInfluencerEdit(id){
   const inf=S.influencers.find(i=>i.id===id); if(!inf)return;
   const handle=document.getElementById('ei-handle').value.trim(); if(!handle)return;
+  const firstName=document.getElementById('ei-firstname').value.trim();
+  const lastName=document.getElementById('ei-lastname').value.trim();
   inf.name=handle; inf.instagramHandle=handle;
-  inf.fullName=document.getElementById('ei-fullname').value.trim();
+  inf.firstName=firstName;
+  inf.lastName=lastName;
+  inf.fullName=[firstName,lastName].filter(Boolean).join(' ');
   inf.phone=document.getElementById('ei-phone').value.trim();
   inf.email=document.getElementById('ei-email').value.trim();
+  inf.address=document.getElementById('ei-address').value.trim();
   inf.platform=document.getElementById('ei-plat').value;
   inf.tier=document.getElementById('ei-tier').value;
   inf.followers=parseInt(document.getElementById('ei-followers').value)||0;
@@ -2028,6 +2036,8 @@ function saveInfluencerEdit(id){
   inf.stage=document.getElementById('ei-stage').value;
   inf.quarter=document.getElementById('ei-quarter').value||'';
   inf.campaign=document.getElementById('ei-campaign').value;
+  inf.serviceDate=document.getElementById('ei-servicedate').value||'';
+  inf.affiliateLink=document.getElementById('ei-affiliatelink').value.trim();
   inf.brief=document.getElementById('ei-brief').value;
   inf.notes=document.getElementById('ei-notes').value;
   const remDate=document.getElementById('ei-rem-date').value;
@@ -2048,13 +2058,13 @@ async function syncClickiCard(id) {
   const btn = document.getElementById('clicki-btn-'+id);
   if (btn) { btn.innerHTML='<i class="ti ti-loader-2" style="animation:spin .8s linear infinite"></i>'; btn.disabled=true; }
   try {
-    // Use first active promo code, email, or handle as identifier
-    const promoCode   = (inf.promoCodes||[]).find(c=>c.active)?.code || (inf.promoCodes||[])[0]?.code || '';
+    // Use affiliate link, email, or ID as identifier
     const promoterEmail = inf.email || '';
+    const promoCode = '';
     const res = await fetch('/api/clicki', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ promoterId: String(inf.id), promoterEmail, promoCode })
+      body: JSON.stringify({ promoterId: String(inf.id), promoterEmail, promoCode, affiliateLink: inf.affiliateLink||'' })
     });
     const json = await res.json();
     if (json.error && !json.data) {
