@@ -128,6 +128,19 @@ label{font-size:12px;color:var(--text2);display:block;margin-bottom:4px;font-wei
 .ce-amber{background:var(--amber-bg);color:var(--amber)}
 .ce-purple{background:var(--purple-bg);color:var(--purple)}
 .ce-blue{background:var(--blue-bg);color:var(--blue)}
+.ce-teal{background:rgba(20,184,166,.15);color:#0d9488}
+.ce-orange{background:rgba(249,115,22,.15);color:#ea580c}
+.hamburger{display:flex;flex-direction:column;gap:4px;cursor:pointer;padding:6px;border-radius:6px;background:none;border:none;color:var(--text2)}
+.hamburger span{display:block;width:18px;height:2px;background:currentColor;border-radius:2px;transition:all .2s}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9;transition:opacity .2s}
+.sidebar-overlay.open{display:block}
+.sidebar.collapsed{transform:translateX(-220px)}
+@media print{
+  .sidebar,.topbar,.chat-panel,.chat-toggle,.modal-overlay,.topbar-right,.hamburger{display:none!important}
+  .main{margin-left:0!important}
+  body{background:#fff;color:#000}
+  .pdf-report{display:block!important}
+}
 /* Reminder chip on influencer cards */
 .reminder-chip{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:3px 7px;border-radius:20px;cursor:pointer;transition:all .12s;font-weight:500;white-space:nowrap}
 .reminder-chip.has-reminder{background:var(--blue-bg);color:var(--blue)}
@@ -264,6 +277,7 @@ label{font-size:12px;color:var(--text2);display:block;margin-bottom:4px;font-wei
   <div class="nav-label">Shared</div>
   <div class="nav-item" onclick="nav('calendar')"><i class="ti ti-calendar"></i>Calendar</div>
   <div class="nav-item" onclick="nav('files')"><i class="ti ti-folder"></i>Files &amp; briefs</div>
+  <div class="nav-item" onclick="nav('pdf')"><i class="ti ti-file-type-pdf"></i>PDF Generator</div>
   <div class="nav-item" onclick="nav('todos')"><i class="ti ti-checkbox"></i>To-Dos<span class="nav-badge" id="todos-badge" style="display:none">0</span></div>
   <div class="nav-label" style="margin-top:auto">Account</div>
   <div class="nav-item" onclick="nav('profile')"><i class="ti ti-user-circle"></i>My profile</div>
@@ -282,6 +296,7 @@ label{font-size:12px;color:var(--text2);display:block;margin-bottom:4px;font-wei
 <div class="main">
   <div class="topbar">
     <div style="display:flex;align-items:center;gap:10px">
+      <button class="hamburger" onclick="toggleSidebar()" title="Toggle menu"><span></span><span></span><span></span></button>
       <div class="page-title" id="page-title">Dashboard</div>
     </div>
     <div class="topbar-right">
@@ -300,6 +315,7 @@ label{font-size:12px;color:var(--text2);display:block;margin-bottom:4px;font-wei
 </div>
 </div>
 
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
 <div class="chat-panel" id="chatPanel">
   <div class="chat-header" onclick="toggleChat()">
     <div class="chat-header-left">
@@ -656,7 +672,7 @@ function updateTodosBadge() {
 // ── Nav ───────────────────────────────────────────────────
 const TITLES = {dashboard:'Dashboard',influencers:'Influencers',social:'Social content',
   newsletters:'Newsletters',events:'Events',partners:'Community partners',
-  kpis:'KPI dashboard',calendar:'Calendar',files:'Files & briefs',todos:'To-Dos',profile:'My profile'};
+  kpis:'KPI dashboard',calendar:'Calendar',files:'Files & briefs',todos:'To-Dos',profile:'My profile',pdf:'PDF Generator'};
 
 function nav(view) {
   S.view = view;
@@ -668,6 +684,12 @@ function nav(view) {
 }
 
 // ── Chat ──────────────────────────────────────────────────
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sidebar-overlay');
+  sb.classList.toggle('collapsed');
+  ov.classList.toggle('open', sb.classList.contains('collapsed') ? false : window.innerWidth < 900);
+}
 function toggleChat() {
   const panel=document.getElementById('chatPanel'), fab=document.getElementById('chat-toggle-fab');
   const open=panel.classList.toggle('open');
@@ -696,7 +718,7 @@ function render() {
   const ca=document.getElementById('content-area');
   const fns={dashboard:renderDashboard,influencers:renderInfluencers,social:renderSocial,
     newsletters:renderNewsletters,events:renderEvents,partners:renderPartners,
-    kpis:renderKPIs,calendar:renderCalendar,files:renderFiles,todos:renderTodos,profile:renderProfile};
+    kpis:renderKPIs,calendar:renderCalendar,files:renderFiles,todos:renderTodos,profile:renderProfile,pdf:renderPDFGenerator};
   ca.innerHTML=(fns[S.view]||(()=>'<div class="empty">Coming soon.</div>'))();
   updateTodosBadge();
 }
@@ -991,6 +1013,9 @@ function reminderChipHtml(inf) {
 }
 
 function renderInfluencers() {
+  // Auto-switch to list if not enough width for 6 kanban columns (min ~160px each)
+  const contentW = document.getElementById('content-area')?.offsetWidth || window.innerWidth - 220;
+  if (!window._infTabManual && contentW < 1050) window._infTab = 'list';
   const tab  = window._infTab || 'board';
   const qFil = window._infQ  || 'All';
   // Apply quarter filter to the working set
@@ -1013,8 +1038,8 @@ function renderInfluencers() {
   const tabBar = `
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
     <div class="tab-bar" style="margin:0;border:none">
-      <button class="tab ${tab==='board'?'active':''}" onclick="window._infTab='board';render()"><i class="ti ti-layout-columns"></i> Board</button>
-      <button class="tab ${tab==='list'?'active':''}" onclick="window._infTab='list';render()"><i class="ti ti-list"></i> List</button>
+      <button class="tab ${tab==='board'?'active':''}" onclick="window._infTab='board';window._infTabManual=true;render()"><i class="ti ti-layout-columns"></i> Board</button>
+      <button class="tab ${tab==='list'?'active':''}" onclick="window._infTab='list';window._infTabManual=true;render()"><i class="ti ti-list"></i> List</button>
     </div>
     <div style="display:flex;gap:6px;flex-wrap:wrap">
       <button id="sheets-sync-btn" class="btn-sm" onclick="loadInfluencersFromSheets()" title="Pull from Google Sheet"><i class="ti ti-table-import"></i> Sync Sheets</button>
@@ -1102,8 +1127,8 @@ function renderInfluencerList(qList) {
         <div class="avatar" style="background:var(--purple-bg);color:var(--purple);font-size:12px;width:38px;height:38px;flex-shrink:0">${(inf.platform||'?')[0]}</div>
         <div class="card-body">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-            <div class="card-title" style="margin:0">${esc(inf.instagramHandle||inf.name)}</div>
-            ${(inf.firstName||inf.lastName||inf.fullName)?`<span style="font-size:12px;color:var(--text2)">${esc((inf.firstName&&inf.lastName)?inf.firstName+' '+inf.lastName:(inf.firstName||inf.lastName||inf.fullName||''))}</span>`:''}
+            <div class="card-title" style="margin:0">${esc((inf.firstName||inf.lastName)?(inf.firstName+' '+inf.lastName).trim():(inf.fullName||inf.instagramHandle||inf.name))}</div>
+            ${inf.instagramHandle?`<span style="font-size:12px;color:var(--text3)">${esc(inf.instagramHandle)}</span>`:''}
             <span class="badge" style="background:${STAGE_BG[inf.stage||'Messaged']};color:${STAGE_COLOR[inf.stage||'Messaged']}">${inf.stage||'Messaged'}</span>
             <span class="badge b-accent">${inf.tier}</span>
             ${inf.quarter?`<span class="badge b-draft">${esc(inf.quarter)}</span>`:''}
@@ -1586,6 +1611,135 @@ function renderKPIs() {
   </div>`;
 }
 
+// ── PDF Generator ─────────────────────────────────────────
+function renderPDFGenerator() {
+  const qFil  = window._pdfQ  || 'All';
+  const pFil  = window._pdfP  || 'All';
+  const sFil  = window._pdfS  || 'All';
+  const fields = window._pdfFields || {name:true,handle:true,platform:true,quarter:true,stage:true,serviceDate:true,campaign:true,fee:true,followers:true,brief:true,affiliateLink:true,notes:true};
+  let list = S.influencers;
+  if (qFil !== 'All') list = list.filter(i => (i.quarter||'') === qFil);
+  if (pFil !== 'All') list = list.filter(i => i.platform === pFil);
+  if (sFil !== 'All') list = list.filter(i => (i.stage||'Messaged') === sFil);
+  window._pdfFields = fields;
+  const fieldDefs = [
+    {key:'name',label:'Name'},{key:'handle',label:'Instagram Handle'},{key:'platform',label:'Platform'},
+    {key:'quarter',label:'Quarter'},{key:'stage',label:'Stage'},{key:'serviceDate',label:'First Date of Service'},
+    {key:'campaign',label:'Campaign'},{key:'fee',label:'Fee Paid'},{key:'followers',label:'Following'},
+    {key:'brief',label:'Brief / Deliverables'},{key:'affiliateLink',label:'Affiliate Link'},{key:'notes',label:'Notes'}
+  ];
+  const getCellVal = (inf,key) => {
+    if(key==='name') return [inf.firstName,inf.lastName].filter(Boolean).join(' ')||inf.fullName||inf.name||'—';
+    if(key==='handle') return inf.instagramHandle||'—';
+    if(key==='platform') return inf.platform||'—';
+    if(key==='quarter') return inf.quarter||'—';
+    if(key==='stage') return inf.stage||'Messaged';
+    if(key==='serviceDate') return inf.serviceDate||'—';
+    if(key==='campaign') return inf.campaign||'—';
+    if(key==='fee') return inf.fee?'$'+inf.fee.toLocaleString():'—';
+    if(key==='followers') return inf.followers?fmt(inf.followers):'—';
+    if(key==='brief') return inf.brief||'—';
+    if(key==='affiliateLink') return inf.affiliateLink||'—';
+    if(key==='notes') return inf.notes||'—';
+    return '—';
+  };
+  const activeFields = fieldDefs.filter(f => fields[f.key]);
+  return `
+  <div style="display:grid;grid-template-columns:260px 1fr;gap:20px;align-items:start">
+    <div style="background:var(--surface2);border-radius:var(--radius);padding:16px;position:sticky;top:80px">
+      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:12px">Filters</div>
+      <div class="fg" style="margin-bottom:10px"><label>Quarter</label>
+        <select onchange="window._pdfQ=this.value;render()">
+          ${['All','Q1','Q2','Q3','Q4'].map(q=>`<option${q===qFil?' selected':''}>${q==='All'?'All Quarters':q}</option>`).join('')}
+        </select>
+      </div>
+      <div class="fg" style="margin-bottom:10px"><label>Platform</label>
+        <select onchange="window._pdfP=this.value;render()">
+          ${['All','Instagram','TikTok','YouTube','Facebook','Pinterest'].map(p=>`<option${p===pFil?' selected':''}>${p==='All'?'All Platforms':p}</option>`).join('')}
+        </select>
+      </div>
+      <div class="fg" style="margin-bottom:14px"><label>Stage</label>
+        <select onchange="window._pdfS=this.value;render()">
+          ${['All',...STAGES].map(s=>`<option${s===sFil?' selected':''}>${s==='All'?'All Stages':s}</option>`).join('')}
+        </select>
+      </div>
+      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Fields to include</div>
+      ${fieldDefs.map(f=>`
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:7px;cursor:pointer">
+          <input type="checkbox" ${fields[f.key]?'checked':''} onchange="window._pdfFields=window._pdfFields||{};window._pdfFields['${f.key}']=this.checked;render()" style="width:auto">
+          ${f.label}
+        </label>`).join('')}
+      <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px">
+        <button class="btn-primary" onclick="generatePDF()"><i class="ti ti-printer"></i> Download / Print PDF</button>
+        <button class="btn-sm" onclick="navigator.clipboard&&navigator.clipboard.writeText(window.location.href).then(()=>alert('Link copied!'))"><i class="ti ti-link"></i> Copy share link</button>
+      </div>
+    </div>
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="font-size:13px;color:var(--text2)">${list.length} influencer${list.length!==1?'s':''} · ${qFil==='All'?'All Quarters':qFil}${pFil!=='All'?' · '+pFil:''}${sFil!=='All'?' · '+sFil:''}</div>
+      </div>
+      ${list.length===0?`<div class="empty"><i class="ti ti-users"></i>No influencers match the selected filters.</div>`:`
+      <div style="overflow-x:auto;border-radius:var(--radius);border:0.5px solid var(--border)">
+        <table class="data-table" style="min-width:100%">
+          <thead><tr>${activeFields.map(f=>`<th style="white-space:nowrap">${f.label}</th>`).join('')}</tr></thead>
+          <tbody>
+            ${list.map(inf=>`<tr>${activeFields.map(f=>`<td style="font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(getCellVal(inf,f.key))}">${esc(getCellVal(inf,f.key))}</td>`).join('')}</tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`}
+    </div>
+  </div>`;
+}
+function generatePDF() {
+  const qFil  = window._pdfQ  || 'All';
+  const pFil  = window._pdfP  || 'All';
+  const sFil  = window._pdfS  || 'All';
+  const fields = window._pdfFields || {name:true,handle:true,platform:true,quarter:true,stage:true,serviceDate:true,campaign:true,fee:true,followers:true,brief:true,affiliateLink:true,notes:true};
+  let list = S.influencers;
+  if (qFil !== 'All') list = list.filter(i => (i.quarter||'') === qFil);
+  if (pFil !== 'All') list = list.filter(i => i.platform === pFil);
+  if (sFil !== 'All') list = list.filter(i => (i.stage||'Messaged') === sFil);
+  const fieldDefs = [
+    {key:'name',label:'Name'},{key:'handle',label:'Instagram'},{key:'platform',label:'Platform'},
+    {key:'quarter',label:'Quarter'},{key:'stage',label:'Stage'},{key:'serviceDate',label:'First Service'},
+    {key:'campaign',label:'Campaign'},{key:'fee',label:'Fee'},{key:'followers',label:'Followers'},
+    {key:'brief',label:'Brief'},{key:'affiliateLink',label:'Affiliate'},{key:'notes',label:'Notes'}
+  ];
+  const getCellVal = (inf,key) => {
+    if(key==='name') return [inf.firstName,inf.lastName].filter(Boolean).join(' ')||inf.fullName||inf.name||'—';
+    if(key==='handle') return inf.instagramHandle||'—';
+    if(key==='platform') return inf.platform||'—';
+    if(key==='quarter') return inf.quarter||'—';
+    if(key==='stage') return inf.stage||'Messaged';
+    if(key==='serviceDate') return inf.serviceDate||'—';
+    if(key==='campaign') return inf.campaign||'—';
+    if(key==='fee') return inf.fee?'$'+inf.fee.toLocaleString():'—';
+    if(key==='followers') return inf.followers?fmt(inf.followers):'—';
+    if(key==='brief') return inf.brief||'—';
+    if(key==='affiliateLink') return inf.affiliateLink||'—';
+    if(key==='notes') return inf.notes||'—';
+    return '—';
+  };
+  const active = fieldDefs.filter(f=>fields[f.key]);
+  const subtitle = [qFil==='All'?'All Quarters':qFil, pFil==='All'?'All Platforms':pFil, sFil==='All'?'All Stages':sFil].join(' · ');
+  const rows = list.map(inf=>`<tr>${active.map(f=>`<td>${esc(getCellVal(inf,f.key))}</td>`).join('')}</tr>`).join('');
+  const w = window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><title>Influencer Report — Solve Marketing</title>
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;padding:32px;color:#111;font-size:12px}
+  h1{font-size:20px;font-weight:700;margin-bottom:4px}p{color:#555;margin-bottom:20px;font-size:12px}
+  table{width:100%;border-collapse:collapse;font-size:11px}
+  th{background:#046c5e;color:#fff;padding:7px 10px;text-align:left;white-space:nowrap}
+  td{padding:6px 10px;border-bottom:1px solid #e5e7eb;vertical-align:top}
+  tr:nth-child(even) td{background:#f9fafb}
+  .footer{margin-top:20px;font-size:10px;color:#999;border-top:1px solid #e5e7eb;padding-top:10px}
+  @media print{body{padding:20px}}</style></head><body>
+  <h1>Influencer Report</h1><p>Solve Marketing OS · ${subtitle} · ${list.length} influencer${list.length!==1?'s':''} · Generated ${new Date().toLocaleDateString()}</p>
+  <table><thead><tr>${active.map(f=>`<th>${f.label}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>
+  <div class="footer">Solve Marketing OS — Confidential</div>
+  <script>window.onload=()=>window.print();<\/script></body></html>`);
+  w.document.close();
+}
+
 // ── Calendar ──────────────────────────────────────────────
 function buildCalMonth(yr, mo, compact) {
   const now = new Date();
@@ -1621,6 +1775,19 @@ function buildCalMonth(yr, mo, compact) {
   // Influencer reminders
   S.influencers.filter(i=>i.reminder?.date).forEach(inf=>{
     try{const d=new Date(inf.reminder.date+'T00:00:00');if(d.getFullYear()===yr&&d.getMonth()===mo)calEvs.push({day:d.getDate(),label:'🔔 '+(inf.instagramHandle||inf.name)+' · '+inf.reminder.note,cls:'ce-blue'});}catch(err){}
+  });
+  // First Date of Service
+  S.influencers.filter(i=>i.serviceDate).forEach(inf=>{
+    try{
+      const d=new Date(inf.serviceDate+'T00:00:00');
+      const dispName=[inf.firstName,inf.lastName].filter(Boolean).join(' ')||inf.instagramHandle||inf.name;
+      if(d.getFullYear()===yr&&d.getMonth()===mo) calEvs.push({day:d.getDate(),label:'📅 First Service: '+dispName,cls:'ce-teal'});
+      // Monthly "Due for Upcoming Service" reminders — same day each subsequent month
+      for(let m=1;m<=24;m++){
+        const rd=new Date(d.getFullYear(),d.getMonth()+m,d.getDate());
+        if(rd.getFullYear()===yr&&rd.getMonth()===mo) calEvs.push({day:rd.getDate(),label:'🔁 Due for Service: '+dispName,cls:'ce-orange'});
+      }
+    }catch(err){}
   });
   // Today marker
   if(yr===now.getFullYear()&&mo===now.getMonth()) calEvs.push({day:now.getDate(),label:'Today',cls:'ce-green'});
@@ -1680,7 +1847,7 @@ function renderCalendar() {
   </div>
   ${content}
   <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;font-size:12px">
-    ${[['ce-red','Events'],['ce-green','Today'],['ce-amber','Newsletters'],['ce-purple','To-Dos (click to open)'],['ce-blue','🔔 Reminders']].map(([c,l])=>`<div style="display:flex;align-items:center;gap:5px"><div class="cal-event ${c}">${l}</div></div>`).join('')}
+    ${[['ce-red','Events'],['ce-green','Today'],['ce-amber','Newsletters'],['ce-purple','To-Dos'],['ce-blue','🔔 Reminders'],['ce-teal','📅 First Service'],['ce-orange','🔁 Due for Service']].map(([c,l])=>`<div style="display:flex;align-items:center;gap:5px"><div class="cal-event ${c}">${l}</div></div>`).join('')}
     <div style="color:var(--text3);font-size:11px;display:flex;align-items:center;gap:4px"><i class="ti ti-click"></i> Click any date to add a task</div>
   </div>`;
 }
@@ -1804,10 +1971,10 @@ function openModal(type, id) {
     <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Platform & pipeline</div>
     <div class="fg-row"><div class="fg"><label>Platform</label><select id="m-plat"><option>Instagram</option><option>TikTok</option><option>YouTube</option><option>Facebook</option><option>Pinterest</option></select></div><div class="fg"><label>Tier</label><select id="m-tier"><option>Nano</option><option>Micro</option><option>Mid</option><option>Macro</option><option>Mega</option></select></div></div>
     <div class="fg-row"><div class="fg"><label>Following count</label><input id="m-followers" placeholder="50000"></div><div class="fg"><label>Fee ($)</label><input id="m-fee" placeholder="1000"></div></div>
-    <div class="fg-row"><div class="fg"><label>Stage</label><select id="m-stage">${STAGES.map(s=>`<option>${s}</option>`).join('')}</select></div><div class="fg"><label>Quarter hired</label><select id="m-quarter"><option value="">— None —</option><option>Q1</option><option>Q2</option><option>Q3</option><option>Q4</option></select></div></div>
+    <div class="fg-row"><div class="fg"><label>Stage</label><select id="m-stage">${STAGES.map(s=>`<option>${s}</option>`).join('')}</select></div><div class="fg"><label>Quarter</label><select id="m-quarter"><option value="">— None —</option><option>Q1</option><option>Q2</option><option>Q3</option><option>Q4</option></select></div></div>
     <div class="divider" style="margin:12px 0 14px"></div>
     <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Campaign</div>
-    <div class="fg-row"><div class="fg"><label>Campaign</label><select id="m-campaign"><option value="">— Select —</option><option>In house Tampa</option><option>In house Orlando</option><option>Orlando Weekly</option></select></div><div class="fg"><label>Service date</label><input type="date" id="m-servicedate"></div></div>
+    <div class="fg-row"><div class="fg"><label>Campaign</label><select id="m-campaign"><option value="">— Select —</option><option>In house Tampa</option><option>In house Orlando</option><option>Orlando Weekly</option></select></div><div class="fg"><label>First Date of Service</label><input type="date" id="m-servicedate"></div></div>
     <div class="fg"><label>Affiliate link</label><input id="m-affiliatelink" placeholder="https://…" type="url"></div>
     <div class="fg"><label>Brief / deliverables</label><textarea id="m-brief" placeholder="What are they creating?" style="min-height:56px"></textarea></div>
     <div class="fg"><label>Notes</label><input id="m-notes" placeholder="Any notes…"></div>
@@ -1874,10 +2041,10 @@ function openModal(type, id) {
     <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Platform & pipeline</div>
     <div class="fg-row"><div class="fg"><label>Platform</label><select id="ei-plat">${['Instagram','TikTok','YouTube','Facebook','Pinterest'].map(p=>`<option${p===inf.platform?' selected':''}>${p}</option>`).join('')}</select></div><div class="fg"><label>Tier</label><select id="ei-tier">${['Nano','Micro','Mid','Macro','Mega'].map(t=>`<option${t===inf.tier?' selected':''}>${t}</option>`).join('')}</select></div></div>
     <div class="fg-row"><div class="fg"><label>Following count</label><input id="ei-followers" value="${inf.followers}"></div><div class="fg"><label>Fee ($)</label><input id="ei-fee" value="${inf.fee}"></div></div>
-    <div class="fg-row"><div class="fg"><label>Stage</label><select id="ei-stage">${STAGES.map(s=>`<option${s===(inf.stage||'Messaged')?' selected':''}>${s}</option>`).join('')}</select></div><div class="fg"><label>Quarter hired</label><select id="ei-quarter"><option value="">— None —</option>${['Q1','Q2','Q3','Q4'].map(q=>`<option${q===(inf.quarter||'')?' selected':''}>${q}</option>`).join('')}</select></div></div>
+    <div class="fg-row"><div class="fg"><label>Stage</label><select id="ei-stage">${STAGES.map(s=>`<option${s===(inf.stage||'Messaged')?' selected':''}>${s}</option>`).join('')}</select></div><div class="fg"><label>Quarter</label><select id="ei-quarter"><option value="">— None —</option>${['Q1','Q2','Q3','Q4'].map(q=>`<option${q===(inf.quarter||'')?' selected':''}>${q}</option>`).join('')}</select></div></div>
     <div class="divider" style="margin:12px 0 14px"></div>
     <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Campaign</div>
-    <div class="fg-row"><div class="fg"><label>Campaign</label><select id="ei-campaign"><option value="">— Select —</option>${_campOpts.map(c=>`<option${c===(inf.campaign||'')?' selected':''}>${c}</option>`).join('')}</select></div><div class="fg"><label>Service date</label><input type="date" id="ei-servicedate" value="${esc(inf.serviceDate||'')}"></div></div>
+    <div class="fg-row"><div class="fg"><label>Campaign</label><select id="ei-campaign"><option value="">— Select —</option>${_campOpts.map(c=>`<option${c===(inf.campaign||'')?' selected':''}>${c}</option>`).join('')}</select></div><div class="fg"><label>First Date of Service</label><input type="date" id="ei-servicedate" value="${esc(inf.serviceDate||'')}"></div></div>
     <div class="fg"><label>Affiliate link</label><input id="ei-affiliatelink" type="url" value="${esc(inf.affiliateLink||'')}" placeholder="https://…"></div>
     <div class="fg"><label>Brief / deliverables</label><textarea id="ei-brief" style="min-height:52px">${esc(inf.brief||'')}</textarea></div>
     <div class="fg"><label>Notes</label><input id="ei-notes" value="${esc(inf.notes||'')}"></div>
