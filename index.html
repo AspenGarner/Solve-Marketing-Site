@@ -1753,6 +1753,7 @@ function buildCalMonth(yr, mo, compact) {
   const now = new Date();
   const firstDay = new Date(yr,mo,1).getDay(), daysInMo = new Date(yr,mo+1,0).getDate();
   const calEvs = [];
+  if (!window._calEventsMap) window._calEventsMap = {};
   // Events (including recurring)
   S.events.forEach(e => {
     try {
@@ -1805,13 +1806,14 @@ function buildCalMonth(yr, mo, compact) {
     const isToday=yr===now.getFullYear()&&mo===now.getMonth()&&d===now.getDate();
     const dateStr=`${yr}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const evs=calEvs.filter(e=>e.day===d);
+    window._calEventsMap[dateStr] = evs;
     const compactDayStyle = compact ? 'min-height:32px;padding:2px 3px;font-size:9px' : '';
     const compactNumStyle = compact ? 'font-size:9px;margin-bottom:1px' : '';
     const compactEvStyle  = compact ? 'font-size:8px;padding:0 2px;margin-bottom:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap' : '';
     const MAX_EVS = compact ? 2 : evs.length;
     const visEvs = evs.slice(0, MAX_EVS);
     const moreCount = compact ? evs.length - MAX_EVS : 0;
-    cells+=`<div class="cal-day${isToday?' today':''}" style="${compactDayStyle}" onclick="openModal('todo','${dateStr}')" title="Add task for ${dateStr}">
+    cells+=`<div class="cal-day${isToday?' today':''}" style="${compactDayStyle};cursor:pointer" onclick="openDayModal('${dateStr}')" title="View ${dateStr}">
       <div class="cal-num" style="${compactNumStyle}">${d}</div>
       ${visEvs.map(e=>`<div class="cal-event ${e.cls}" style="${compactEvStyle}" title="${esc(e.label)}" ${e.todoId?`onclick="event.stopPropagation();openModal('todo_edit',${e.todoId})" style="cursor:pointer;${compactEvStyle}"`:''}>
         ${compact ? esc(e.label).slice(0,18)+(esc(e.label).length>18?'…':'') : esc(e.label)}${e.meet&&!compact?` <a href="${esc(e.meet)}" target="_blank" onclick="event.stopPropagation()" style="color:inherit" title="Join Meet">📹</a>`:''}
@@ -1944,6 +1946,32 @@ function renderProfile() {
 }
 
 // ── Modals ────────────────────────────────────────────────
+function openDayModal(dateStr) {
+  const evs = (window._calEventsMap || {})[dateStr] || [];
+  const d = new Date(dateStr + 'T00:00:00');
+  const label = d.toLocaleDateString('default', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
+  const typeLabel = cls => ({'ce-red':'Event','ce-amber':'Newsletter','ce-purple':'Task','ce-blue':'Reminder','ce-teal':'First Service','ce-orange':'Due for Service','ce-green':'Today'}[cls] || 'Item');
+  const evHtml = evs.length === 0
+    ? `<div style="color:var(--text3);font-size:13px;padding:16px 0;text-align:center"><i class="ti ti-calendar-off" style="font-size:24px;display:block;margin-bottom:6px;opacity:.4"></i>Nothing scheduled for this day.</div>`
+    : evs.map(e => `
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border)">
+        <span class="cal-event ${e.cls}" style="font-size:10px;padding:2px 8px;white-space:nowrap;flex-shrink:0">${typeLabel(e.cls)}</span>
+        <span style="font-size:13px;color:var(--text1);flex:1;line-height:1.4">${esc(e.label)}</span>
+        ${e.meet?`<a href="${esc(e.meet)}" target="_blank" onclick="event.stopPropagation()" style="color:var(--blue);font-size:12px;text-decoration:none;flex-shrink:0">📹 Join</a>`:''}
+        ${e.todoId?`<button class="btn-sm" style="flex-shrink:0" onclick="closeModal();openModal('todo_edit',${e.todoId})"><i class="ti ti-edit"></i></button>`:''}
+      </div>`).join('');
+  const wrap = document.getElementById('modalOverlay');
+  const box  = document.getElementById('modalBox');
+  box.innerHTML = `
+    <h3 style="margin-bottom:2px">${label}</h3>
+    <div style="color:var(--text3);font-size:12px;margin-bottom:14px">${evs.length} item${evs.length!==1?'s':''}</div>
+    ${evHtml}
+    <div class="modal-footer" style="margin-top:16px">
+      <button onclick="closeModal()">Close</button>
+      <button class="btn-primary" onclick="closeModal();openModal('todo','${dateStr}')"><i class="ti ti-plus"></i> Add task</button>
+    </div>`;
+  wrap.classList.add('open');
+}
 function openModal(type, id) {
   const wrap=document.getElementById('modalOverlay'), box=document.getElementById('modalBox');
   let html='';
