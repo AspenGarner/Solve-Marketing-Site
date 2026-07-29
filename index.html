@@ -1590,8 +1590,6 @@ function renderKPIs() {
     <div class="kpi-block">
       <div class="kpi-title"><i class="ti ti-brand-instagram"></i>Social engagement</div>
       <div class="kpi-row"><span>Instagram reach</span><span class="kpi-val kpi-up">38K</span></div>
-      <div class="kpi-row"><span>TikTok views</span><span class="kpi-val kpi-up">22K</span></div>
-      <div class="kpi-row"><span>LinkedIn impressions</span><span class="kpi-val">14.2K</span></div>
       <div class="kpi-row"><span>Avg engagement rate</span><span class="kpi-val kpi-up">4.8%</span></div>
       <div class="kpi-row"><span>Story views</span><span class="kpi-val">8.1K</span></div>
     </div>
@@ -1605,8 +1603,8 @@ function renderKPIs() {
       ${qNL.length===0?`<div style="font-size:12px;color:var(--text3);padding:8px 0">No newsletters sent in ${q} yet.</div>`:''}
     </div>
     <div class="kpi-block">
-      <div class="kpi-title"><i class="ti ti-user-star"></i>Influencer KPIs</div>
-      ${S.influencers.map(i=>`<div class="kpi-row"><span>${esc(i.instagramHandle||i.name)}</span><span class="kpi-val">${fmt(i.followers)}${i.roi>0?' · <span class="kpi-up">'+i.roi+'x</span>':''}</span></div>`).join('')}
+      <div class="kpi-title"><i class="ti ti-user-star"></i>Influencer Following — ${q}</div>
+      ${(()=>{const qi=S.influencers.filter(i=>i.quarter===q);return qi.length?qi.map(i=>`<div class="kpi-row"><span style="display:flex;flex-direction:column;gap:1px"><span>${esc([i.firstName,i.lastName].filter(Boolean).join(' ')||i.instagramHandle||i.name)}</span>${i.instagramHandle?`<span style="font-size:11px;color:var(--text3)">${esc(i.instagramHandle)}</span>`:''}</span><span class="kpi-val">${fmt(i.followers)}</span></div>`).join(''):`<div style="font-size:12px;color:var(--text3);padding:8px 0">No influencers in ${q} yet.</div>`;})()}
     </div>
     <div class="kpi-block">
       <div class="kpi-title"><i class="ti ti-calendar-event"></i>Events & community</div>
@@ -1624,7 +1622,7 @@ function renderPDFGenerator() {
   const qFil  = window._pdfQ  || 'All';
   const pFil  = window._pdfP  || 'All';
   const sFil  = window._pdfS  || 'All';
-  const fields = window._pdfFields || {name:true,handle:true,platform:true,quarter:true,stage:true,serviceDate:true,campaign:true,fee:true,followers:true,brief:true,affiliateLink:true,notes:true};
+  const fields = window._pdfFields || {name:true,handle:true,platform:true,quarter:true,stage:true,serviceDate:true,campaign:true,fee:true,followers:true,brief:true,affiliateLink:true,notes:true,phone:false,email:false,address:false};
   let list = S.influencers;
   if (qFil !== 'All') list = list.filter(i => (i.quarter||'') === qFil);
   if (pFil !== 'All') list = list.filter(i => i.platform === pFil);
@@ -1634,6 +1632,7 @@ function renderPDFGenerator() {
     {key:'name',label:'Name'},{key:'handle',label:'Instagram Handle'},{key:'platform',label:'Platform'},
     {key:'quarter',label:'Quarter'},{key:'stage',label:'Stage'},{key:'serviceDate',label:'First Date of Service'},
     {key:'campaign',label:'Campaign'},{key:'fee',label:'Fee Paid'},{key:'followers',label:'Following'},
+    {key:'phone',label:'Phone'},{key:'email',label:'Email'},{key:'address',label:'Address'},
     {key:'brief',label:'Brief / Deliverables'},{key:'affiliateLink',label:'Affiliate Link'},{key:'notes',label:'Notes'}
   ];
   const getCellVal = (inf,key) => {
@@ -1646,6 +1645,9 @@ function renderPDFGenerator() {
     if(key==='campaign') return inf.campaign||'—';
     if(key==='fee') return inf.fee?'$'+inf.fee.toLocaleString():'—';
     if(key==='followers') return inf.followers?fmt(inf.followers):'—';
+    if(key==='phone') return inf.phone||'—';
+    if(key==='email') return inf.email||'—';
+    if(key==='address') return inf.address||'—';
     if(key==='brief') return inf.brief||'—';
     if(key==='affiliateLink') return inf.affiliateLink||'—';
     if(key==='notes') return inf.notes||'—';
@@ -1702,7 +1704,7 @@ function generatePDF() {
   const qFil  = window._pdfQ  || 'All';
   const pFil  = window._pdfP  || 'All';
   const sFil  = window._pdfS  || 'All';
-  const fields = window._pdfFields || {name:true,handle:true,platform:true,quarter:true,stage:true,serviceDate:true,campaign:true,fee:true,followers:true,brief:true,affiliateLink:true,notes:true};
+  const fields = window._pdfFields || {name:true,handle:true,platform:true,quarter:true,stage:true,serviceDate:true,campaign:true,fee:true,followers:true,brief:true,affiliateLink:true,notes:true,phone:false,email:false,address:false};
   let list = S.influencers;
   if (qFil !== 'All') list = list.filter(i => (i.quarter||'') === qFil);
   if (pFil !== 'All') list = list.filter(i => i.platform === pFil);
@@ -1711,6 +1713,7 @@ function generatePDF() {
     {key:'name',label:'Name'},{key:'handle',label:'Instagram'},{key:'platform',label:'Platform'},
     {key:'quarter',label:'Quarter'},{key:'stage',label:'Stage'},{key:'serviceDate',label:'First Service'},
     {key:'campaign',label:'Campaign'},{key:'fee',label:'Fee'},{key:'followers',label:'Followers'},
+    {key:'phone',label:'Phone'},{key:'email',label:'Email'},{key:'address',label:'Address'},
     {key:'brief',label:'Brief'},{key:'affiliateLink',label:'Affiliate'},{key:'notes',label:'Notes'}
   ];
   const getCellVal = (inf,key) => {
@@ -1723,12 +1726,16 @@ function generatePDF() {
     if(key==='campaign') return inf.campaign||'—';
     if(key==='fee') return inf.fee?'$'+inf.fee.toLocaleString():'—';
     if(key==='followers') return inf.followers?fmt(inf.followers):'—';
+    if(key==='phone') return inf.phone||'—';
+    if(key==='email') return inf.email||'—';
+    if(key==='address') return inf.address||'—';
     if(key==='brief') return inf.brief||'—';
     if(key==='affiliateLink') return inf.affiliateLink||'—';
     if(key==='notes') return inf.notes||'—';
     return '—';
   };
   const active = fieldDefs.filter(f=>fields[f.key]);
+  const now = new Date();
   const subtitle = [qFil==='All'?'All Quarters':qFil, pFil==='All'?'All Platforms':pFil, sFil==='All'?'All Stages':sFil].join(' · ');
   const rows = list.map(inf=>`<tr>${active.map(f=>`<td>${esc(getCellVal(inf,f.key))}</td>`).join('')}</tr>`).join('');
   const w = window.open('','_blank');
@@ -1741,11 +1748,23 @@ function generatePDF() {
   tr:nth-child(even) td{background:#f9fafb}
   .footer{margin-top:20px;font-size:10px;color:#999;border-top:1px solid #e5e7eb;padding-top:10px}
   @media print{body{padding:20px}}</style></head><body>
-  <h1>Influencer Report</h1><p>Solve Marketing OS · ${subtitle} · ${list.length} influencer${list.length!==1?'s':''} · Generated ${new Date().toLocaleDateString()}</p>
+  <h1>Influencer Report</h1><p>Solve Marketing OS · ${subtitle} · ${list.length} influencer${list.length!==1?'s':''} · Generated ${now.toLocaleDateString()}</p>
   <table><thead><tr>${active.map(f=>`<th>${f.label}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>
   <div class="footer">Solve Marketing OS — Confidential</div>
   <script>window.onload=()=>window.print();<\/script></body></html>`);
   w.document.close();
+  S.files.unshift({
+    id: Date.now(),
+    name: `Influencer Report — ${subtitle} — ${now.toLocaleDateString()}.pdf`,
+    type: 'Report',
+    module: 'Influencers',
+    uploaded: `${now.toLocaleString('default',{month:'short'})} ${now.getDate()}`,
+    by: S.profile?.name || 'Me',
+    size: `${list.length} influencer${list.length!==1?'s':''}`,
+    driveUrl: ''
+  });
+  persist();
+  const ca=document.getElementById('content-area'); if(ca){const t=document.createElement('div');t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.2)';t.textContent='✓ Saved to Files & Briefs';document.body.appendChild(t);setTimeout(()=>t.remove(),3000);}
 }
 
 // ── Calendar ──────────────────────────────────────────────
@@ -1783,18 +1802,18 @@ function buildCalMonth(yr, mo, compact) {
   });
   // Influencer reminders
   S.influencers.filter(i=>i.reminder?.date).forEach(inf=>{
-    try{const d=new Date(inf.reminder.date+'T00:00:00');if(d.getFullYear()===yr&&d.getMonth()===mo)calEvs.push({day:d.getDate(),label:'🔔 '+(inf.instagramHandle||inf.name)+' · '+inf.reminder.note,cls:'ce-blue'});}catch(err){}
+    try{const d=new Date(inf.reminder.date+'T00:00:00');if(d.getFullYear()===yr&&d.getMonth()===mo)calEvs.push({day:d.getDate(),label:'🔔 '+(inf.instagramHandle||inf.name)+' · '+inf.reminder.note,cls:'ce-blue',infId:inf.id});}catch(err){}
   });
   // First Date of Service
   S.influencers.filter(i=>i.serviceDate).forEach(inf=>{
     try{
       const d=new Date(inf.serviceDate+'T00:00:00');
       const dispName=[inf.firstName,inf.lastName].filter(Boolean).join(' ')||inf.instagramHandle||inf.name;
-      if(d.getFullYear()===yr&&d.getMonth()===mo) calEvs.push({day:d.getDate(),label:'📅 First Service: '+dispName,cls:'ce-teal'});
+      if(d.getFullYear()===yr&&d.getMonth()===mo) calEvs.push({day:d.getDate(),label:'📅 First Service: '+dispName,cls:'ce-teal',infId:inf.id});
       // Monthly "Due for Upcoming Service" reminders — same day each subsequent month
       for(let m=1;m<=24;m++){
         const rd=new Date(d.getFullYear(),d.getMonth()+m,d.getDate());
-        if(rd.getFullYear()===yr&&rd.getMonth()===mo) calEvs.push({day:rd.getDate(),label:'🔁 Due for Service: '+dispName,cls:'ce-orange'});
+        if(rd.getFullYear()===yr&&rd.getMonth()===mo) calEvs.push({day:rd.getDate(),label:'🔁 Due for Service: '+dispName,cls:'ce-orange',infId:inf.id});
       }
     }catch(err){}
   });
@@ -1959,6 +1978,7 @@ function openDayModal(dateStr) {
         <span style="font-size:13px;color:var(--text1);flex:1;line-height:1.4">${esc(e.label)}</span>
         ${e.meet?`<a href="${esc(e.meet)}" target="_blank" onclick="event.stopPropagation()" style="color:var(--blue);font-size:12px;text-decoration:none;flex-shrink:0">📹 Join</a>`:''}
         ${e.todoId?`<button class="btn-sm" style="flex-shrink:0" onclick="closeModal();openModal('todo_edit',${e.todoId})"><i class="ti ti-edit"></i></button>`:''}
+        ${e.infId?`<button class="btn-sm" style="flex-shrink:0" onclick="closeModal();editInfluencer(${e.infId})"><i class="ti ti-user"></i> View</button>`:''}
       </div>`).join('');
   const wrap = document.getElementById('modalOverlay');
   const box  = document.getElementById('modalBox');
