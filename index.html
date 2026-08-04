@@ -587,10 +587,10 @@ window.APP_STATE = {
     {id:4,name:'Subscriber Summit',location:'Remote / Zoom',date:'2026-06-28',status:'Done',budget:500,spent:480,attendees:412,type:'Digital',owner:'Admin Team',brief:'Virtual Q&A + product demo',meetLink:'https://meet.google.com/abc-defg-hij',recurring:false,recurringType:'none'},
   ],
   partners: [
-    {id:1,name:'Wasatch Wellness Co.',type:'Health & wellness',location:'SLC, UT',status:'Active',events:2,media:'Feature article + IG post',kpi:'2.4k reach',notes:'Co-branded wellness guide in progress'},
-    {id:2,name:'Urban Arts Collective',type:'Arts & culture',location:'SLC, UT',status:'Active',events:1,media:'Newsletter spotlight',kpi:'1.8k reach',notes:'Mural collaboration confirmed for Aug'},
-    {id:3,name:'Green Mountain Market',type:'Food & beverage',location:'Denver, CO',status:'In review',events:0,media:'TBD',kpi:'—',notes:'Partnership proposal sent Jun 10'},
-    {id:4,name:'Peak Performance Gym',type:'Fitness',location:'Provo, UT',status:'Planned',events:1,media:'Social + signage',kpi:'—',notes:'Contract review in progress'},
+    {id:1,businessName:'Wasatch Wellness Co.',contactPerson:'Sarah Kimball',location:'SLC, UT',email:'sarah@wasatchwellness.com',phone:'(801) 555-0188',campaign:'In-house Tampa',eventDate:'2026-09-15',agreementDriveUrl:'',stage:'Community Partner',notes:'Co-branded wellness guide in progress',name:'Wasatch Wellness Co.',type:'Health & wellness',status:'Active',events:2,media:'Feature article + IG post',kpi:'2.4k reach'},
+    {id:2,businessName:'Urban Arts Collective',contactPerson:'Marcus Rivera',location:'SLC, UT',email:'marcus@urbanarts.org',phone:'(801) 555-0234',campaign:'In-house Orlando',eventDate:'2026-08-22',agreementDriveUrl:'',stage:'Reviewing Partnership Agreement',notes:'Mural collaboration confirmed for Aug',name:'Urban Arts Collective',type:'Arts & culture',status:'In review',events:1,media:'Newsletter spotlight',kpi:'1.8k reach'},
+    {id:3,businessName:'Green Mountain Market',contactPerson:'Jen Torres',location:'Denver, CO',email:'jen@greenmtn.co',phone:'',campaign:'In-house Orlando',eventDate:'',agreementDriveUrl:'',stage:'Scheduled Call',notes:'Partnership proposal sent Jun 10',name:'Green Mountain Market',type:'Food & beverage',status:'Planned',events:0,media:'TBD',kpi:'—'},
+    {id:4,businessName:'Peak Performance Gym',contactPerson:'Derek Holt',location:'Provo, UT',email:'derek@peakperfgym.com',phone:'(385) 555-0301',campaign:'In-house Tampa',eventDate:'',agreementDriveUrl:'',stage:'Messaged',notes:'Contract review in progress',name:'Peak Performance Gym',type:'Fitness',status:'Planned',events:1,media:'Social + signage',kpi:'—'},
   ],
   files: [
     {id:1,name:'Q3 Campaign Brief.pdf',type:'Brief',module:'Influencers',uploaded:'Jun 10',by:'Me',size:'420 KB'},
@@ -978,6 +978,7 @@ function renderEvents() {
             <span>Budget: <strong>$${e.budget.toLocaleString()}</strong></span>
             ${e.spent>0?`<span style="color:var(--amber)">Spent: $${e.spent.toLocaleString()}</span>`:''}
             <span>Owner: ${e.owner}</span>
+            ${(()=>{const cp=e.communityPartnerId&&S.partners.find(p=>p.id===e.communityPartnerId);return cp?`<span style="cursor:pointer;color:var(--accent);font-weight:500" onclick="openModal('view_partner',${cp.id})" title="View partner"><i class="ti ti-building"></i> ${esc(cp.businessName||cp.name)}</span>`:''})()}
           </div>
           <div style="font-size:12px;color:var(--text3);margin-top:4px">${esc(e.brief)}</div>
           ${e.meetLink?`<div style="margin-top:8px"><a href="${esc(e.meetLink)}" target="_blank" class="btn btn-sm btn-success" style="display:inline-flex;gap:5px;font-size:12px"><i class="ti ti-video"></i> Join Google Meet</a></div>`:''}
@@ -992,9 +993,14 @@ function renderEvents() {
 }
 
 // ── Influencers ───────────────────────────────────────────
-const STAGES = ['Messaged','Talking','Scheduled Service','Serviced/Content Scheduled','Needs to be paid','Paid'];
-const STAGE_COLOR = {'Messaged':'var(--blue)','Talking':'var(--amber)','Scheduled Service':'var(--purple)','Serviced/Content Scheduled':'var(--accent)','Needs to be paid':'var(--red)','Paid':'var(--green)'};
-const STAGE_BG    = {'Messaged':'var(--blue-bg)','Talking':'var(--amber-bg)','Scheduled Service':'var(--purple-bg)','Serviced/Content Scheduled':'rgba(4,108,94,.1)','Needs to be paid':'var(--red-bg)','Paid':'var(--green-bg)'};
+const STAGES = ['Messaged','Scheduled Call','Talking','Scheduled Service','Serviced/Content Scheduled','Needs to be paid','Paid'];
+const STAGE_COLOR = {'Messaged':'var(--blue)','Scheduled Call':'var(--purple)','Talking':'var(--amber)','Scheduled Service':'var(--purple)','Serviced/Content Scheduled':'var(--accent)','Needs to be paid':'var(--red)','Paid':'var(--green)'};
+const STAGE_BG    = {'Messaged':'var(--blue-bg)','Scheduled Call':'var(--purple-bg)','Talking':'var(--amber-bg)','Scheduled Service':'var(--purple-bg)','Serviced/Content Scheduled':'rgba(4,108,94,.1)','Needs to be paid':'var(--red-bg)','Paid':'var(--green-bg)'};
+
+// ── Community Partner pipeline ────────────────────────────
+const PARTNER_STAGES = ['Messaged','Scheduled Call','Reviewing Partnership Agreement','Community Partner'];
+const PARTNER_STAGE_COLOR = {'Messaged':'var(--blue)','Scheduled Call':'var(--purple)','Reviewing Partnership Agreement':'var(--amber)','Community Partner':'var(--accent)'};
+const PARTNER_STAGE_BG    = {'Messaged':'var(--blue-bg)','Scheduled Call':'var(--purple-bg)','Reviewing Partnership Agreement':'var(--amber-bg)','Community Partner':'rgba(4,108,94,.1)'};
 
 // ── Reminder helpers ──────────────────────────────────────
 function dateOffsetStr(days, from) {
@@ -1213,6 +1219,25 @@ function moveStage(id, stage) {
   if (stage === 'Messaged' && !inf.reminder) {
     inf.reminder = makeAutoReminder('Messaged');
   }
+  if (stage === 'Scheduled Call') {
+    const displayName = [inf.firstName,inf.lastName].filter(Boolean).join(' ') || inf.fullName || inf.instagramHandle || inf.name;
+    const callDate = TODAY;
+    const gcTitle = encodeURIComponent(`Scheduled Call: ${displayName}`);
+    const gcDetails = encodeURIComponent(`Influencer call scheduled\nInstagram: ${inf.instagramHandle||'—'}\nCampaign: ${inf.campaign||'—'}`);
+    const gcStart = callDate.replace(/-/g,'');
+    const gcEnd   = dateOffsetStr(1).replace(/-/g,'');
+    const gcUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${gcTitle}&dates=${gcStart}/${gcEnd}&details=${gcDetails}`;
+    const prev = document.getElementById('call-toast'); if(prev) prev.remove();
+    const toast = document.createElement('div');
+    toast.id = 'call-toast';
+    toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--purple);color:var(--text1);padding:12px 18px;border-radius:var(--radius);font-size:12px;z-index:9999;box-shadow:0 4px 24px rgba(0,0,0,.2);font-family:var(--font);max-width:340px;width:90%';
+    toast.innerHTML = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><i class="ti ti-phone" style="color:var(--purple);font-size:16px"></i><strong>Scheduled Call created</strong></div>
+      <div style="color:var(--text2);margin-bottom:8px;font-size:12px">Add to Jayson's calendar for today.</div>
+      <a href="${gcUrl}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:6px;background:var(--accent);color:#fff;padding:7px 14px;border-radius:var(--radius-sm);text-decoration:none;font-weight:500;font-size:12px"><i class="ti ti-brand-google"></i> Add to Jayson's Google Calendar</a>
+      <button onclick="document.getElementById('call-toast').remove()" style="position:absolute;top:8px;right:10px;background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px">×</button>`;
+    document.body.appendChild(toast);
+    setTimeout(()=>{const t=document.getElementById('call-toast');if(t)t.remove();},15000);
+  }
   if (stage === 'Needs to be paid') {
     // Auto-add payment event to Marketing OS calendar (7 days from today)
     const payDate = TODAY;
@@ -1270,6 +1295,51 @@ function moveStage(id, stage) {
   }
   persist(); render();
 }
+function movePartnerStage(id, stage) {
+  const p = S.partners.find(x=>x.id===id);
+  if (!p) return;
+  p.stage = stage;
+  if (stage === 'Scheduled Call') {
+    const gcTitle = encodeURIComponent(`Scheduled Call: ${p.businessName||p.name}`);
+    const gcDetails = encodeURIComponent(`Partner call scheduled\nContact: ${p.contactPerson||'—'}\nCampaign: ${p.campaign||'—'}\nEmail: ${p.email||'—'}`);
+    const gcStart = TODAY.replace(/-/g,'');
+    const gcEnd = dateOffsetStr(1).replace(/-/g,'');
+    const gcUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${gcTitle}&dates=${gcStart}/${gcEnd}&details=${gcDetails}`;
+    const prev = document.getElementById('pcall-toast'); if(prev) prev.remove();
+    const toast = document.createElement('div');
+    toast.id = 'pcall-toast';
+    toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--purple);color:var(--text1);padding:12px 18px;border-radius:var(--radius);font-size:12px;z-index:9999;box-shadow:0 4px 24px rgba(0,0,0,.2);font-family:var(--font);max-width:340px;width:90%';
+    toast.innerHTML = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><i class="ti ti-phone" style="color:var(--purple);font-size:16px"></i><strong>Partner call reminder</strong></div>
+      <div style="color:var(--text2);margin-bottom:8px;font-size:12px">${esc(p.businessName||p.name)} moved to Scheduled Call.</div>
+      <a href="${gcUrl}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:6px;background:var(--accent);color:#fff;padding:7px 14px;border-radius:var(--radius-sm);text-decoration:none;font-weight:500;font-size:12px"><i class="ti ti-brand-google"></i> Add to Jayson's Google Calendar</a>
+      <button onclick="document.getElementById('pcall-toast').remove()" style="position:absolute;top:8px;right:10px;background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px">×</button>`;
+    document.body.appendChild(toast);
+    setTimeout(()=>{const t=document.getElementById('pcall-toast');if(t)t.remove();},15000);
+  }
+  if (stage === 'Community Partner' && p.eventDate) {
+    const evName = `Partner Event: ${p.businessName||p.name}`;
+    const alreadyExists = S.events.some(e=>e.name===evName&&e.date===p.eventDate);
+    if (!alreadyExists) {
+      S.events.push({id:Date.now(),name:evName,location:p.location||'TBD',date:p.eventDate,status:'Planned',budget:0,spent:0,attendees:0,type:'Community',owner:'Jayson Greene',brief:`Partnership event with ${p.businessName||p.name}. Contact: ${p.contactPerson||'—'}`,meetLink:'',recurring:false,recurringType:'none',communityPartnerId:p.id});
+    }
+    const gcTitle = encodeURIComponent(evName);
+    const gcDetails = encodeURIComponent(`Community partner event\nContact: ${p.contactPerson||'—'}\nCampaign: ${p.campaign||'—'}`);
+    const gcStart = p.eventDate.replace(/-/g,'');
+    const gcEnd = (()=>{const d=new Date(p.eventDate+'T00:00:00');d.setDate(d.getDate()+1);return d.toISOString().slice(0,10).replace(/-/g,'');})();
+    const gcUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${gcTitle}&dates=${gcStart}/${gcEnd}&details=${gcDetails}`;
+    const prev = document.getElementById('pevent-toast'); if(prev) prev.remove();
+    const toast = document.createElement('div');
+    toast.id = 'pevent-toast';
+    toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--accent);color:var(--text1);padding:12px 18px;border-radius:var(--radius);font-size:12px;z-index:9999;box-shadow:0 4px 24px rgba(0,0,0,.2);font-family:var(--font);max-width:340px;width:90%';
+    toast.innerHTML = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><i class="ti ti-calendar-event" style="color:var(--accent);font-size:16px"></i><strong>Partner event added to calendar</strong></div>
+      <div style="color:var(--text2);margin-bottom:8px;font-size:12px">${esc(p.eventDate)} — ${esc(p.businessName||p.name)}</div>
+      <a href="${gcUrl}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:6px;background:var(--accent);color:#fff;padding:7px 14px;border-radius:var(--radius-sm);text-decoration:none;font-weight:500;font-size:12px"><i class="ti ti-brand-google"></i> Add to Jayson's Google Calendar</a>
+      <button onclick="document.getElementById('pevent-toast').remove()" style="position:absolute;top:8px;right:10px;background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px">×</button>`;
+    document.body.appendChild(toast);
+    setTimeout(()=>{const t=document.getElementById('pevent-toast');if(t)t.remove();},15000);
+  }
+  persist(); render();
+}
 function editInfluencer(id) {
   const inf = S.influencers.find(i=>i.id===id);
   if (!inf) return;
@@ -1319,38 +1389,44 @@ function renderNewsletters() {
 
 // ── Partners ──────────────────────────────────────────────
 function renderPartners() {
+  const cpCount = S.partners.filter(p=>p.stage==='Community Partner').length;
   return `
-  <div class="stats">
-    <div class="stat"><div class="stat-n">${S.partners.filter(p=>p.status==='Active').length}</div><div class="stat-l">Active</div></div>
+  <div class="stats" style="margin-bottom:14px">
+    <div class="stat"><div class="stat-n">${cpCount}</div><div class="stat-l">Community Partners</div></div>
     <div class="stat"><div class="stat-n">${S.partners.length}</div><div class="stat-l">Total</div></div>
-    <div class="stat"><div class="stat-n">${S.partners.reduce((a,p)=>a+p.events,0)}</div><div class="stat-l">Co-events</div></div>
-    <div class="stat"><div class="stat-n">4.2K</div><div class="stat-l">Combined reach</div></div>
+    <div class="stat"><div class="stat-n">${S.partners.filter(p=>p.campaign==='In-house Tampa').length}</div><div class="stat-l">Tampa</div></div>
+    <div class="stat"><div class="stat-n">${S.partners.filter(p=>p.campaign==='In-house Orlando').length}</div><div class="stat-l">Orlando</div></div>
   </div>
   <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
     <button class="btn-primary btn-sm" onclick="openModal('partner')"><i class="ti ti-plus"></i> Add partner</button>
   </div>
-  ${S.partners.map(p=>`
-    <div class="card">
-      <div class="card-row">
-        <div class="card-body">
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
-            <div class="card-title" style="margin:0">${esc(p.name)}</div>
-            <span class="badge ${stCls(p.status)}">${p.status}</span>
-            <span class="badge b-purple">${p.type}</span>
-          </div>
-          <div class="card-meta">
-            <span><i class="ti ti-map-pin"></i>${p.location}</span>
-            <span><i class="ti ti-calendar-event"></i>${p.events} co-event${p.events!==1?'s':''}</span>
-            <span>Media: ${p.media}</span>
-            ${p.kpi!=='—'?`<span class="kpi-up"><i class="ti ti-trending-up"></i>${p.kpi}</span>`:''}
-          </div>
-          <div style="font-size:12px;color:var(--text3);margin-top:4px">${esc(p.notes)}</div>
+  <div class="kanban-board" style="overflow-x:auto;padding-bottom:8px">
+    ${PARTNER_STAGES.map(stage=>{
+      const items = S.partners.filter(p=>(p.stage||'Messaged')===stage);
+      return `<div class="kanban-col" style="min-width:200px">
+        <div class="kanban-col-hdr">
+          <span style="color:${PARTNER_STAGE_COLOR[stage]}">${stage}</span>
+          <span style="background:${PARTNER_STAGE_BG[stage]};color:${PARTNER_STAGE_COLOR[stage]};padding:1px 7px;border-radius:99px;font-size:10px">${items.length}</span>
         </div>
-        <div class="card-actions">
-          <button class="btn-sm" onclick="openModal('edit_partner',${p.id})"><i class="ti ti-edit"></i></button>
-        </div>
-      </div>
-    </div>`).join('')}`;
+        ${items.map(p=>`
+          <div class="kanban-card" onclick="openModal('view_partner',${p.id})">
+            <div style="font-size:13px;font-weight:600;margin-bottom:2px;line-height:1.3">${esc(p.businessName||p.name)}</div>
+            ${p.contactPerson?`<div style="font-size:11px;color:var(--text3);margin-bottom:5px">${esc(p.contactPerson)}</div>`:''}
+            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">
+              <span class="badge" style="background:${PARTNER_STAGE_BG[stage]};color:${PARTNER_STAGE_COLOR[stage]};font-size:9px">${stage}</span>
+              ${p.campaign?`<span class="badge b-draft" style="font-size:9px">${esc(p.campaign)}</span>`:''}
+            </div>
+            ${p.location?`<div style="font-size:11px;color:var(--text2)"><i class="ti ti-map-pin" style="font-size:10px"></i> ${esc(p.location)}</div>`:''}
+            ${p.eventDate?`<div style="font-size:11px;color:var(--accent);margin-top:3px"><i class="ti ti-calendar-event" style="font-size:10px"></i> ${esc(p.eventDate)}</div>`:''}
+            <div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap">
+              ${PARTNER_STAGES.map(s=>s===stage?'':`<button class="btn-sm" style="font-size:9px;padding:2px 6px;flex-shrink:0" onclick="event.stopPropagation();movePartnerStage(${p.id},'${s}')" title="Move to ${s}">${s==='Community Partner'?'→ Partner':s==='Reviewing Partnership Agreement'?'→ Review':s==='Scheduled Call'?'→ Call':'→ '+s}</button>`).join('')}
+              <button class="btn-sm" style="font-size:9px;padding:2px 6px" onclick="event.stopPropagation();openModal('edit_partner',${p.id})"><i class="ti ti-edit"></i></button>
+            </div>
+          </div>`).join('')}
+        <button class="btn-sm" style="width:100%;margin-top:6px;border-style:dashed;font-size:11px" onclick="openModal('partner','${stage}')"><i class="ti ti-plus"></i> Add</button>
+      </div>`;
+    }).join('')}
+  </div>`;
 }
 
 // ── GHL data loader ───────────────────────────────────────
@@ -1618,7 +1694,108 @@ function renderKPIs() {
 }
 
 // ── PDF Generator ─────────────────────────────────────────
+function renderPDFPartners() {
+  const cpStageFil = window._pdfCPS || 'All';
+  const cpCampFil  = window._pdfCPC || 'All';
+  const cpFields   = window._pdfCPFields || {businessName:true,contactPerson:true,location:true,email:false,phone:false,campaign:true,stage:true,eventDate:true,notes:true,agreementDriveUrl:false};
+  let list = S.partners;
+  if (cpStageFil !== 'All') list = list.filter(p=>(p.stage||'Messaged')===cpStageFil);
+  if (cpCampFil  !== 'All') list = list.filter(p=>(p.campaign||'')===cpCampFil);
+  window._pdfCPFields = cpFields;
+  const fieldDefs = [
+    {key:'businessName',label:'Business Name'},{key:'contactPerson',label:'Person of Contact'},
+    {key:'location',label:'Location'},{key:'email',label:'Email'},{key:'phone',label:'Phone'},
+    {key:'campaign',label:'Campaign'},{key:'stage',label:'Stage'},{key:'eventDate',label:'Event Date'},
+    {key:'notes',label:'Notes'},{key:'agreementDriveUrl',label:'Agreement Link'}
+  ];
+  const getVal = (p,key) => {
+    if(key==='businessName') return p.businessName||p.name||'—';
+    if(key==='agreementDriveUrl') return p.agreementDriveUrl||'—';
+    return p[key]||'—';
+  };
+  const active = fieldDefs.filter(f=>cpFields[f.key]);
+  return `
+  <div style="display:grid;grid-template-columns:260px 1fr;gap:20px;align-items:start">
+    <div style="background:var(--surface2);border-radius:var(--radius);padding:16px;position:sticky;top:80px">
+      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:12px">Filters</div>
+      <div class="fg" style="margin-bottom:10px"><label>Stage</label>
+        <select onchange="window._pdfCPS=this.value;render()">
+          ${['All',...PARTNER_STAGES].map(s=>`<option${s===cpStageFil?' selected':''}>${s==='All'?'All Stages':s}</option>`).join('')}
+        </select>
+      </div>
+      <div class="fg" style="margin-bottom:14px"><label>Campaign</label>
+        <select onchange="window._pdfCPC=this.value;render()">
+          ${['All','In-house Orlando','In-house Tampa'].map(c=>`<option${c===cpCampFil?' selected':''}>${c==='All'?'All Campaigns':c}</option>`).join('')}
+        </select>
+      </div>
+      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Fields to include</div>
+      ${fieldDefs.map(f=>`
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:7px;cursor:pointer">
+          <input type="checkbox" ${cpFields[f.key]?'checked':''} onchange="window._pdfCPFields=window._pdfCPFields||{};window._pdfCPFields['${f.key}']=this.checked;render()" style="width:auto">
+          ${f.label}
+        </label>`).join('')}
+      <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px">
+        <button class="btn-primary" onclick="generatePartnerPDF()"><i class="ti ti-printer"></i> Download / Print PDF</button>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:14px">${list.length} partner${list.length!==1?'s':''} · ${cpStageFil==='All'?'All Stages':cpStageFil}${cpCampFil!=='All'?' · '+cpCampFil:''}</div>
+      ${list.length===0?`<div class="empty"><i class="ti ti-building"></i>No partners match the selected filters.</div>`:`
+      <div style="overflow-x:auto;border-radius:var(--radius);border:0.5px solid var(--border)">
+        <table class="data-table" style="min-width:100%">
+          <thead><tr>${active.map(f=>`<th style="white-space:nowrap">${f.label}</th>`).join('')}</tr></thead>
+          <tbody>
+            ${list.map(p=>`<tr>${active.map(f=>`<td style="font-size:12px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(getVal(p,f.key))}">${esc(getVal(p,f.key))}</td>`).join('')}</tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`}
+    </div>
+  </div>`;
+}
+function generatePartnerPDF() {
+  const cpStageFil = window._pdfCPS || 'All';
+  const cpCampFil  = window._pdfCPC || 'All';
+  const cpFields   = window._pdfCPFields || {businessName:true,contactPerson:true,location:true,email:false,phone:false,campaign:true,stage:true,eventDate:true,notes:true,agreementDriveUrl:false};
+  let list = S.partners;
+  if (cpStageFil !== 'All') list = list.filter(p=>(p.stage||'Messaged')===cpStageFil);
+  if (cpCampFil  !== 'All') list = list.filter(p=>(p.campaign||'')===cpCampFil);
+  const fieldDefs = [
+    {key:'businessName',label:'Business Name'},{key:'contactPerson',label:'Contact'},
+    {key:'location',label:'Location'},{key:'email',label:'Email'},{key:'phone',label:'Phone'},
+    {key:'campaign',label:'Campaign'},{key:'stage',label:'Stage'},{key:'eventDate',label:'Event Date'},
+    {key:'notes',label:'Notes'},{key:'agreementDriveUrl',label:'Agreement'}
+  ];
+  const getVal = (p,key) => { if(key==='businessName') return p.businessName||p.name||'—'; return p[key]||'—'; };
+  const active = fieldDefs.filter(f=>cpFields[f.key]);
+  const subtitle = [cpStageFil==='All'?'All Stages':cpStageFil, cpCampFil==='All'?'All Campaigns':cpCampFil].join(' · ');
+  const rows = list.map(p=>`<tr>${active.map(f=>`<td>${esc(getVal(p,f.key))}</td>`).join('')}</tr>`).join('');
+  const now = new Date();
+  const w = window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><title>Community Partner Report — Solve Marketing</title>
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;padding:32px;color:#111;font-size:12px}
+  h1{font-size:20px;font-weight:700;margin-bottom:4px}p{color:#555;margin-bottom:20px;font-size:12px}
+  table{width:100%;border-collapse:collapse;font-size:11px}
+  th{background:#046c5e;color:#fff;padding:7px 10px;text-align:left;white-space:nowrap}
+  td{padding:6px 10px;border-bottom:1px solid #e5e7eb;vertical-align:top}
+  tr:nth-child(even) td{background:#f9fafb}
+  .footer{margin-top:20px;font-size:10px;color:#999;border-top:1px solid #e5e7eb;padding-top:10px}
+  @media print{body{padding:20px}}</style></head><body>
+  <h1>Community Partner Report</h1><p>Solve Marketing OS · ${subtitle} · ${list.length} partner${list.length!==1?'s':''} · Generated ${now.toLocaleDateString()}</p>
+  <table><thead><tr>${active.map(f=>`<th>${f.label}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>
+  <div class="footer">Solve Marketing OS — Confidential</div>
+  <script>window.onload=()=>window.print();<\/script></body></html>`);
+  w.document.close();
+  S.files.unshift({id:Date.now(),name:`Community Partner Report — ${subtitle} — ${now.toLocaleDateString()}.pdf`,type:'Report',module:'Partners',uploaded:`${now.toLocaleString('default',{month:'short'})} ${now.getDate()}`,by:S.profile?.name||'Me',size:`${list.length} partner${list.length!==1?'s':''}`,driveUrl:''});
+  persist();
+  const t=document.createElement('div');t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.2)';t.textContent='✓ Saved to Files & Briefs';document.body.appendChild(t);setTimeout(()=>t.remove(),3000);
+}
 function renderPDFGenerator() {
+  const pdfTab = window._pdfTab || 'influencers';
+  const tabBar = `<div class="tab-bar" style="margin-bottom:20px">
+    <button class="tab ${pdfTab==='influencers'?'active':''}" onclick="window._pdfTab='influencers';render()"><i class="ti ti-user-star"></i> Influencers</button>
+    <button class="tab ${pdfTab==='partners'?'active':''}" onclick="window._pdfTab='partners';render()"><i class="ti ti-building"></i> Community Partners</button>
+  </div>`;
+  if (pdfTab === 'partners') return tabBar + renderPDFPartners();
   const qFil  = window._pdfQ  || 'All';
   const pFil  = window._pdfP  || 'All';
   const sFil  = window._pdfS  || 'All';
@@ -1654,7 +1831,7 @@ function renderPDFGenerator() {
     return '—';
   };
   const activeFields = fieldDefs.filter(f => fields[f.key]);
-  return `
+  return tabBar + `
   <div style="display:grid;grid-template-columns:260px 1fr;gap:20px;align-items:start">
     <div style="background:var(--surface2);border-radius:var(--radius);padding:16px;position:sticky;top:80px">
       <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:12px">Filters</div>
@@ -1817,6 +1994,10 @@ function buildCalMonth(yr, mo, compact) {
       }
     }catch(err){}
   });
+  // Community partner event dates
+  S.partners.filter(p=>p.eventDate&&p.stage==='Community Partner').forEach(p=>{
+    try{const d=new Date(p.eventDate+'T00:00:00');if(d.getFullYear()===yr&&d.getMonth()===mo)calEvs.push({day:d.getDate(),label:'🤝 Partner Event: '+(p.businessName||p.name),cls:'ce-amber',partnerId:p.id});}catch(err){}
+  });
   // Today marker
   if(yr===now.getFullYear()&&mo===now.getMonth()) calEvs.push({day:now.getDate(),label:'Today',cls:'ce-green'});
   let cells='';
@@ -1852,20 +2033,27 @@ function buildCalMonth(yr, mo, compact) {
 
 function renderCalendar() {
   const now=new Date(), calView=window._calView||'month';
+  if(window._calYr==null) window._calYr=now.getFullYear();
+  if(window._calMo==null) window._calMo=now.getMonth();
+  const yr=window._calYr, mo=window._calMo;
+  const navDate=new Date(yr,mo,1);
+  function calNav(dy,dm){return `window._calYr=${yr+(mo+dm<0?-1:mo+dm>11?1:0)};window._calMo=(${mo}+${dm}+120)%12;render()`;}
   let content='';
   if(calView==='quarter'){
     const months=[];
-    for(let i=0;i<3;i++){
-      const d=new Date(now.getFullYear(),now.getMonth()+i,1);
-      months.push({yr:d.getFullYear(),mo:d.getMonth()});
-    }
+    for(let i=0;i<3;i++){const d=new Date(yr,mo+i,1);months.push({yr:d.getFullYear(),mo:d.getMonth()});}
     content=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;overflow-x:auto">${months.map(m=>buildCalMonth(m.yr,m.mo,true)).join('')}</div>`;
   } else {
-    content=buildCalMonth(now.getFullYear(),now.getMonth(),false);
+    content=buildCalMonth(yr,mo,false);
   }
   return `
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px">
-    <div style="font-size:16px;font-weight:500">${calView==='quarter'?'Next 3 months':now.toLocaleString('default',{month:'long'})+' '+now.getFullYear()}</div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="btn-sm" onclick="${calNav(0,-1)}" title="Previous month"><i class="ti ti-chevron-left"></i></button>
+      <div style="font-size:16px;font-weight:500;min-width:160px;text-align:center">${calView==='quarter'?`${navDate.toLocaleString('default',{month:'short'})} – ${new Date(yr,mo+2,1).toLocaleString('default',{month:'short',year:'numeric'})}`:navDate.toLocaleString('default',{month:'long',year:'numeric'})}</div>
+      <button class="btn-sm" onclick="${calNav(0,1)}" title="Next month"><i class="ti ti-chevron-right"></i></button>
+      <button class="btn-sm" onclick="window._calYr=${now.getFullYear()};window._calMo=${now.getMonth()};render()" title="Today" style="font-size:11px">Today</button>
+    </div>
     <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
       <div class="tab-bar" style="margin:0">
         <button class="tab ${calView==='month'?'active':''}" onclick="window._calView='month';render()"><i class="ti ti-calendar-month"></i> Month</button>
@@ -1876,8 +2064,8 @@ function renderCalendar() {
   </div>
   ${content}
   <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;font-size:12px">
-    ${[['ce-red','Events'],['ce-green','Today'],['ce-amber','Newsletters'],['ce-purple','To-Dos'],['ce-blue','🔔 Reminders'],['ce-teal','📅 First Service'],['ce-orange','🔁 Due for Service']].map(([c,l])=>`<div style="display:flex;align-items:center;gap:5px"><div class="cal-event ${c}">${l}</div></div>`).join('')}
-    <div style="color:var(--text3);font-size:11px;display:flex;align-items:center;gap:4px"><i class="ti ti-click"></i> Click any date to add a task</div>
+    ${[['ce-red','Events'],['ce-green','Today'],['ce-amber','Newsletters / Partner Events'],['ce-purple','To-Dos'],['ce-blue','🔔 Reminders'],['ce-teal','📅 First Service'],['ce-orange','🔁 Due for Service']].map(([c,l])=>`<div style="display:flex;align-items:center;gap:5px"><div class="cal-event ${c}">${l}</div></div>`).join('')}
+    <div style="color:var(--text3);font-size:11px;display:flex;align-items:center;gap:4px"><i class="ti ti-click"></i> Click any date to view or add</div>
   </div>`;
 }
 
@@ -1969,7 +2157,7 @@ function openDayModal(dateStr) {
   const evs = (window._calEventsMap || {})[dateStr] || [];
   const d = new Date(dateStr + 'T00:00:00');
   const label = d.toLocaleDateString('default', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
-  const typeLabel = cls => ({'ce-red':'Event','ce-amber':'Newsletter','ce-purple':'Task','ce-blue':'Reminder','ce-teal':'First Service','ce-orange':'Due for Service','ce-green':'Today'}[cls] || 'Item');
+  const typeLabel = cls => ({'ce-red':'Event','ce-amber':'Newsletter / Partner','ce-purple':'Task','ce-blue':'Reminder','ce-teal':'First Service','ce-orange':'Due for Service','ce-green':'Today'}[cls] || 'Item');
   const evHtml = evs.length === 0
     ? `<div style="color:var(--text3);font-size:13px;padding:16px 0;text-align:center"><i class="ti ti-calendar-off" style="font-size:24px;display:block;margin-bottom:6px;opacity:.4"></i>Nothing scheduled for this day.</div>`
     : evs.map(e => `
@@ -1979,6 +2167,7 @@ function openDayModal(dateStr) {
         ${e.meet?`<a href="${esc(e.meet)}" target="_blank" onclick="event.stopPropagation()" style="color:var(--blue);font-size:12px;text-decoration:none;flex-shrink:0">📹 Join</a>`:''}
         ${e.todoId?`<button class="btn-sm" style="flex-shrink:0" onclick="closeModal();openModal('todo_edit',${e.todoId})"><i class="ti ti-edit"></i></button>`:''}
         ${e.infId?`<button class="btn-sm" style="flex-shrink:0" onclick="closeModal();editInfluencer(${e.infId})"><i class="ti ti-user"></i> View</button>`:''}
+        ${e.partnerId?`<button class="btn-sm" style="flex-shrink:0" onclick="closeModal();openModal('view_partner',${e.partnerId})"><i class="ti ti-building"></i> View</button>`:''}
       </div>`).join('');
   const wrap = document.getElementById('modalOverlay');
   const box  = document.getElementById('modalBox');
@@ -2058,16 +2247,19 @@ function openModal(type, id) {
     <div class="fg-row"><div class="fg"><label>Location</label><input id="m-loc" placeholder="City, State"></div><div class="fg"><label>Date</label><input type="date" id="m-date"></div></div>
     <div class="fg-row"><div class="fg"><label>Budget ($)</label><input id="m-budget" placeholder="5000"></div><div class="fg"><label>Expected attendees</label><input id="m-att" placeholder="100"></div></div>
     <div class="fg-row"><div class="fg"><label>Type</label><select id="m-type"><option>Brand</option><option>Influencer</option><option>Community</option><option>Digital</option></select></div><div class="fg"><label>Recurring</label><select id="m-recurring"><option value="none">One-time</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option></select></div></div>
-    <div class="fg"><label>Google Meet link <span style="font-weight:400;color:var(--text3)">(optional)</span></label><input id="m-meet" type="url" placeholder="https://meet.google.com/xxx-xxxx-xxx"></div>
+    <div class="fg-row"><div class="fg"><label>Google Meet link <span style="font-weight:400;color:var(--text3)">(optional)</span></label><input id="m-meet" type="url" placeholder="https://meet.google.com/xxx-xxxx-xxx"></div><div class="fg"><label>Community Partner <span style="font-weight:400;color:var(--text3)">(optional)</span></label><select id="m-cp-id"><option value="">— None —</option>${S.partners.map(p=>`<option value="${p.id}">${esc(p.businessName||p.name)}</option>`).join('')}</select></div></div>
     <div class="fg"><label>Brief</label><textarea id="m-brief" placeholder="Event description and goals…"></textarea></div>
     <div class="modal-footer"><button onclick="closeModal()">Cancel</button><button class="btn-primary" onclick="saveEvent()">Save event</button></div>`;
   } else if(type==='partner') {
+    const initStage = (typeof id==='string'&&PARTNER_STAGES.includes(id))?id:'Messaged';
     html=`<h3>Add community partner</h3>
-    <div class="fg"><label>Organization name</label><input id="m-name" placeholder="Partner organization"></div>
-    <div class="fg-row"><div class="fg"><label>Type</label><input id="m-type" placeholder="e.g. Arts & culture"></div><div class="fg"><label>Location</label><input id="m-loc" placeholder="City, State"></div></div>
-    <div class="fg"><label>Media / deliverables</label><input id="m-media" placeholder="e.g. Newsletter + IG post"></div>
+    <div class="fg"><label>Business name</label><input id="m-name" placeholder="Business or organization name"></div>
+    <div class="fg-row"><div class="fg"><label>Person of contact</label><input id="m-contact" placeholder="First & last name"></div><div class="fg"><label>Location</label><input id="m-loc" placeholder="City, State"></div></div>
+    <div class="fg-row"><div class="fg"><label>Email</label><input id="m-email" type="email" placeholder="contact@business.com"></div><div class="fg"><label>Phone</label><input id="m-phone" placeholder="(xxx) xxx-xxxx"></div></div>
+    <div class="fg-row"><div class="fg"><label>Campaign</label><select id="m-campaign"><option value="">— None —</option><option>In-house Orlando</option><option>In-house Tampa</option></select></div><div class="fg"><label>Stage</label><select id="m-stage">${PARTNER_STAGES.map(s=>`<option${s===initStage?' selected':''}>${s}</option>`).join('')}</select></div></div>
+    <div class="fg-row"><div class="fg"><label>Event / Partnership date</label><input type="date" id="m-eventdate"></div><div class="fg"><label>Partnership agreement (Drive link)</label><input id="m-agreement" type="url" placeholder="https://drive.google.com/…"></div></div>
     <div class="fg"><label>Notes</label><textarea id="m-notes" placeholder="Partnership notes…"></textarea></div>
-    <div class="modal-footer"><button onclick="closeModal()">Cancel</button><button class="btn-primary" onclick="savePartner()">Save</button></div>`;
+    <div class="modal-footer"><button onclick="closeModal()">Cancel</button><button class="btn-primary" onclick="savePartner()"><i class="ti ti-check"></i> Save</button></div>`;
   } else if(type==='file') {
     html=`<h3>Add file</h3>
     <div class="fg">
@@ -2180,21 +2372,33 @@ function openModal(type, id) {
     <div class="fg-row"><div class="fg"><label>Budget ($)</label><input id="ee-budget" type="number" value="${ev.budget}"></div><div class="fg"><label>Spent ($)</label><input id="ee-spent" type="number" value="${ev.spent}"></div><div class="fg"><label>Attendees</label><input id="ee-att" type="number" value="${ev.attendees}"></div></div>
     <div class="fg-row"><div class="fg"><label>Type</label><select id="ee-type">${['Brand','Influencer','Community','Digital'].map(t=>`<option${t===ev.type?' selected':''}>${t}</option>`).join('')}</select></div><div class="fg"><label>Status</label><select id="ee-status">${['Active','Planned','Done'].map(st=>`<option${st===ev.status?' selected':''}>${st}</option>`).join('')}</select></div></div>
     <div class="fg-row"><div class="fg"><label>Owner</label><input id="ee-owner" value="${esc(ev.owner)}"></div><div class="fg"><label>Recurring</label><select id="ee-rec">${['none','weekly','monthly','quarterly'].map(r=>`<option value="${r}"${r===(ev.recurringType||'none')?' selected':''}>${r==='none'?'One-time':r.charAt(0).toUpperCase()+r.slice(1)}</option>`).join('')}</select></div></div>
-    <div class="fg"><label>Google Meet link</label><input id="ee-meet" type="url" value="${esc(ev.meetLink||'')}"></div>
+    <div class="fg-row"><div class="fg"><label>Google Meet link</label><input id="ee-meet" type="url" value="${esc(ev.meetLink||'')}"></div><div class="fg"><label>Community Partner</label><select id="ee-cp-id"><option value="">— None —</option>${S.partners.map(p=>`<option value="${p.id}"${p.id===ev.communityPartnerId?' selected':''}>${esc(p.businessName||p.name)}</option>`).join('')}</select></div></div>
     <div class="fg"><label>Brief</label><textarea id="ee-brief">${esc(ev.brief)}</textarea></div>
     <div class="modal-footer">
       <button class="btn-danger btn-sm" onclick="deleteEvent(${ev.id})"><i class="ti ti-trash"></i></button>
       <button onclick="closeModal()">Cancel</button>
       <button class="btn-primary" onclick="saveEditEvent(${ev.id})"><i class="ti ti-check"></i> Save</button>
     </div>`;
+  } else if(type==='view_partner') {
+    const p=S.partners.find(x=>x.id===id); if(!p){closeModal();return;}
+    const stageColor=PARTNER_STAGE_COLOR[p.stage||'Messaged']||'var(--blue)';
+    const stageBg=PARTNER_STAGE_BG[p.stage||'Messaged']||'var(--blue-bg)';
+    html=`<h3 style="margin-bottom:4px">${esc(p.businessName||p.name)}</h3>
+    <div style="margin-bottom:14px"><span class="badge" style="background:${stageBg};color:${stageColor}">${p.stage||'Messaged'}</span>${p.campaign?` <span class="badge b-draft">${esc(p.campaign)}</span>`:''}</div>
+    ${[['Person of contact',p.contactPerson],['Location',p.location],['Email',p.email],['Phone',p.phone],['Campaign',p.campaign],['Event / Partnership date',p.eventDate],['Notes',p.notes]].filter(([,v])=>v).map(([k,v])=>`<div style="padding:8px 0;border-bottom:0.5px solid var(--border);display:flex;gap:16px"><span style="font-size:12px;font-weight:500;color:var(--text2);min-width:110px;flex-shrink:0">${k}</span><span style="font-size:13px">${k==='Email'?`<a href="mailto:${esc(v)}" style="color:var(--blue)">${esc(v)}</a>`:esc(String(v))}</span></div>`).join('')}
+    ${p.agreementDriveUrl?`<div style="padding:8px 0;border-bottom:0.5px solid var(--border);display:flex;gap:16px"><span style="font-size:12px;font-weight:500;color:var(--text2);min-width:110px;flex-shrink:0">Agreement</span><a href="${esc(p.agreementDriveUrl)}" target="_blank" style="font-size:13px;color:var(--blue);display:flex;align-items:center;gap:4px"><i class="ti ti-brand-google-drive"></i> Open in Drive</a></div>`:''}
+    <div class="modal-footer">
+      <button onclick="closeModal();openModal('edit_partner',${p.id})"><i class="ti ti-edit"></i> Edit</button>
+      <button class="btn-primary" onclick="closeModal()">Close</button>
+    </div>`;
   } else if(type==='edit_partner') {
     const p=S.partners.find(x=>x.id===id); if(!p){closeModal();return;}
-    html=`<h3>Edit partner</h3>
-    <div class="fg"><label>Organization name</label><input id="ep-name" value="${esc(p.name)}"></div>
-    <div class="fg-row"><div class="fg"><label>Type</label><input id="ep-type" value="${esc(p.type)}"></div><div class="fg"><label>Location</label><input id="ep-loc" value="${esc(p.location)}"></div></div>
-    <div class="fg"><label>Status</label><select id="ep-status">${['Active','In review','Planned'].map(st=>`<option${st===p.status?' selected':''}>${st}</option>`).join('')}</select></div>
-    <div class="fg-row"><div class="fg"><label>Co-events</label><input id="ep-events" type="number" value="${p.events}"></div><div class="fg"><label>Reach / KPI</label><input id="ep-kpi" value="${esc(p.kpi)}"></div></div>
-    <div class="fg"><label>Media / deliverables</label><input id="ep-media" value="${esc(p.media)}"></div>
+    html=`<h3>Edit community partner</h3>
+    <div class="fg"><label>Business name</label><input id="ep-name" value="${esc(p.businessName||p.name)}"></div>
+    <div class="fg-row"><div class="fg"><label>Person of contact</label><input id="ep-contact" value="${esc(p.contactPerson||'')}"></div><div class="fg"><label>Location</label><input id="ep-loc" value="${esc(p.location)}"></div></div>
+    <div class="fg-row"><div class="fg"><label>Email</label><input id="ep-email" type="email" value="${esc(p.email||'')}"></div><div class="fg"><label>Phone</label><input id="ep-phone" value="${esc(p.phone||'')}"></div></div>
+    <div class="fg-row"><div class="fg"><label>Campaign</label><select id="ep-campaign"><option value="">— None —</option>${['In-house Orlando','In-house Tampa'].map(c=>`<option${c===(p.campaign||'')?' selected':''}>${c}</option>`).join('')}</select></div><div class="fg"><label>Stage</label><select id="ep-stage">${PARTNER_STAGES.map(s=>`<option${s===(p.stage||'Messaged')?' selected':''}>${s}</option>`).join('')}</select></div></div>
+    <div class="fg-row"><div class="fg"><label>Event / Partnership date</label><input type="date" id="ep-eventdate" value="${p.eventDate||''}"></div><div class="fg"><label>Partnership agreement (Drive link)</label><input id="ep-agreement" type="url" value="${esc(p.agreementDriveUrl||'')}" placeholder="https://drive.google.com/…"></div></div>
     <div class="fg"><label>Notes</label><textarea id="ep-notes">${esc(p.notes)}</textarea></div>
     <div class="modal-footer">
       <button class="btn-danger btn-sm" onclick="deletePartner(${p.id})"><i class="ti ti-trash"></i></button>
@@ -2425,12 +2629,25 @@ function saveNewsletter(){
 function saveEvent(){
   const name=document.getElementById('m-name').value.trim(); if(!name)return;
   const recType=(document.getElementById('m-recurring')||{}).value||'none';
-  S.events.push({id:Date.now(),name,location:document.getElementById('m-loc').value||'TBD',date:document.getElementById('m-date').value||'',status:'Planned',budget:parseInt(document.getElementById('m-budget').value)||0,spent:0,attendees:parseInt(document.getElementById('m-att').value)||0,type:document.getElementById('m-type').value,owner:S.profile.name||'Me',brief:document.getElementById('m-brief').value||'',meetLink:document.getElementById('m-meet').value.trim()||'',recurring:recType!=='none',recurringType:recType});
+  const cpIdRaw=document.getElementById('m-cp-id')?.value; const cpId=cpIdRaw?parseInt(cpIdRaw):null;
+  S.events.push({id:Date.now(),name,location:document.getElementById('m-loc').value||'TBD',date:document.getElementById('m-date').value||'',status:'Planned',budget:parseInt(document.getElementById('m-budget').value)||0,spent:0,attendees:parseInt(document.getElementById('m-att').value)||0,type:document.getElementById('m-type').value,owner:S.profile.name||'Me',brief:document.getElementById('m-brief').value||'',meetLink:document.getElementById('m-meet').value.trim()||'',recurring:recType!=='none',recurringType:recType,communityPartnerId:cpId||null});
   persist(); closeModal(); render();
 }
 function savePartner(){
   const name=document.getElementById('m-name').value.trim(); if(!name)return;
-  S.partners.push({id:Date.now(),name,type:document.getElementById('m-type').value||'General',location:document.getElementById('m-loc').value||'TBD',status:'Planned',events:0,media:document.getElementById('m-media').value||'TBD',kpi:'—',notes:document.getElementById('m-notes').value||''});
+  const stage=document.getElementById('m-stage')?.value||'Messaged';
+  S.partners.push({
+    id:Date.now(), businessName:name, name,
+    contactPerson:document.getElementById('m-contact')?.value.trim()||'',
+    location:document.getElementById('m-loc')?.value.trim()||'',
+    email:document.getElementById('m-email')?.value.trim()||'',
+    phone:document.getElementById('m-phone')?.value.trim()||'',
+    campaign:document.getElementById('m-campaign')?.value||'',
+    eventDate:document.getElementById('m-eventdate')?.value||'',
+    agreementDriveUrl:document.getElementById('m-agreement')?.value.trim()||'',
+    stage, notes:document.getElementById('m-notes')?.value||'',
+    type:'General', status:'Planned', events:0, media:'TBD', kpi:'—'
+  });
   persist(); closeModal(); render();
 }
 function saveFile() {
@@ -2598,6 +2815,8 @@ function saveEditEvent(id){
   ev.brief=document.getElementById('ee-brief').value;
   ev.recurringType=document.getElementById('ee-rec').value;
   ev.recurring=ev.recurringType!=='none';
+  const cpRaw=document.getElementById('ee-cp-id')?.value;
+  ev.communityPartnerId=cpRaw?parseInt(cpRaw):null;
   persist(); closeModal(); render();
 }
 function deleteEvent(id){
@@ -2606,14 +2825,17 @@ function deleteEvent(id){
 }
 function saveEditPartner(id){
   const p=S.partners.find(x=>x.id===id); if(!p)return;
-  p.name=document.getElementById('ep-name').value.trim()||p.name;
-  p.type=document.getElementById('ep-type').value;
-  p.location=document.getElementById('ep-loc').value;
-  p.status=document.getElementById('ep-status').value;
-  p.events=parseInt(document.getElementById('ep-events').value)||0;
-  p.kpi=document.getElementById('ep-kpi').value.trim()||'—';
-  p.media=document.getElementById('ep-media').value;
-  p.notes=document.getElementById('ep-notes').value;
+  const newName=document.getElementById('ep-name').value.trim()||p.businessName||p.name;
+  p.businessName=newName; p.name=newName;
+  p.contactPerson=document.getElementById('ep-contact')?.value.trim()||p.contactPerson||'';
+  p.location=document.getElementById('ep-loc')?.value.trim()||p.location||'';
+  p.email=document.getElementById('ep-email')?.value.trim()||p.email||'';
+  p.phone=document.getElementById('ep-phone')?.value.trim()||p.phone||'';
+  p.campaign=document.getElementById('ep-campaign')?.value||p.campaign||'';
+  p.stage=document.getElementById('ep-stage')?.value||p.stage||'Messaged';
+  p.eventDate=document.getElementById('ep-eventdate')?.value||p.eventDate||'';
+  p.agreementDriveUrl=document.getElementById('ep-agreement')?.value.trim()||p.agreementDriveUrl||'';
+  p.notes=document.getElementById('ep-notes')?.value||p.notes||'';
   persist(); closeModal(); render();
 }
 function deletePartner(id){
