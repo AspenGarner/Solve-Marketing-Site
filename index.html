@@ -59,6 +59,10 @@ a{color:var(--accent);text-decoration:none}
 .nav-user:hover{background:rgba(255,255,255,0.07)}
 .page-title{font-size:15px;font-weight:500;font-family:var(--font-heading)}
 .topbar-right{display:flex;align-items:center;gap:10px}
+.topbar-search{display:flex;align-items:center;gap:6px;background:var(--surface2);border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:5px 10px;min-width:180px;max-width:260px;flex:1}
+.topbar-search input{border:none;background:none;outline:none;font-size:13px;color:var(--text1);width:100%;font-family:var(--font)}
+.topbar-search input::placeholder{color:var(--text3)}
+.topbar-search i{color:var(--text3);font-size:14px;flex-shrink:0}
 .topbar-btn{width:32px;height:32px;border-radius:50%;border:0.5px solid var(--border2);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:16px;transition:background .12s}
 .topbar-btn:hover{background:var(--surface2)}
 button,.btn{cursor:pointer;font-family:var(--font);font-size:13px;padding:7px 14px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);transition:all .12s;display:inline-flex;align-items:center;gap:5px}
@@ -300,6 +304,11 @@ label{font-size:12px;color:var(--text2);display:block;margin-bottom:4px;font-wei
     <div style="display:flex;align-items:center;gap:10px">
       <button class="hamburger" onclick="toggleSidebar()" title="Toggle menu"><span></span><span></span><span></span></button>
       <div class="page-title" id="page-title">Dashboard</div>
+    </div>
+    <div class="topbar-search">
+      <i class="ti ti-search"></i>
+      <input id="global-search" placeholder="Search…" oninput="window._searchQ=this.value;render()" autocomplete="off">
+      <button id="search-clear" onclick="window._searchQ='';document.getElementById('global-search').value='';render()" style="display:none;background:none;border:none;cursor:pointer;color:var(--text3);padding:0;font-size:14px">×</button>
     </div>
     <div class="topbar-right">
       <div id="firebase-indicator" class="firebase-status fs-disconnected"><span class="fs-dot"></span>Chat offline</div>
@@ -552,6 +561,18 @@ window.escHtml = escHtml;
 </script>
 
 <script>
+// ── Search helper ─────────────────────────────────────────
+function getSearchQ() {
+  const q = (window._searchQ || '').trim().toLowerCase();
+  const sc = document.getElementById('search-clear');
+  if (sc) sc.style.display = q ? '' : 'none';
+  return q;
+}
+function srch(q, ...vals) {
+  if (!q) return true;
+  return vals.some(v => String(v||'').toLowerCase().includes(q));
+}
+
 // ── State ────────────────────────────────────────────────
 const TODAY = new Date().toISOString().slice(0,10);
 
@@ -678,6 +699,9 @@ const TITLES = {dashboard:'Dashboard',influencers:'Influencers',social:'Social c
 
 function nav(view) {
   S.view = view;
+  window._searchQ = '';
+  const si = document.getElementById('global-search'); if(si) si.value = '';
+  const sc = document.getElementById('search-clear'); if(sc) sc.style.display = 'none';
   document.querySelectorAll('.nav-item').forEach(el => {
     el.classList.toggle('active', el.getAttribute('onclick')===`nav('${view}')`);
   });
@@ -809,11 +833,13 @@ function renderDashboard() {
 // ── To-Dos page ───────────────────────────────────────────
 function renderTodos() {
   const fl=window._todoFL||'All', fp=window._todoFP||'All', sd=window._todoSD||false;
+  const q=getSearchQ();
   const labels=['All',...new Set(S.todos.map(t=>t.label))];
   let list=S.todos;
   if(fl!=='All') list=list.filter(t=>t.label===fl);
   if(fp!=='All') list=list.filter(t=>t.priority===fp);
   if(!sd) list=list.filter(t=>!t.done);
+  if(q) list=list.filter(t=>srch(q,t.title,t.label,t.assignee,t.priority));
   const ov=list.filter(t=>!t.done&&t.dueDate<TODAY);
   const dt=list.filter(t=>!t.done&&t.dueDate===TODAY);
   const up=list.filter(t=>!t.done&&t.dueDate>TODAY);
@@ -859,8 +885,10 @@ function renderTodos() {
 
 // ── Social ────────────────────────────────────────────────
 function renderSocial() {
-  const pending=S.social.filter(s=>s.status==='Pending approval');
-  const approved=S.social.filter(s=>s.status==='Approved');
+  const q=getSearchQ();
+  const allSocial = q ? S.social.filter(s=>srch(q,s.title,s.platform,s.copy,s.status,s.submittedBy)) : S.social;
+  const pending=allSocial.filter(s=>s.status==='Pending approval');
+  const approved=allSocial.filter(s=>s.status==='Approved');
   const rejected=S.social.filter(s=>s.status==='Rejected');
   const tab=S.socialTab;
   const list=tab==='pending'?pending:tab==='approved'?approved:rejected;
@@ -951,6 +979,8 @@ function approvePost(id,approve) {
 
 // ── Events ────────────────────────────────────────────────
 function renderEvents() {
+  const q=getSearchQ();
+  const evList = q ? S.events.filter(e=>srch(q,e.name,e.location,e.type,e.owner,e.brief,e.status)) : S.events;
   const tb=S.events.reduce((a,e)=>a+e.budget,0), ts=S.events.reduce((a,e)=>a+e.spent,0);
   return `
   <div class="stats">
@@ -962,7 +992,8 @@ function renderEvents() {
   <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
     <button class="btn-primary btn-sm" onclick="openModal('event')"><i class="ti ti-plus"></i> Add event</button>
   </div>
-  ${S.events.map(e=>`
+  ${evList.length===0&&q?`<div class="empty"><i class="ti ti-search"></i>No events match "${esc(q)}".</div>`:''}
+  ${evList.map(e=>`
     <div class="card">
       <div class="card-row">
         <div class="card-body">
@@ -993,7 +1024,7 @@ function renderEvents() {
 }
 
 // ── Influencers ───────────────────────────────────────────
-const STAGES = ['Messaged','Scheduled Call','Talking','Scheduled Service','Serviced/Content Scheduled','Needs to be paid','Paid'];
+const STAGES = ['Messaged','Talking','Scheduled Call','Scheduled Service','Serviced/Content Scheduled','Needs to be paid','Paid'];
 const STAGE_COLOR = {'Messaged':'var(--blue)','Scheduled Call':'var(--purple)','Talking':'var(--amber)','Scheduled Service':'var(--purple)','Serviced/Content Scheduled':'var(--accent)','Needs to be paid':'var(--red)','Paid':'var(--green)'};
 const STAGE_BG    = {'Messaged':'var(--blue-bg)','Scheduled Call':'var(--purple-bg)','Talking':'var(--amber-bg)','Scheduled Service':'var(--purple-bg)','Serviced/Content Scheduled':'rgba(4,108,94,.1)','Needs to be paid':'var(--red-bg)','Paid':'var(--green-bg)'};
 
@@ -1024,6 +1055,18 @@ function reminderChipHtml(inf) {
     <i class="ti ti-bell-plus"></i> Add reminder
   </span>`;
 }
+function partnerReminderChipHtml(p) {
+  if (p.reminder?.date) {
+    const overdue = p.reminder.date < TODAY;
+    const style = overdue ? 'background:var(--amber-bg);color:var(--amber)' : '';
+    return `<span class="reminder-chip has-reminder" style="${style}" onclick="event.stopPropagation();openModal('partner_reminder',${p.id})" title="Edit reminder">
+      <i class="ti ti-bell${overdue?'-ringing':''}"></i> ${fmtDate(p.reminder.date)} · ${esc(p.reminder.note)}
+    </span>`;
+  }
+  return `<span class="reminder-chip no-reminder" onclick="event.stopPropagation();openModal('partner_reminder',${p.id})" title="Add reminder">
+    <i class="ti ti-bell-plus"></i> Add reminder
+  </span>`;
+}
 
 function renderInfluencers() {
   // Auto-switch to list if not enough width for 6 kanban columns (min ~160px each)
@@ -1031,9 +1074,11 @@ function renderInfluencers() {
   const effectiveW = isMobile ? window.innerWidth : (window.innerWidth - 220);
   if (isMobile || (!window._infTabManual && effectiveW < 1050)) window._infTab = 'list';
   const tab  = window._infTab || 'board';
+  const q = getSearchQ();
   const qFil = window._infQ  || 'All';
-  // Apply quarter filter to the working set
-  const qList = qFil === 'All' ? S.influencers : S.influencers.filter(i=>(i.quarter||'')===qFil);
+  // Apply quarter filter then search to the working set
+  let qList = qFil === 'All' ? S.influencers : S.influencers.filter(i=>(i.quarter||'')===qFil);
+  if (q) qList = qList.filter(i=>srch(q,i.firstName,i.lastName,i.fullName,i.instagramHandle,i.name,i.email,i.phone,i.campaign,i.stage,i.platform,i.brief,i.notes));
   const fees   = qList.reduce((a,i)=>a+i.fee,0);
   const quarters = ['Q1','Q2','Q3','Q4'];
   const stats = `
@@ -1348,6 +1393,8 @@ function editInfluencer(id) {
 
 // ── Newsletters ───────────────────────────────────────────
 function renderNewsletters() {
+  const q=getSearchQ();
+  const nlList = q ? S.newsletters.filter(n=>srch(q,n.subject,n.status,n.segment,n.brief)) : S.newsletters;
   const sent=S.newsletters.filter(n=>n.status==='Sent');
   const avgOpen=sent.length?Math.round(sent.reduce((a,n)=>a+n.openRate,0)/sent.length):0;
   return `
@@ -1360,7 +1407,8 @@ function renderNewsletters() {
   <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
     <button class="btn-primary btn-sm" onclick="openModal('newsletter')"><i class="ti ti-plus"></i> New campaign</button>
   </div>
-  ${S.newsletters.map(n=>`
+  ${nlList.length===0&&q?`<div class="empty"><i class="ti ti-search"></i>No newsletters match "${esc(q)}".</div>`:''}
+  ${nlList.map(n=>`
     <div class="card">
       <div class="card-row">
         <div class="card-body">
@@ -1389,6 +1437,8 @@ function renderNewsletters() {
 
 // ── Partners ──────────────────────────────────────────────
 function renderPartners() {
+  const q=getSearchQ();
+  const partnerPool = q ? S.partners.filter(p=>srch(q,p.businessName,p.name,p.contactPerson,p.location,p.email,p.campaign,p.stage,p.notes)) : S.partners;
   const cpCount = S.partners.filter(p=>p.stage==='Community Partner').length;
   return `
   <div class="stats" style="margin-bottom:14px">
@@ -1402,7 +1452,7 @@ function renderPartners() {
   </div>
   <div class="kanban-board" style="overflow-x:auto;padding-bottom:8px">
     ${PARTNER_STAGES.map(stage=>{
-      const items = S.partners.filter(p=>(p.stage||'Messaged')===stage);
+      const items = partnerPool.filter(p=>(p.stage||'Messaged')===stage);
       return `<div class="kanban-col" style="min-width:200px">
         <div class="kanban-col-hdr">
           <span style="color:${PARTNER_STAGE_COLOR[stage]}">${stage}</span>
@@ -1418,6 +1468,7 @@ function renderPartners() {
             </div>
             ${p.location?`<div style="font-size:11px;color:var(--text2)"><i class="ti ti-map-pin" style="font-size:10px"></i> ${esc(p.location)}</div>`:''}
             ${p.eventDate?`<div style="font-size:11px;color:var(--accent);margin-top:3px"><i class="ti ti-calendar-event" style="font-size:10px"></i> ${esc(p.eventDate)}</div>`:''}
+            <div style="margin-top:6px">${partnerReminderChipHtml(p)}</div>
             <div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap">
               ${PARTNER_STAGES.map(s=>s===stage?'':`<button class="btn-sm" style="font-size:9px;padding:2px 6px;flex-shrink:0" onclick="event.stopPropagation();movePartnerStage(${p.id},'${s}')" title="Move to ${s}">${s==='Community Partner'?'→ Partner':s==='Reviewing Partnership Agreement'?'→ Review':s==='Scheduled Call'?'→ Call':'→ '+s}</button>`).join('')}
               <button class="btn-sm" style="font-size:9px;padding:2px 6px" onclick="event.stopPropagation();openModal('edit_partner',${p.id})"><i class="ti ti-edit"></i></button>
@@ -1994,6 +2045,10 @@ function buildCalMonth(yr, mo, compact) {
       }
     }catch(err){}
   });
+  // Community partner reminders
+  S.partners.filter(p=>p.reminder?.date).forEach(p=>{
+    try{const d=new Date(p.reminder.date+'T00:00:00');if(d.getFullYear()===yr&&d.getMonth()===mo)calEvs.push({day:d.getDate(),label:'🔔 Partner: '+(p.businessName||p.name)+' · '+p.reminder.note,cls:'ce-blue',partnerId:p.id});}catch(err){}
+  });
   // Community partner event dates
   S.partners.filter(p=>p.eventDate&&p.stage==='Community Partner').forEach(p=>{
     try{const d=new Date(p.eventDate+'T00:00:00');if(d.getFullYear()===yr&&d.getMonth()===mo)calEvs.push({day:d.getDate(),label:'🤝 Partner Event: '+(p.businessName||p.name),cls:'ce-amber',partnerId:p.id});}catch(err){}
@@ -2071,17 +2126,20 @@ function renderCalendar() {
 
 // ── Files ─────────────────────────────────────────────────
 function renderFiles() {
+  const q=getSearchQ();
+  const fileList = q ? S.files.filter(f=>srch(q,f.name,f.type,f.module,f.by)) : S.files;
   const tc={Brief:'b-accent',Template:'b-purple',Proposal:'b-blue',Calendar:'b-active',Reference:'b-draft',Report:'b-active',KPIs:'b-accent'};
   return `
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-    <div style="font-size:13px;color:var(--text2)">${S.files.length} files</div>
+    <div style="font-size:13px;color:var(--text2)">${fileList.length} file${fileList.length!==1?'s':''}</div>
     <button class="btn-primary btn-sm" onclick="openModal('file')"><i class="ti ti-upload"></i> Upload file</button>
   </div>
   <div class="toolbar">
     <select><option>All modules</option><option>Influencers</option><option>Social</option><option>Newsletters</option><option>Events</option><option>Partners</option></select>
     <input type="text" placeholder="Search files…" style="width:180px">
   </div>
-  ${S.files.map(f=>`
+  ${fileList.length===0&&q?`<div class="empty"><i class="ti ti-search"></i>No files match "${esc(q)}".</div>`:''}
+  ${fileList.map(f=>`
     <div class="card" style="padding:11px 14px">
       <div class="card-row" style="align-items:center">
         <div style="width:34px;height:34px;border-radius:var(--radius-sm);background:var(--surface2);display:flex;align-items:center;justify-content:center;flex-shrink:0">
@@ -2318,6 +2376,17 @@ function openModal(type, id) {
       ${r?`<button class="btn-danger btn-sm" onclick="clearReminder(${inf.id})"><i class="ti ti-bell-off"></i> Remove</button>`:''}
       <button onclick="closeModal()">Cancel</button>
       <button class="btn-primary" onclick="saveReminder(${inf.id})"><i class="ti ti-check"></i> Save reminder</button>
+    </div>`;
+  } else if(type==='partner_reminder') {
+    const p=S.partners.find(x=>x.id===id); if(!p){closeModal();return;}
+    const r=p.reminder;
+    html=`<h3 style="display:flex;align-items:center;gap:8px"><i class="ti ti-bell" style="color:var(--blue)"></i> Reminder — ${esc(p.businessName||p.name)}</h3>
+    <div class="fg"><label>Reminder date</label><input type="date" id="pr-date" value="${r?.date||''}"></div>
+    <div class="fg"><label>Note</label><input id="pr-note" value="${esc(r?.note||'Follow up')}" placeholder="e.g. Follow up, Send agreement…"></div>
+    <div class="modal-footer">
+      ${r?`<button class="btn-danger btn-sm" onclick="clearPartnerReminder(${p.id})"><i class="ti ti-bell-off"></i> Remove</button>`:''}
+      <button onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="savePartnerReminder(${p.id})"><i class="ti ti-check"></i> Save reminder</button>
     </div>`;
   } else if(type==='addPromoCode') {
     html=`<h3>Add community promo code</h3>
@@ -2600,6 +2669,17 @@ function saveReminder(infId){
 function clearReminder(infId){
   const inf=S.influencers.find(i=>i.id===infId); if(!inf)return;
   inf.reminder=null; persist(); closeModal(); render();
+}
+function savePartnerReminder(pid){
+  const p=S.partners.find(x=>x.id===pid); if(!p)return;
+  const date=document.getElementById('pr-date').value;
+  const note=document.getElementById('pr-note').value.trim();
+  p.reminder = date ? {date, note:note||'Reminder', auto:false} : null;
+  persist(); closeModal(); render();
+}
+function clearPartnerReminder(pid){
+  const p=S.partners.find(x=>x.id===pid); if(!p)return;
+  p.reminder=null; persist(); closeModal(); render();
 }
 function saveGlobalPromo(){
   const code=document.getElementById('gpc-code').value.trim().toUpperCase(); if(!code)return;
