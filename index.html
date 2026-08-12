@@ -1114,8 +1114,7 @@ function renderInfluencers() {
       <button class="tab ${tab==='list'?'active':''}" onclick="window._infTab='list';window._infTabManual=true;render()"><i class="ti ti-list"></i> List</button>
     </div>
     <div style="display:flex;gap:6px;flex-wrap:wrap">
-      <button id="sheets-sync-btn" class="btn-sm" onclick="loadInfluencersFromSheets()" title="Pull from Google Sheet"><i class="ti ti-table-import"></i> Sync Sheets</button>
-      <button id="clicki-sync-all-btn" class="btn-sm" onclick="syncAllClicki()" title="Pull latest stats from Clicki for all influencers" style="color:var(--blue)"><i class="ti ti-refresh"></i> Sync Clicki</button>
+<button id="clicki-sync-all-btn" class="btn-sm" onclick="syncAllClicki()" title="Pull latest stats from Clicki for all influencers" style="color:var(--blue)"><i class="ti ti-refresh"></i> Sync Clicki</button>
       <button class="btn-primary btn-sm" onclick="openModal('influencer')"><i class="ti ti-plus"></i> Add influencer</button>
     </div>
   </div>`;
