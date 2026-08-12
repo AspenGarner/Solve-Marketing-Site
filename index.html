@@ -475,12 +475,25 @@ if (CONFIGURED) {
         }));
         if (window.render) window.render();
       } else {
-        // First device to connect — seed Firestore with current localStorage data
-        await setDoc(fsDocRef, {
-          influencers:S.influencers, social:S.social, newsletters:S.newsletters,
-          events:S.events, partners:S.partners, files:S.files, todos:S.todos, promoCodes:S.promoCodes,
-          _ts: Date.now(), _by: 'Initial seed'
-        });
+        // Firestore doc doesn't exist yet — only seed if localStorage has real user data
+        // (never seed with hardcoded defaults, which would overwrite real data on other devices)
+        const lsRaw = localStorage.getItem('solve-os-data');
+        const lsData = lsRaw ? JSON.parse(lsRaw) : null;
+        const hasRealData = lsData && (
+          (lsData.influencers?.length > 0) ||
+          (lsData.todos?.length > 0) ||
+          (lsData.events?.length > 0)
+        );
+        if (hasRealData) {
+          // Seed Firestore with the real localStorage data from this device
+          await setDoc(fsDocRef, {
+            influencers:lsData.influencers||[], social:lsData.social||[], newsletters:lsData.newsletters||[],
+            events:lsData.events||[], partners:lsData.partners||[], files:lsData.files||[],
+            todos:lsData.todos||[], promoCodes:lsData.promoCodes||[],
+            _ts: Date.now(), _by: 'Initial seed from localStorage'
+          });
+        }
+        // If no real local data either, do nothing — leave Firestore empty; user will add data
       }
       setSyncStatus('synced');
     } catch(e) {
@@ -1618,30 +1631,76 @@ async function loadInfluencersFromSheets() {
       return '';
     };
 
-    const imported = data.rows.map((row, i) => ({
-      id: Date.now() + i,
-      name:       col(row, 'handle', 'name', 'username', 'influencer'),
+    const rawImported = data.rows.map((row, i) => ({
+      _sheetName: col(row, 'handle', 'name', 'username', 'influencer'),
       platform:   col(row, 'platform', 'channel', 'network') || 'Instagram',
       followers:  parseInt(String(col(row, 'followers', 'follower', 'subscribers')).replace(/[^0-9]/g, '')) || 0,
       tier:       col(row, 'tier', 'level', 'category') || 'Micro',
-      status:     col(row, 'status', 'stage') || 'Active',
+      status:     col(row, 'status') || 'Active',
+      stage:      col(row, 'stage', 'pipeline') || '',
       campaign:   col(row, 'campaign', 'project', 'initiative') || 'TBD',
       reach:      parseInt(String(col(row, 'reach', 'avg reach', 'views')).replace(/[^0-9]/g, '')) || 0,
       roi:        parseFloat(col(row, 'roi', 'return')) || 0,
       fee:        parseInt(String(col(row, 'fee', 'rate', 'cost', 'pay')).replace(/[^0-9]/g, '')) || 0,
       brief:      col(row, 'brief', 'deliverable', 'notes', 'description') || '—',
       notes:      col(row, 'note', 'comment', 'remark') || '',
-    })).filter(inf => inf.name);
+    })).filter(r => r._sheetName);
 
-    if (!imported.length) throw new Error('Could not map any rows — check column headers');
+    if (!rawImported.length) throw new Error('Could not map any rows — check column headers');
 
-    S.influencers = imported;
+    // Merge with existing influencers — preserve stage, reminders, and other in-app fields
+    let addedCount = 0, updatedCount = 0;
+    const merged = rawImported.map((row, i) => {
+      const existing = S.influencers.find(inf =>
+        (inf.name || '').toLowerCase() === row._sheetName.toLowerCase() ||
+        (inf.instagramHandle || '').toLowerCase() === row._sheetName.toLowerCase()
+      );
+      if (existing) {
+        updatedCount++;
+        return {
+          ...existing,
+          // Update sheet-sourced fields
+          name:      row._sheetName,
+          platform:  row.platform || existing.platform,
+          followers: row.followers || existing.followers,
+          tier:      row.tier || existing.tier,
+          status:    row.status || existing.status,
+          campaign:  row.campaign || existing.campaign,
+          reach:     row.reach || existing.reach,
+          roi:       row.roi || existing.roi,
+          fee:       row.fee || existing.fee,
+          brief:     row.brief || existing.brief,
+          notes:     row.notes || existing.notes,
+          // Preserve in-app fields: stage, reminder, quarter, clicki, etc.
+          stage:     existing.stage || (STAGES.includes(row.stage) ? row.stage : 'Messaged'),
+        };
+      } else {
+        addedCount++;
+        return {
+          id: Date.now() + i,
+          name:      row._sheetName,
+          platform:  row.platform,
+          followers: row.followers,
+          tier:      row.tier,
+          status:    row.status,
+          stage:     STAGES.includes(row.stage) ? row.stage : 'Messaged',
+          campaign:  row.campaign,
+          reach:     row.reach,
+          roi:       row.roi,
+          fee:       row.fee,
+          brief:     row.brief,
+          notes:     row.notes,
+        };
+      }
+    });
+
+    S.influencers = merged;
     persist();
     render();
 
     const notice = document.createElement('div');
     notice.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--nav-bg);color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;z-index:200;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,.2)';
-    notice.innerHTML = `<i class="ti ti-check"></i> Synced ${imported.length} influencers from "${target.title}"`;
+    notice.innerHTML = `<i class="ti ti-check"></i> Synced from "${target.title}" — ${updatedCount} updated, ${addedCount} added`;
     document.body.appendChild(notice);
     setTimeout(() => notice.remove(), 4000);
 
