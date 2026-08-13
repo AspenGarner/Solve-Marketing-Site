@@ -685,6 +685,30 @@ const fmtDate = d => { if(!d||d==='—') return '—'; try { return new Date(d+'
 const stCls = s => ({Active:'b-active','In review':'b-review',Planned:'b-planned',Done:'b-done',Approved:'b-approved','Pending approval':'b-pending',Rejected:'b-rejected',Scheduled:'b-scheduled',Sent:'b-done',Draft:'b-draft'}[s]||'b-draft');
 const priCls = p => p==='High'?'b-accent':p==='Medium'?'b-pending':'b-draft';
 
+// ── Service date helpers ──────────────────────────────────
+function calcNextServiceDate(lastDateStr) {
+  if (!lastDateStr) return '';
+  const dt = new Date(lastDateStr + 'T00:00:00');
+  dt.setDate(dt.getDate() + 21);
+  return dt.toISOString().split('T')[0];
+}
+function autoCalcNextService(lastId, nextId) {
+  const lastVal = document.getElementById(lastId)?.value;
+  const nextEl  = document.getElementById(nextId);
+  if (nextEl) nextEl.value = calcNextServiceDate(lastVal);
+}
+function nextServiceChipHtml(inf) {
+  if (!inf.nextServiceDate) return '';
+  const today = new Date(); today.setHours(0,0,0,0);
+  const next  = new Date(inf.nextServiceDate + 'T00:00:00');
+  const diff  = Math.ceil((next - today) / 86400000);
+  if (diff < 0)
+    return `<div style="margin-top:5px;font-size:10px;font-weight:600;color:var(--red);display:flex;align-items:center;gap:3px"><i class="ti ti-alert-circle"></i> Service overdue · ${fmtDate(inf.nextServiceDate)}</div>`;
+  if (diff <= 14)
+    return `<div style="margin-top:5px;font-size:10px;font-weight:600;color:var(--amber);display:flex;align-items:center;gap:3px"><i class="ti ti-clock"></i> Due soon · ${fmtDate(inf.nextServiceDate)}</div>`;
+  return `<div style="margin-top:5px;font-size:10px;color:var(--text3);display:flex;align-items:center;gap:3px"><i class="ti ti-calendar-event"></i> Next service · ${fmtDate(inf.nextServiceDate)}</div>`;
+}
+
 // ── Profile ───────────────────────────────────────────────
 function saveProfile() {
   localStorage.setItem('solve-profile', JSON.stringify(S.profile));
@@ -1169,7 +1193,7 @@ function renderInfluencerBoard(qList) {
               </select>
               <button onclick="event.stopPropagation();syncClickiCard(${inf.id})" title="Sync Clicki stats" id="clicki-btn-${inf.id}" style="flex-shrink:0;padding:3px 7px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface2);cursor:pointer;font-size:11px;color:var(--text2)"><i class="ti ti-refresh"></i></button>
             </div>
-            <div style="margin-top:7px">${reminderChipHtml(inf)}</div>
+            <div style="margin-top:7px">${reminderChipHtml(inf)}${nextServiceChipHtml(inf)}</div>
           </div>`).join('')}
         ${items.length===0?`<div class="kc-empty">No influencers</div>`:''}
       </div>`;
@@ -1908,15 +1932,28 @@ function renderPDFGenerator() {
   const qFil  = window._pdfQ  || 'All';
   const pFil  = window._pdfP  || 'All';
   const sFil  = window._pdfS  || 'All';
-  const fields = window._pdfFields || {name:true,handle:true,platform:true,quarter:true,stage:true,serviceDate:true,campaign:true,fee:true,followers:true,brief:true,affiliateLink:true,notes:true,phone:false,email:false,address:false};
+  const dueFil = window._pdfDue || 'All';
+  const fields = window._pdfFields || {name:true,handle:true,platform:true,quarter:true,stage:true,serviceDate:true,lastServiceDate:true,nextServiceDate:true,campaign:true,fee:true,followers:true,brief:true,affiliateLink:true,notes:true,phone:false,email:false,address:false};
+  const nowDate = new Date(); nowDate.setHours(0,0,0,0);
+  const nowYr = nowDate.getFullYear(), nowMo = nowDate.getMonth();
   let list = S.influencers;
   if (qFil !== 'All') list = list.filter(i => (i.quarter||'') === qFil);
   if (pFil !== 'All') list = list.filter(i => i.platform === pFil);
   if (sFil !== 'All') list = list.filter(i => (i.stage||'Messaged') === sFil);
+  if (dueFil === 'This Month') list = list.filter(i => {
+    if (!i.nextServiceDate) return false;
+    const d = new Date(i.nextServiceDate + 'T00:00:00');
+    return d.getFullYear() === nowYr && d.getMonth() === nowMo;
+  });
+  if (dueFil === 'Overdue') list = list.filter(i => {
+    if (!i.nextServiceDate) return false;
+    return new Date(i.nextServiceDate + 'T00:00:00') < nowDate;
+  });
   window._pdfFields = fields;
   const fieldDefs = [
     {key:'name',label:'Name'},{key:'handle',label:'Instagram Handle'},{key:'platform',label:'Platform'},
     {key:'quarter',label:'Quarter'},{key:'stage',label:'Stage'},{key:'serviceDate',label:'First Date of Service'},
+    {key:'lastServiceDate',label:'Last Service Date'},{key:'nextServiceDate',label:'Next Service Date'},
     {key:'campaign',label:'Campaign'},{key:'fee',label:'Fee Paid'},{key:'followers',label:'Following'},
     {key:'phone',label:'Phone'},{key:'email',label:'Email'},{key:'address',label:'Address'},
     {key:'brief',label:'Brief / Deliverables'},{key:'affiliateLink',label:'Affiliate Link'},{key:'notes',label:'Notes'}
@@ -1927,7 +1964,9 @@ function renderPDFGenerator() {
     if(key==='platform') return inf.platform||'—';
     if(key==='quarter') return inf.quarter||'—';
     if(key==='stage') return inf.stage||'Messaged';
-    if(key==='serviceDate') return inf.serviceDate||'—';
+    if(key==='serviceDate') return inf.serviceDate ? fmtDate(inf.serviceDate) : '—';
+    if(key==='lastServiceDate') return inf.lastServiceDate ? fmtDate(inf.lastServiceDate) : '—';
+    if(key==='nextServiceDate') return inf.nextServiceDate ? fmtDate(inf.nextServiceDate) : '—';
     if(key==='campaign') return inf.campaign||'—';
     if(key==='fee') return inf.fee?'$'+inf.fee.toLocaleString():'—';
     if(key==='followers') return inf.followers?fmt(inf.followers):'—';
@@ -1940,6 +1979,11 @@ function renderPDFGenerator() {
     return '—';
   };
   const activeFields = fieldDefs.filter(f => fields[f.key]);
+  const dueThisMonth = S.influencers.filter(i => {
+    if (!i.nextServiceDate) return false;
+    const d = new Date(i.nextServiceDate + 'T00:00:00');
+    return d.getFullYear() === nowYr && d.getMonth() === nowMo;
+  }).length;
   return tabBar + `
   <div style="display:grid;grid-template-columns:260px 1fr;gap:20px;align-items:start">
     <div style="background:var(--surface2);border-radius:var(--radius);padding:16px;position:sticky;top:80px">
@@ -1954,9 +1998,16 @@ function renderPDFGenerator() {
           ${['All','Instagram','TikTok','YouTube','Facebook','Pinterest'].map(p=>`<option${p===pFil?' selected':''}>${p==='All'?'All Platforms':p}</option>`).join('')}
         </select>
       </div>
-      <div class="fg" style="margin-bottom:14px"><label>Stage</label>
+      <div class="fg" style="margin-bottom:10px"><label>Stage</label>
         <select onchange="window._pdfS=this.value;render()">
           ${['All',...STAGES].map(s=>`<option${s===sFil?' selected':''}>${s==='All'?'All Stages':s}</option>`).join('')}
+        </select>
+      </div>
+      <div class="fg" style="margin-bottom:14px"><label>Due for Service <span style="font-weight:400;color:var(--text3)">(${dueThisMonth} this month)</span></label>
+        <select onchange="window._pdfDue=this.value;render()">
+          <option${dueFil==='All'?' selected':''}>All</option>
+          <option${dueFil==='This Month'?' selected':''}>This Month</option>
+          <option${dueFil==='Overdue'?' selected':''}>Overdue</option>
         </select>
       </div>
       <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Fields to include</div>
@@ -1990,14 +2041,27 @@ function generatePDF() {
   const qFil  = window._pdfQ  || 'All';
   const pFil  = window._pdfP  || 'All';
   const sFil  = window._pdfS  || 'All';
-  const fields = window._pdfFields || {name:true,handle:true,platform:true,quarter:true,stage:true,serviceDate:true,campaign:true,fee:true,followers:true,brief:true,affiliateLink:true,notes:true,phone:false,email:false,address:false};
+  const dueFil = window._pdfDue || 'All';
+  const fields = window._pdfFields || {name:true,handle:true,platform:true,quarter:true,stage:true,serviceDate:true,lastServiceDate:true,nextServiceDate:true,campaign:true,fee:true,followers:true,brief:true,affiliateLink:true,notes:true,phone:false,email:false,address:false};
+  const nowDate = new Date(); nowDate.setHours(0,0,0,0);
+  const nowYr = nowDate.getFullYear(), nowMo = nowDate.getMonth();
   let list = S.influencers;
   if (qFil !== 'All') list = list.filter(i => (i.quarter||'') === qFil);
   if (pFil !== 'All') list = list.filter(i => i.platform === pFil);
   if (sFil !== 'All') list = list.filter(i => (i.stage||'Messaged') === sFil);
+  if (dueFil === 'This Month') list = list.filter(i => {
+    if (!i.nextServiceDate) return false;
+    const d = new Date(i.nextServiceDate + 'T00:00:00');
+    return d.getFullYear() === nowYr && d.getMonth() === nowMo;
+  });
+  if (dueFil === 'Overdue') list = list.filter(i => {
+    if (!i.nextServiceDate) return false;
+    return new Date(i.nextServiceDate + 'T00:00:00') < nowDate;
+  });
   const fieldDefs = [
     {key:'name',label:'Name'},{key:'handle',label:'Instagram'},{key:'platform',label:'Platform'},
     {key:'quarter',label:'Quarter'},{key:'stage',label:'Stage'},{key:'serviceDate',label:'First Service'},
+    {key:'lastServiceDate',label:'Last Service'},{key:'nextServiceDate',label:'Next Service'},
     {key:'campaign',label:'Campaign'},{key:'fee',label:'Fee'},{key:'followers',label:'Followers'},
     {key:'phone',label:'Phone'},{key:'email',label:'Email'},{key:'address',label:'Address'},
     {key:'brief',label:'Brief'},{key:'affiliateLink',label:'Affiliate'},{key:'notes',label:'Notes'}
@@ -2008,7 +2072,9 @@ function generatePDF() {
     if(key==='platform') return inf.platform||'—';
     if(key==='quarter') return inf.quarter||'—';
     if(key==='stage') return inf.stage||'Messaged';
-    if(key==='serviceDate') return inf.serviceDate||'—';
+    if(key==='serviceDate') return inf.serviceDate ? fmtDate(inf.serviceDate) : '—';
+    if(key==='lastServiceDate') return inf.lastServiceDate ? fmtDate(inf.lastServiceDate) : '—';
+    if(key==='nextServiceDate') return inf.nextServiceDate ? fmtDate(inf.nextServiceDate) : '—';
     if(key==='campaign') return inf.campaign||'—';
     if(key==='fee') return inf.fee?'$'+inf.fee.toLocaleString():'—';
     if(key==='followers') return inf.followers?fmt(inf.followers):'—';
@@ -2022,7 +2088,8 @@ function generatePDF() {
   };
   const active = fieldDefs.filter(f=>fields[f.key]);
   const now = new Date();
-  const subtitle = [qFil==='All'?'All Quarters':qFil, pFil==='All'?'All Platforms':pFil, sFil==='All'?'All Stages':sFil].join(' · ');
+  const dueLabel = dueFil !== 'All' ? ' · ' + dueFil : '';
+  const subtitle = [qFil==='All'?'All Quarters':qFil, pFil==='All'?'All Platforms':pFil, sFil==='All'?'All Stages':sFil].join(' · ') + dueLabel;
   const rows = list.map(inf=>`<tr>${active.map(f=>`<td>${esc(getCellVal(inf,f.key))}</td>`).join('')}</tr>`).join('');
   const w = window.open('','_blank');
   w.document.write(`<!DOCTYPE html><html><head><title>Influencer Report — Solve Marketing</title>
@@ -2190,7 +2257,10 @@ function renderFiles() {
   return `
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
     <div style="font-size:13px;color:var(--text2)">${fileList.length} file${fileList.length!==1?'s':''}</div>
-    <button class="btn-primary btn-sm" onclick="openModal('file')"><i class="ti ti-upload"></i> Upload file</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn-sm" onclick="downloadBackupExcel()" title="Download a full data backup as Excel"><i class="ti ti-table-export"></i> Download Backup (.xlsx)</button>
+      <button class="btn-primary btn-sm" onclick="openModal('file')"><i class="ti ti-upload"></i> Upload file</button>
+    </div>
   </div>
   <div class="toolbar">
     <select><option>All modules</option><option>Influencers</option><option>Social</option><option>Newsletters</option><option>Events</option><option>Partners</option></select>
@@ -2218,6 +2288,85 @@ function renderFiles() {
         </div>
       </div>
     </div>`).join('')}`;
+}
+
+// ── Excel backup ──────────────────────────────────────────
+async function downloadBackupExcel() {
+  const btn = document.querySelector('[onclick="downloadBackupExcel()"]');
+  if (btn) { btn.textContent = 'Preparing…'; btn.disabled = true; }
+  try {
+    if (!window.XLSX) {
+      await new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js';
+        s.onload = res; s.onerror = rej;
+        document.head.appendChild(s);
+      });
+    }
+    const wb = window.XLSX.utils.book_new();
+
+    // Influencers
+    const infRows = S.influencers.map(i => ({
+      'Handle': i.instagramHandle||i.name||'', 'First Name': i.firstName||'', 'Last Name': i.lastName||'',
+      'Platform': i.platform||'', 'Tier': i.tier||'', 'Followers': i.followers||0, 'Fee ($)': i.fee||0,
+      'Stage': i.stage||'Messaged', 'Quarter': i.quarter||'', 'Campaign': i.campaign||'',
+      'First Service Date': i.serviceDate||'', 'Last Service Date': i.lastServiceDate||'',
+      'Next Service Date': i.nextServiceDate||'',
+      'Phone': i.phone||'', 'Email': i.email||'', 'Address': i.address||'',
+      'Brief': i.brief||'', 'Notes': i.notes||'',
+    }));
+    window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.json_to_sheet(infRows.length ? infRows : [{}]), 'Influencers');
+
+    // Community Partners
+    const partRows = S.partners.map(p => ({
+      'Business Name': p.businessName||p.name||'', 'Contact Person': p.contactPerson||'',
+      'Location': p.location||'', 'Email': p.email||'', 'Phone': p.phone||'',
+      'Campaign': p.campaign||'', 'Stage': p.stage||'', 'Event Date': p.eventDate||'',
+      'Agreement URL': p.agreementDriveUrl||'', 'Notes': p.notes||'',
+    }));
+    window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.json_to_sheet(partRows.length ? partRows : [{}]), 'Community Partners');
+
+    // Events
+    const evtRows = S.events.map(e => ({
+      'Title': e.title||'', 'Date': e.date||'', 'Type': e.type||'',
+      'Location': e.location||'', 'Status': e.status||'', 'Notes': e.notes||'',
+    }));
+    window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.json_to_sheet(evtRows.length ? evtRows : [{}]), 'Events');
+
+    // To-Dos
+    const todoRows = S.todos.map(t => ({
+      'Task': t.title||'', 'Label': t.label||'', 'Priority': t.priority||'',
+      'Due Date': t.dueDate||'', 'Assignee': t.assignee||'', 'Done': t.done ? 'Yes' : 'No',
+    }));
+    window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.json_to_sheet(todoRows.length ? todoRows : [{}]), 'To-Dos');
+
+    // Social
+    const socRows = S.social.map(p => ({
+      'Title': p.title||'', 'Platform': p.platform||'', 'Status': p.status||'',
+      'Scheduled': p.scheduledDate||'', 'Notes': p.notes||'',
+    }));
+    window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.json_to_sheet(socRows.length ? socRows : [{}]), 'Social');
+
+    // Newsletters
+    const nlRows = S.newsletters.map(n => ({
+      'Subject': n.subject||'', 'Status': n.status||'', 'Send Date': n.sendDate||'', 'Notes': n.notes||'',
+    }));
+    window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.json_to_sheet(nlRows.length ? nlRows : [{}]), 'Newsletters');
+
+    const d = new Date();
+    const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    window.XLSX.writeFile(wb, `Solve-Marketing-OS-Backup-${ds}.xlsx`);
+
+    const t = document.createElement('div');
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.2)';
+    t.textContent = `✓ Backup downloaded — ${S.influencers.length} influencers, ${S.partners.length} partners, ${S.todos.length} tasks`;
+    document.body.appendChild(t); setTimeout(() => t.remove(), 4000);
+  } catch(e) {
+    alert('Backup failed: ' + e.message);
+    console.error('Backup error:', e);
+  } finally {
+    if (btn) { btn.innerHTML = '<i class="ti ti-table-export"></i> Download Backup (.xlsx)'; btn.disabled = false; }
+  }
 }
 
 // ── Profile ───────────────────────────────────────────────
@@ -2336,6 +2485,7 @@ function openModal(type, id) {
     <div class="divider" style="margin:12px 0 14px"></div>
     <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Campaign</div>
     <div class="fg-row"><div class="fg"><label>Campaign</label><select id="m-campaign"><option value="">— Select —</option><option>In house Tampa</option><option>In house Orlando</option><option>Orlando Weekly</option></select></div><div class="fg"><label>First Date of Service</label><input type="date" id="m-servicedate"></div></div>
+    <div class="fg-row"><div class="fg"><label>Last Service Date</label><input type="date" id="m-lastservice" oninput="autoCalcNextService('m-lastservice','m-nextservice')"></div><div class="fg"><label>Next Service Date <span style="font-weight:400;color:var(--text3)">(auto: +3 weeks)</span></label><input type="date" id="m-nextservice"></div></div>
     <div class="fg"><label>Affiliate link</label><input id="m-affiliatelink" placeholder="https://…" type="url"></div>
     <div class="fg"><label>Brief / deliverables</label><textarea id="m-brief" placeholder="What are they creating?" style="min-height:56px"></textarea></div>
     <div class="fg"><label>Notes</label><input id="m-notes" placeholder="Any notes…"></div>
@@ -2409,6 +2559,7 @@ function openModal(type, id) {
     <div class="divider" style="margin:12px 0 14px"></div>
     <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Campaign</div>
     <div class="fg-row"><div class="fg"><label>Campaign</label><select id="ei-campaign"><option value="">— Select —</option>${_campOpts.map(c=>`<option${c===(inf.campaign||'')?' selected':''}>${c}</option>`).join('')}</select></div><div class="fg"><label>First Date of Service</label><input type="date" id="ei-servicedate" value="${esc(inf.serviceDate||'')}"></div></div>
+    <div class="fg-row"><div class="fg"><label>Last Service Date</label><input type="date" id="ei-lastservice" value="${esc(inf.lastServiceDate||'')}" oninput="autoCalcNextService('ei-lastservice','ei-nextservice')"></div><div class="fg"><label>Next Service Date <span style="font-weight:400;color:var(--text3)">(auto: +3 weeks)</span></label><input type="date" id="ei-nextservice" value="${esc(inf.nextServiceDate||'')}"></div></div>
     <div class="fg"><label>Affiliate link</label><input id="ei-affiliatelink" type="url" value="${esc(inf.affiliateLink||'')}" placeholder="https://…"></div>
     <div class="fg"><label>Brief / deliverables</label><textarea id="ei-brief" style="min-height:52px">${esc(inf.brief||'')}</textarea></div>
     <div class="fg"><label>Notes</label><input id="ei-notes" value="${esc(inf.notes||'')}"></div>
@@ -2588,6 +2739,8 @@ function saveInfluencer(){
     quarter:document.getElementById('m-quarter').value||'',
     campaign:document.getElementById('m-campaign').value||'',
     serviceDate:document.getElementById('m-servicedate').value||'',
+    lastServiceDate:document.getElementById('m-lastservice').value||'',
+    nextServiceDate:document.getElementById('m-nextservice').value||calcNextServiceDate(document.getElementById('m-lastservice').value||''),
     affiliateLink:document.getElementById('m-affiliatelink').value.trim(),
     brief:document.getElementById('m-brief').value||'',
     notes:document.getElementById('m-notes').value||'',
@@ -2616,6 +2769,8 @@ function saveInfluencerEdit(id){
   inf.quarter=document.getElementById('ei-quarter').value||'';
   inf.campaign=document.getElementById('ei-campaign').value;
   inf.serviceDate=document.getElementById('ei-servicedate').value||'';
+  inf.lastServiceDate=document.getElementById('ei-lastservice').value||'';
+  inf.nextServiceDate=document.getElementById('ei-nextservice').value||calcNextServiceDate(document.getElementById('ei-lastservice').value||'');
   inf.affiliateLink=document.getElementById('ei-affiliatelink').value.trim();
   inf.brief=document.getElementById('ei-brief').value;
   inf.notes=document.getElementById('ei-notes').value;
