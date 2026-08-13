@@ -134,6 +134,8 @@ label{font-size:12px;color:var(--text2);display:block;margin-bottom:4px;font-wei
 .ce-blue{background:var(--blue-bg);color:var(--blue)}
 .ce-teal{background:rgba(20,184,166,.15);color:#0d9488}
 .ce-orange{background:rgba(249,115,22,.15);color:#ea580c}
+.ce-rose{background:rgba(225,29,72,.1);color:#e11d48}
+.ce-slate{background:rgba(100,116,139,.12);color:#64748b}
 .hamburger{display:flex;flex-direction:column;gap:4px;cursor:pointer;padding:6px;border-radius:6px;background:none;border:none;color:var(--text2)}
 .hamburger span{display:block;width:18px;height:2px;background:currentColor;border-radius:2px;transition:all .2s}
 .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9;transition:opacity .2s}
@@ -2157,18 +2159,15 @@ function buildCalMonth(yr, mo, compact) {
   S.influencers.filter(i=>i.reminder?.date).forEach(inf=>{
     try{const d=new Date(inf.reminder.date+'T00:00:00');if(d.getFullYear()===yr&&d.getMonth()===mo)calEvs.push({day:d.getDate(),label:'🔔 '+(inf.instagramHandle||inf.name)+' · '+inf.reminder.note,cls:'ce-blue',infId:inf.id});}catch(err){}
   });
-  // First Date of Service
-  S.influencers.filter(i=>i.serviceDate).forEach(inf=>{
-    try{
-      const d=new Date(inf.serviceDate+'T00:00:00');
-      const dispName=[inf.firstName,inf.lastName].filter(Boolean).join(' ')||inf.instagramHandle||inf.name;
-      if(d.getFullYear()===yr&&d.getMonth()===mo) calEvs.push({day:d.getDate(),label:'📅 First Service: '+dispName,cls:'ce-teal',infId:inf.id});
-      // Monthly "Due for Upcoming Service" reminders — same day each subsequent month
-      for(let m=1;m<=24;m++){
-        const rd=new Date(d.getFullYear(),d.getMonth()+m,d.getDate());
-        if(rd.getFullYear()===yr&&rd.getMonth()===mo) calEvs.push({day:rd.getDate(),label:'🔁 Due for Service: '+dispName,cls:'ce-orange',infId:inf.id});
-      }
-    }catch(err){}
+  // Service dates (initial / last / next)
+  S.influencers.forEach(inf=>{
+    const dispName=[inf.firstName,inf.lastName].filter(Boolean).join(' ')||inf.instagramHandle||inf.name;
+    // Initial service date
+    if(inf.serviceDate){try{const d=new Date(inf.serviceDate+'T00:00:00');if(d.getFullYear()===yr&&d.getMonth()===mo)calEvs.push({day:d.getDate(),label:'📅 Initial Service: '+dispName,cls:'ce-teal',infId:inf.id});}catch(err){}}
+    // Last service date
+    if(inf.lastServiceDate){try{const d=new Date(inf.lastServiceDate+'T00:00:00');if(d.getFullYear()===yr&&d.getMonth()===mo)calEvs.push({day:d.getDate(),label:'🔁 Last Service: '+dispName,cls:'ce-slate',infId:inf.id});}catch(err){}}
+    // Due for service / next service date
+    if(inf.nextServiceDate){try{const d=new Date(inf.nextServiceDate+'T00:00:00');if(d.getFullYear()===yr&&d.getMonth()===mo)calEvs.push({day:d.getDate(),label:'⚡ Due for Service: '+dispName,cls:'ce-rose',infId:inf.id});}catch(err){}}
   });
   // Community partner reminders
   S.partners.filter(p=>p.reminder?.date).forEach(p=>{
@@ -2244,7 +2243,7 @@ function renderCalendar() {
   </div>
   ${content}
   <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;font-size:12px">
-    ${[['ce-red','Events'],['ce-green','Today'],['ce-amber','Newsletters / Partner Events'],['ce-purple','To-Dos'],['ce-blue','🔔 Reminders'],['ce-teal','📅 First Service'],['ce-orange','🔁 Due for Service']].map(([c,l])=>`<div style="display:flex;align-items:center;gap:5px"><div class="cal-event ${c}">${l}</div></div>`).join('')}
+    ${[['ce-red','Events'],['ce-green','Today'],['ce-amber','Newsletters / Partner Events'],['ce-purple','To-Dos'],['ce-blue','🔔 Reminders'],['ce-teal','📅 Initial Service'],['ce-slate','🔁 Last Service'],['ce-rose','⚡ Due for Service']].map(([c,l])=>`<div style="display:flex;align-items:center;gap:5px"><div class="cal-event ${c}">${l}</div></div>`).join('')}
     <div style="color:var(--text3);font-size:11px;display:flex;align-items:center;gap:4px"><i class="ti ti-click"></i> Click any date to view or add</div>
   </div>`;
 }
