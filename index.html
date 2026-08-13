@@ -315,6 +315,7 @@ label{font-size:12px;color:var(--text2);display:block;margin-bottom:4px;font-wei
     <div class="topbar-right">
       <div id="firebase-indicator" class="firebase-status fs-disconnected"><span class="fs-dot"></span>Chat offline</div>
       <div id="sync-chip" class="sync-chip sync-offline"><i class="ti ti-cloud-off"></i>Local only</div>
+      <div id="backup-chip" style="font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px;white-space:nowrap" title="Google Sheets auto-backup status"></div>
       <div style="position:relative">
         <div class="topbar-btn" onclick="toggleChat()" title="Team chat"><i class="ti ti-message-circle"></i></div>
         <div class="unread-dot" id="unread-dot" style="display:none"></div>
@@ -675,9 +676,45 @@ function persist() {
     localStorage.setItem('solve-os-data', JSON.stringify(data));
     // Also push to Firestore so all devices stay in sync
     if (window.syncToFirestore) window.syncToFirestore(data);
+    // Schedule a debounced Google Sheets backup (30 s after last change)
+    scheduleSheetBackup(data);
   } catch(e) {}
 }
 loadData();
+
+// ── Google Sheets auto-backup ─────────────────────────────
+let _backupTimer = null;
+let _lastBackupTs = 0;
+function scheduleSheetBackup(data) {
+  if (_backupTimer) clearTimeout(_backupTimer);
+  _backupTimer = setTimeout(() => runSheetBackup(data), 30000); // 30 s debounce
+}
+async function runSheetBackup(data) {
+  try {
+    const res = await fetch('/api/sheets-backup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...data, _by: window.APP_STATE?.profile?.name || 'app' }),
+    });
+    const r = await res.json();
+    if (r.ok) {
+      _lastBackupTs = Date.now();
+      updateBackupChip('synced');
+    }
+  } catch(e) {
+    // Silent fail — Firestore is still the live backup
+    console.warn('Sheet backup skipped:', e.message);
+  }
+}
+function updateBackupChip(state) {
+  const el = document.getElementById('backup-chip');
+  if (!el) return;
+  if (state === 'synced') {
+    const t = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    el.innerHTML = `<i class="ti ti-table-check" style="font-size:12px"></i> Sheet backed up ${t}`;
+    el.style.color = 'var(--accent)';
+  }
+}
 
 // ── Helpers ───────────────────────────────────────────────
 const fmt = n => n>=1000000?(n/1000000).toFixed(1)+'M':n>=1000?(n/1000).toFixed(0)+'K':String(n);
