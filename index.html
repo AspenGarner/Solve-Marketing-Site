@@ -2196,15 +2196,17 @@ function buildCalMonth(yr, mo, compact) {
   S.influencers.filter(i=>i.reminder?.date).forEach(inf=>{
     try{const d=new Date(inf.reminder.date+'T00:00:00');if(d.getFullYear()===yr&&d.getMonth()===mo)calEvs.push({day:d.getDate(),label:'🔔 '+(inf.instagramHandle||inf.name)+' · '+inf.reminder.note,cls:'ce-blue',infId:inf.id});}catch(err){}
   });
-  // Service dates (initial / last / next)
+  // Service dates (initial / last / follow-up auto / next service manual)
   S.influencers.forEach(inf=>{
     const dispName=[inf.firstName,inf.lastName].filter(Boolean).join(' ')||inf.instagramHandle||inf.name;
     // Initial service date
     if(inf.serviceDate){try{const d=new Date(inf.serviceDate+'T00:00:00');if(d.getFullYear()===yr&&d.getMonth()===mo)calEvs.push({day:d.getDate(),label:'📅 Initial Service: '+dispName,cls:'ce-teal',infId:inf.id});}catch(err){}}
     // Last service date
     if(inf.lastServiceDate){try{const d=new Date(inf.lastServiceDate+'T00:00:00');if(d.getFullYear()===yr&&d.getMonth()===mo)calEvs.push({day:d.getDate(),label:'🔁 Last Service: '+dispName,cls:'ce-slate',infId:inf.id});}catch(err){}}
-    // Due for service / next service date
-    if(inf.nextServiceDate){try{const d=new Date(inf.nextServiceDate+'T00:00:00');if(d.getFullYear()===yr&&d.getMonth()===mo)calEvs.push({day:d.getDate(),label:'⚡ Due for Service: '+dispName,cls:'ce-rose',infId:inf.id});}catch(err){}}
+    // Auto Follow Up = last service + 21 days
+    if(inf.lastServiceDate){try{const followUp=calcNextServiceDate(inf.lastServiceDate);if(followUp){const d=new Date(followUp+'T00:00:00');if(d.getFullYear()===yr&&d.getMonth()===mo)calEvs.push({day:d.getDate(),label:'📌 Follow Up: '+dispName,cls:'ce-rose',infId:inf.id});}}catch(err){}}
+    // Manually entered next service date
+    if(inf.nextServiceDate){try{const d=new Date(inf.nextServiceDate+'T00:00:00');if(d.getFullYear()===yr&&d.getMonth()===mo)calEvs.push({day:d.getDate(),label:'⚡ Next Service: '+dispName,cls:'ce-orange',infId:inf.id});}catch(err){}}
   });
   // Community partner reminders
   S.partners.filter(p=>p.reminder?.date).forEach(p=>{
@@ -2280,7 +2282,7 @@ function renderCalendar() {
   </div>
   ${content}
   <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;font-size:12px">
-    ${[['ce-red','Events'],['ce-green','Today'],['ce-amber','Newsletters / Partner Events'],['ce-purple','To-Dos'],['ce-blue','🔔 Reminders'],['ce-teal','📅 Initial Service'],['ce-slate','🔁 Last Service'],['ce-rose','⚡ Due for Service']].map(([c,l])=>`<div style="display:flex;align-items:center;gap:5px"><div class="cal-event ${c}">${l}</div></div>`).join('')}
+    ${[['ce-red','Events'],['ce-green','Today'],['ce-amber','Newsletters / Partner Events'],['ce-purple','To-Dos'],['ce-blue','🔔 Reminders'],['ce-teal','📅 Initial Service'],['ce-slate','🔁 Last Service'],['ce-rose','📌 Follow Up (auto)'],['ce-orange','⚡ Next Service']].map(([c,l])=>`<div style="display:flex;align-items:center;gap:5px"><div class="cal-event ${c}">${l}</div></div>`).join('')}
     <div style="color:var(--text3);font-size:11px;display:flex;align-items:center;gap:4px"><i class="ti ti-click"></i> Click any date to view or add</div>
   </div>`;
 }
@@ -2458,7 +2460,7 @@ function openDayModal(dateStr) {
   const evs = (window._calEventsMap || {})[dateStr] || [];
   const d = new Date(dateStr + 'T00:00:00');
   const label = d.toLocaleDateString('default', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
-  const typeLabel = cls => ({'ce-red':'Event','ce-amber':'Newsletter / Partner','ce-purple':'Task','ce-blue':'Reminder','ce-teal':'First Service','ce-orange':'Due for Service','ce-green':'Today'}[cls] || 'Item');
+  const typeLabel = cls => ({'ce-red':'Event','ce-amber':'Newsletter / Partner','ce-purple':'Task','ce-blue':'Reminder','ce-teal':'Initial Service','ce-slate':'Last Service','ce-rose':'Follow Up','ce-orange':'Next Service','ce-green':'Today'}[cls] || 'Item');
   const evHtml = evs.length === 0
     ? `<div style="color:var(--text3);font-size:13px;padding:16px 0;text-align:center"><i class="ti ti-calendar-off" style="font-size:24px;display:block;margin-bottom:6px;opacity:.4"></i>Nothing scheduled for this day.</div>`
     : evs.map(e => `
@@ -2521,7 +2523,7 @@ function openModal(type, id) {
     <div class="divider" style="margin:12px 0 14px"></div>
     <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Campaign</div>
     <div class="fg-row"><div class="fg"><label>Campaign</label><select id="m-campaign"><option value="">— Select —</option><option>In house Tampa</option><option>In house Orlando</option><option>Orlando Weekly</option></select></div><div class="fg"><label>First Date of Service</label><input type="date" id="m-servicedate"></div></div>
-    <div class="fg-row"><div class="fg"><label>Last Service Date</label><input type="date" id="m-lastservice" oninput="autoCalcNextService('m-lastservice','m-nextservice')"></div><div class="fg"><label>Next Service Date <span style="font-weight:400;color:var(--text3)">(auto: +3 weeks)</span></label><input type="date" id="m-nextservice"></div></div>
+    <div class="fg-row"><div class="fg"><label>Last Service Date</label><input type="date" id="m-lastservice"></div><div class="fg"><label>Next Service Date</label><input type="date" id="m-nextservice"></div></div>
     <div class="fg"><label>Affiliate link</label><input id="m-affiliatelink" placeholder="https://…" type="url"></div>
     <div class="fg"><label>Brief / deliverables</label><textarea id="m-brief" placeholder="What are they creating?" style="min-height:56px"></textarea></div>
     <div class="fg"><label>Notes</label><input id="m-notes" placeholder="Any notes…"></div>
@@ -2595,7 +2597,7 @@ function openModal(type, id) {
     <div class="divider" style="margin:12px 0 14px"></div>
     <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Campaign</div>
     <div class="fg-row"><div class="fg"><label>Campaign</label><select id="ei-campaign"><option value="">— Select —</option>${_campOpts.map(c=>`<option${c===(inf.campaign||'')?' selected':''}>${c}</option>`).join('')}</select></div><div class="fg"><label>First Date of Service</label><input type="date" id="ei-servicedate" value="${esc(inf.serviceDate||'')}"></div></div>
-    <div class="fg-row"><div class="fg"><label>Last Service Date</label><input type="date" id="ei-lastservice" value="${esc(inf.lastServiceDate||'')}" oninput="autoCalcNextService('ei-lastservice','ei-nextservice')"></div><div class="fg"><label>Next Service Date <span style="font-weight:400;color:var(--text3)">(auto: +3 weeks)</span></label><input type="date" id="ei-nextservice" value="${esc(inf.nextServiceDate||'')}"></div></div>
+    <div class="fg-row"><div class="fg"><label>Last Service Date</label><input type="date" id="ei-lastservice" value="${esc(inf.lastServiceDate||'')}"></div><div class="fg"><label>Next Service Date</label><input type="date" id="ei-nextservice" value="${esc(inf.nextServiceDate||'')}"></div></div>
     <div class="fg"><label>Affiliate link</label><input id="ei-affiliatelink" type="url" value="${esc(inf.affiliateLink||'')}" placeholder="https://…"></div>
     <div class="fg"><label>Brief / deliverables</label><textarea id="ei-brief" style="min-height:52px">${esc(inf.brief||'')}</textarea></div>
     <div class="fg"><label>Notes</label><input id="ei-notes" value="${esc(inf.notes||'')}"></div>
@@ -2776,7 +2778,7 @@ function saveInfluencer(){
     campaign:document.getElementById('m-campaign').value||'',
     serviceDate:document.getElementById('m-servicedate').value||'',
     lastServiceDate:document.getElementById('m-lastservice').value||'',
-    nextServiceDate:document.getElementById('m-nextservice').value||calcNextServiceDate(document.getElementById('m-lastservice').value||''),
+    nextServiceDate:document.getElementById('m-nextservice').value||'',
     affiliateLink:document.getElementById('m-affiliatelink').value.trim(),
     brief:document.getElementById('m-brief').value||'',
     notes:document.getElementById('m-notes').value||'',
@@ -2806,7 +2808,7 @@ function saveInfluencerEdit(id){
   inf.campaign=document.getElementById('ei-campaign').value;
   inf.serviceDate=document.getElementById('ei-servicedate').value||'';
   inf.lastServiceDate=document.getElementById('ei-lastservice').value||'';
-  inf.nextServiceDate=document.getElementById('ei-nextservice').value||calcNextServiceDate(document.getElementById('ei-lastservice').value||'');
+  inf.nextServiceDate=document.getElementById('ei-nextservice').value||'';
   inf.affiliateLink=document.getElementById('ei-affiliatelink').value.trim();
   inf.brief=document.getElementById('ei-brief').value;
   inf.notes=document.getElementById('ei-notes').value;
