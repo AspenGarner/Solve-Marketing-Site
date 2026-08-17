@@ -2195,6 +2195,13 @@ function buildCalMonth(yr, mo, compact) {
   const firstDay = new Date(yr,mo,1).getDay(), daysInMo = new Date(yr,mo+1,0).getDate();
   const calEvs = [];
   if (!window._calEventsMap) window._calEventsMap = {};
+  // Weekly recurring work schedule — first so they appear at the top of each day
+  for(let day=1;day<=daysInMo;day++){
+    const dow=new Date(yr,mo,day).getDay();
+    WEEKLY_SCHEDULE.filter(t=>t.dow===dow).forEach(t=>{
+      calEvs.push({day, label:t.label+' · '+t.time, cls:t.cls});
+    });
+  }
   // Events (including recurring)
   S.events.forEach(e => {
     try {
@@ -2246,13 +2253,6 @@ function buildCalMonth(yr, mo, compact) {
   S.partners.filter(p=>p.eventDate&&p.stage==='Community Partner').forEach(p=>{
     try{const d=new Date(p.eventDate+'T00:00:00');if(d.getFullYear()===yr&&d.getMonth()===mo)calEvs.push({day:d.getDate(),label:'🤝 Partner Event: '+(p.businessName||p.name),cls:'ce-amber',partnerId:p.id});}catch(err){}
   });
-  // Weekly recurring work schedule — auto-generated for every matching weekday
-  for(let day=1;day<=daysInMo;day++){
-    const dow=new Date(yr,mo,day).getDay();
-    WEEKLY_SCHEDULE.filter(t=>t.dow===dow).forEach(t=>{
-      calEvs.push({day, label:t.label+' · '+t.time, cls:t.cls});
-    });
-  }
   // Today marker
   if(yr===now.getFullYear()&&mo===now.getMonth()) calEvs.push({day:now.getDate(),label:'Today',cls:'ce-green'});
   let cells='';
