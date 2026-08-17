@@ -2168,26 +2168,26 @@ function generatePDF() {
 // dow: 0=Sun 1=Mon 2=Tue 3=Wed 4=Thu 5=Fri 6=Sat
 const WEEKLY_SCHEDULE = [
   // Monday
-  {dow:1, label:'📧 Newsletter writing',       cls:'ce-amber',  time:'6:45–8:30am'},
-  {dow:1, label:'💬 Social engagement',         cls:'ce-cyan',   time:'8–9:30pm'},
+  {dow:1, label:'Newsletter writing',       cls:'ce-amber',  time:'6:45–8:30am'},
+  {dow:1, label:'Social engagement',        cls:'ce-cyan',   time:'8–9:30pm'},
   // Tuesday
-  {dow:2, label:'📊 Meta Ads deep work',        cls:'ce-indigo', time:'5–8:30am'},
-  {dow:2, label:'🤝 Influencer outreach',       cls:'ce-violet', time:'8–9:30pm'},
+  {dow:2, label:'Meta Ads deep work',       cls:'ce-indigo', time:'5–8:30am'},
+  {dow:2, label:'Influencer outreach',      cls:'ce-violet', time:'8–9:30pm'},
   // Wednesday
-  {dow:3, label:'🎨 Content batch',             cls:'ce-lime',   time:'6:45–8:30am'},
-  {dow:3, label:'📝 Newsletter 2nd pass',       cls:'ce-amber',  time:'8–9:30pm'},
+  {dow:3, label:'Content batch',            cls:'ce-lime',   time:'6:45–8:30am'},
+  {dow:3, label:'Newsletter 2nd pass',      cls:'ce-amber',  time:'8–9:30pm'},
   // Thursday
-  {dow:4, label:'🤝 Influencer coordination',   cls:'ce-violet', time:'5–8:30am'},
-  {dow:4, label:'📱 Schedule social posts',     cls:'ce-cyan',   time:'8–9:30pm'},
+  {dow:4, label:'Influencer coordination',  cls:'ce-violet', time:'5–8:30am'},
+  {dow:4, label:'Schedule social posts',    cls:'ce-cyan',   time:'8–9:30pm'},
   // Friday
-  {dow:5, label:'📈 Pull KPIs',                cls:'ce-slate',  time:'6:45–8:30am'},
-  {dow:5, label:'👥 Meeting: Sarah',            cls:'ce-red',    time:'12–1pm'},
-  {dow:5, label:'🏢 Community + follow-ups',    cls:'ce-orange', time:'1–6pm'},
+  {dow:5, label:'Pull KPIs',               cls:'ce-slate',  time:'6:45–8:30am'},
+  {dow:5, label:'Meeting: Sarah',           cls:'ce-red',    time:'12–1pm'},
+  {dow:5, label:'Community + follow-ups',   cls:'ce-orange', time:'1–6pm'},
   // Saturday
-  {dow:6, label:'✍️ Blog / content',            cls:'ce-lime',   time:'6:45–8:30am'},
-  {dow:6, label:'🚀 Big batch block',           cls:'ce-lime',   time:'12–6pm'},
+  {dow:6, label:'Blog / content',           cls:'ce-lime',   time:'6:45–8:30am'},
+  {dow:6, label:'Big batch block',          cls:'ce-lime',   time:'12–6pm'},
   // Sunday
-  {dow:0, label:'📊 KPI review + planning',     cls:'ce-slate',  time:'5–8:30am'},
+  {dow:0, label:'KPI review + planning',    cls:'ce-slate',  time:'5–8:30am'},
 ];
 
 function buildCalMonth(yr, mo, compact) {
@@ -2321,12 +2321,12 @@ function renderCalendar() {
   <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px">
     <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:12px;align-items:center">
       <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);white-space:nowrap">Calendar</span>
-      ${[['ce-red','Events'],['ce-green','Today'],['ce-amber','Newsletters'],['ce-purple','To-Dos'],['ce-blue','🔔 Reminders'],['ce-teal','📅 Initial Service'],['ce-slate','🔁 Last Service'],['ce-rose','📌 Follow Up'],['ce-orange','⚡ Next Service']].map(([c,l])=>`<div class="cal-event ${c}">${l}</div>`).join('')}
+      ${[['ce-red','Events'],['ce-green','Today'],['ce-amber','Newsletters'],['ce-purple','To-Dos'],['ce-blue','Reminders'],['ce-teal','Initial Service'],['ce-slate','Last Service'],['ce-rose','Follow Up'],['ce-orange','Next Service']].map(([c,l])=>`<div class="cal-event ${c}">${l}</div>`).join('')}
       <div style="color:var(--text3);font-size:11px;display:flex;align-items:center;gap:4px"><i class="ti ti-click"></i> Click any date</div>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:12px;align-items:center">
       <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);white-space:nowrap">Weekly</span>
-      ${[['ce-indigo','📊 Meta Ads'],['ce-violet','🤝 Influencer'],['ce-amber','📧 Newsletter'],['ce-cyan','💬 Social'],['ce-lime','🎨 Content / Batch'],['ce-orange','🏢 Community'],['ce-red','👥 Sarah Meeting'],['ce-slate','📈 KPI Review']].map(([c,l])=>`<div class="cal-event ${c}">${l}</div>`).join('')}
+      ${[['ce-indigo','Meta Ads'],['ce-violet','Influencer'],['ce-amber','Newsletter'],['ce-cyan','Social'],['ce-lime','Content / Batch'],['ce-orange','Community'],['ce-red','Sarah Meeting'],['ce-slate','KPI Review']].map(([c,l])=>`<div class="cal-event ${c}">${l}</div>`).join('')}
     </div>
   </div>`;
 }
