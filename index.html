@@ -136,6 +136,10 @@ label{font-size:12px;color:var(--text2);display:block;margin-bottom:4px;font-wei
 .ce-orange{background:rgba(249,115,22,.15);color:#ea580c}
 .ce-rose{background:rgba(225,29,72,.1);color:#e11d48}
 .ce-slate{background:rgba(100,116,139,.12);color:#64748b}
+.ce-indigo{background:rgba(99,102,241,.15);color:#4f46e5}
+.ce-violet{background:rgba(139,92,246,.15);color:#7c3aed}
+.ce-cyan{background:rgba(6,182,212,.15);color:#0891b2}
+.ce-lime{background:rgba(101,163,13,.15);color:#4d7c0f}
 .hamburger{display:flex;flex-direction:column;gap:4px;cursor:pointer;padding:6px;border-radius:6px;background:none;border:none;color:var(--text2)}
 .hamburger span{display:block;width:18px;height:2px;background:currentColor;border-radius:2px;transition:all .2s}
 .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9;transition:opacity .2s}
@@ -2160,6 +2164,32 @@ function generatePDF() {
 }
 
 // ── Calendar ──────────────────────────────────────────────
+// ── Weekly recurring work schedule ────────────────────────────────────────────
+// dow: 0=Sun 1=Mon 2=Tue 3=Wed 4=Thu 5=Fri 6=Sat
+const WEEKLY_SCHEDULE = [
+  // Monday
+  {dow:1, label:'📧 Newsletter writing',       cls:'ce-amber',  time:'6:45–8:30am'},
+  {dow:1, label:'💬 Social engagement',         cls:'ce-cyan',   time:'8–9:30pm'},
+  // Tuesday
+  {dow:2, label:'📊 Meta Ads deep work',        cls:'ce-indigo', time:'5–8:30am'},
+  {dow:2, label:'🤝 Influencer outreach',       cls:'ce-violet', time:'8–9:30pm'},
+  // Wednesday
+  {dow:3, label:'🎨 Content batch',             cls:'ce-lime',   time:'6:45–8:30am'},
+  {dow:3, label:'📝 Newsletter 2nd pass',       cls:'ce-amber',  time:'8–9:30pm'},
+  // Thursday
+  {dow:4, label:'🤝 Influencer coordination',   cls:'ce-violet', time:'5–8:30am'},
+  {dow:4, label:'📱 Schedule social posts',     cls:'ce-cyan',   time:'8–9:30pm'},
+  // Friday
+  {dow:5, label:'📈 Pull KPIs',                cls:'ce-slate',  time:'6:45–8:30am'},
+  {dow:5, label:'👥 Meeting: Sarah',            cls:'ce-red',    time:'12–1pm'},
+  {dow:5, label:'🏢 Community + follow-ups',    cls:'ce-orange', time:'1–6pm'},
+  // Saturday
+  {dow:6, label:'✍️ Blog / content',            cls:'ce-lime',   time:'6:45–8:30am'},
+  {dow:6, label:'🚀 Big batch block',           cls:'ce-lime',   time:'12–6pm'},
+  // Sunday
+  {dow:0, label:'📊 KPI review + planning',     cls:'ce-slate',  time:'5–8:30am'},
+];
+
 function buildCalMonth(yr, mo, compact) {
   const now = new Date();
   const firstDay = new Date(yr,mo,1).getDay(), daysInMo = new Date(yr,mo+1,0).getDate();
@@ -2216,6 +2246,13 @@ function buildCalMonth(yr, mo, compact) {
   S.partners.filter(p=>p.eventDate&&p.stage==='Community Partner').forEach(p=>{
     try{const d=new Date(p.eventDate+'T00:00:00');if(d.getFullYear()===yr&&d.getMonth()===mo)calEvs.push({day:d.getDate(),label:'🤝 Partner Event: '+(p.businessName||p.name),cls:'ce-amber',partnerId:p.id});}catch(err){}
   });
+  // Weekly recurring work schedule — auto-generated for every matching weekday
+  for(let day=1;day<=daysInMo;day++){
+    const dow=new Date(yr,mo,day).getDay();
+    WEEKLY_SCHEDULE.filter(t=>t.dow===dow).forEach(t=>{
+      calEvs.push({day, label:t.label+' · '+t.time, cls:t.cls});
+    });
+  }
   // Today marker
   if(yr===now.getFullYear()&&mo===now.getMonth()) calEvs.push({day:now.getDate(),label:'Today',cls:'ce-green'});
   let cells='';
@@ -2281,9 +2318,16 @@ function renderCalendar() {
     </div>
   </div>
   ${content}
-  <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;font-size:12px">
-    ${[['ce-red','Events'],['ce-green','Today'],['ce-amber','Newsletters / Partner Events'],['ce-purple','To-Dos'],['ce-blue','🔔 Reminders'],['ce-teal','📅 Initial Service'],['ce-slate','🔁 Last Service'],['ce-rose','📌 Follow Up (auto)'],['ce-orange','⚡ Next Service']].map(([c,l])=>`<div style="display:flex;align-items:center;gap:5px"><div class="cal-event ${c}">${l}</div></div>`).join('')}
-    <div style="color:var(--text3);font-size:11px;display:flex;align-items:center;gap:4px"><i class="ti ti-click"></i> Click any date to view or add</div>
+  <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:12px;align-items:center">
+      <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);white-space:nowrap">Calendar</span>
+      ${[['ce-red','Events'],['ce-green','Today'],['ce-amber','Newsletters'],['ce-purple','To-Dos'],['ce-blue','🔔 Reminders'],['ce-teal','📅 Initial Service'],['ce-slate','🔁 Last Service'],['ce-rose','📌 Follow Up'],['ce-orange','⚡ Next Service']].map(([c,l])=>`<div class="cal-event ${c}">${l}</div>`).join('')}
+      <div style="color:var(--text3);font-size:11px;display:flex;align-items:center;gap:4px"><i class="ti ti-click"></i> Click any date</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:12px;align-items:center">
+      <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);white-space:nowrap">Weekly</span>
+      ${[['ce-indigo','📊 Meta Ads'],['ce-violet','🤝 Influencer'],['ce-amber','📧 Newsletter'],['ce-cyan','💬 Social'],['ce-lime','🎨 Content / Batch'],['ce-orange','🏢 Community'],['ce-red','👥 Sarah Meeting'],['ce-slate','📈 KPI Review']].map(([c,l])=>`<div class="cal-event ${c}">${l}</div>`).join('')}
+    </div>
   </div>`;
 }
 
@@ -2460,7 +2504,7 @@ function openDayModal(dateStr) {
   const evs = (window._calEventsMap || {})[dateStr] || [];
   const d = new Date(dateStr + 'T00:00:00');
   const label = d.toLocaleDateString('default', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
-  const typeLabel = cls => ({'ce-red':'Event','ce-amber':'Newsletter / Partner','ce-purple':'Task','ce-blue':'Reminder','ce-teal':'Initial Service','ce-slate':'Last Service','ce-rose':'Follow Up','ce-orange':'Next Service','ce-green':'Today'}[cls] || 'Item');
+  const typeLabel = cls => ({'ce-red':'Event / Meeting','ce-amber':'Newsletter / Partner','ce-purple':'Task','ce-blue':'Reminder','ce-teal':'Initial Service','ce-slate':'Last Service / KPI','ce-rose':'Follow Up','ce-orange':'Next Service / Community','ce-green':'Today','ce-indigo':'Meta Ads','ce-violet':'Influencer','ce-cyan':'Social','ce-lime':'Content / Batch'}[cls] || 'Item');
   const evHtml = evs.length === 0
     ? `<div style="color:var(--text3);font-size:13px;padding:16px 0;text-align:center"><i class="ti ti-calendar-off" style="font-size:24px;display:block;margin-bottom:6px;opacity:.4"></i>Nothing scheduled for this day.</div>`
     : evs.map(e => `
