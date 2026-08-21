@@ -1135,6 +1135,13 @@ function reminderChipHtml(inf) {
     <i class="ti ti-bell-plus"></i> Add reminder
   </span>`;
 }
+function agreementCheckboxHtml(inf) {
+  const checked = !!inf.agreementSigned;
+  return `<label onclick="event.stopPropagation()" style="display:flex;align-items:center;gap:6px;font-size:11px;color:${checked?'var(--green)':'var(--text2)'};cursor:pointer;user-select:none">
+    <span style="width:15px;height:15px;border-radius:4px;border:1.5px solid ${checked?'var(--green)':'var(--border2)'};background:${checked?'var(--green)':'transparent'};flex-shrink:0;display:flex;align-items:center;justify-content:center" onclick="toggleAgreement(${inf.id})">${checked?'<i class="ti ti-check" style="font-size:10px;color:#fff"></i>':''}</span>
+    <span onclick="toggleAgreement(${inf.id})">Completed Influencer Agreement</span>
+  </label>`;
+}
 function partnerReminderChipHtml(p) {
   if (p.reminder?.date) {
     const overdue = p.reminder.date < TODAY;
@@ -1237,6 +1244,7 @@ function renderInfluencerBoard(qList) {
               <button onclick="event.stopPropagation();syncClickiCard(${inf.id})" title="Sync Clicki stats" id="clicki-btn-${inf.id}" style="flex-shrink:0;padding:3px 7px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface2);cursor:pointer;font-size:11px;color:var(--text2)"><i class="ti ti-refresh"></i></button>
             </div>
             <div style="margin-top:7px">${reminderChipHtml(inf)}${nextServiceChipHtml(inf)}</div>
+            <div style="margin-top:7px">${agreementCheckboxHtml(inf)}</div>
           </div>`).join('')}
         ${items.length===0?`<div class="kc-empty">No influencers</div>`:''}
       </div>`;
@@ -1284,7 +1292,7 @@ function renderInfluencerList(qList) {
             ${inf.clicki?`<span style="color:var(--blue)"><i class="ti ti-cursor"></i> ${(inf.clicki.clicks||0).toLocaleString()} clicks</span><span style="color:var(--accent)"><i class="ti ti-repeat"></i> ${(inf.clicki.conversions||0).toLocaleString()} conv.</span><span style="color:var(--green)"><i class="ti ti-cash"></i> $${(inf.clicki.commission||0).toLocaleString()} earned</span>`:''}
           </div>
           <div style="font-size:12px;color:var(--text3);margin-top:4px">${esc(inf.brief)}${inf.notes?' · '+esc(inf.notes):''}</div>
-          <div style="margin-top:7px">${reminderChipHtml(inf)}</div>
+          <div style="margin-top:7px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">${reminderChipHtml(inf)}${agreementCheckboxHtml(inf)}</div>
           ${inf.reach>0?`<div class="prog-bar"><div class="prog-fill" style="width:${Math.min(100,Math.round(inf.reach/inf.followers*100))}%;background:var(--purple)"></div></div>`:''}
         </div>
         <div class="card-actions">
@@ -1417,6 +1425,12 @@ function moveStage(id, stage) {
       if(msg) msg.innerHTML=`<span style="color:var(--red)">Email failed: ${err.message}</span>`;
     });
   }
+  persist(); render();
+}
+function toggleAgreement(id) {
+  const inf = S.influencers.find(i=>i.id===id);
+  if (!inf) return;
+  inf.agreementSigned = !inf.agreementSigned;
   persist(); render();
 }
 function movePartnerStage(id, stage) {
