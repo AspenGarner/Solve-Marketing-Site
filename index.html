@@ -641,8 +641,8 @@ window.APP_STATE = {
     {id:5,name:'Partner Proposal — Wasatch.pdf',type:'Proposal',module:'Partners',uploaded:'Jun 8',by:'Me',size:'380 KB'},
   ],
   users: JSON.parse(localStorage.getItem('solve-users') || 'null') || [
-    {id:'u1',name:'Jayson Greene',title:'Owner',email:'Jayson@solveallpest.com',role:'owner',color:'#046c5e'},
-    {id:'u2',name:'Alec Anderson',title:'Owner',email:'Alec@solveallpest.com',role:'owner',color:'#223241'},
+    {id:'u1',name:'Jayson Greene',title:'Owner',email:'Jayson@solveallpest.com',role:'admin',color:'#046c5e'},
+    {id:'u2',name:'Alec Anderson',title:'Owner',email:'Alec@solveallpest.com',role:'admin',color:'#223241'},
     {id:'u3',name:'Aspen Garner',title:'Marketing Manager',email:'Aspen@solveallpest.com',role:'admin',color:'#7bc796'},
   ],
   currentUserId: sessionStorage.getItem('solve-session') || null,
@@ -3289,8 +3289,7 @@ function openAddUserModal(editId) {
     <div class="fg"><label>Email</label><input id="u-email" type="email" value="${esc(u?.email||'')}" placeholder="name@solveallpest.com"></div>
     <div class="fg"><label>Access level</label>
       <select id="u-role">
-        <option value="admin" ${(!u||u.role==='admin')?'selected':''}>Admin — full access (add, edit, manage everything)</option>
-        <option value="owner" ${u?.role==='owner'?'selected':''}>Owner — review access (approve content, view data, read-only)</option>
+        <option value="admin" selected>Full access — add, edit, and manage everything</option>
       </select>
     </div>
     <div class="fg"><label>Avatar color</label>
@@ -3402,23 +3401,7 @@ window.nav = function(view) {
   _origNav(view);
 };
 
-// ── Patch render to respect role access ───────────────────
-const _origRender = render;
-window.render = function() {
-  const u = getCurrentUser();
-  if (u && u.role === 'owner') {
-    // Hide add buttons for owners — they see everything but can't add records
-    _origRender();
-    document.querySelectorAll('.btn-primary.btn-sm').forEach(btn => {
-      const txt = btn.textContent.trim();
-      if (txt.startsWith('Add') || txt.startsWith('Submit') || txt.startsWith('New') || txt.startsWith('Upload')) {
-        btn.style.display = 'none';
-      }
-    });
-  } else {
-    _origRender();
-  }
-};
+// All accounts have full access — no role restrictions
 
 // ── Init ──────────────────────────────────────────────────
 // Add Users link to nav
