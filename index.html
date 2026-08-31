@@ -847,10 +847,10 @@ function renderDashboard() {
     <div style="font-size:13px;color:var(--text2);margin-top:2px">Here's what's happening at Solve Marketing today.</div>
   </div>
   <div class="stats">
-    <div class="stat"><div class="stat-n">${S.influencers.filter(i=>i.stage==='Serviced'||i.stage==='Paid').length}</div><div class="stat-l">Active influencers</div></div>
+    <div class="stat"><div class="stat-n">${S.influencers.filter(i=>!i.inactive&&(i.stage==='Serviced'||i.stage==='Paid')).length}</div><div class="stat-l">Active influencers</div></div>
     <div class="stat"><div class="stat-n" style="color:var(--accent)">${pending}</div><div class="stat-l">Pending approvals</div></div>
     <div class="stat"><div class="stat-n">${S.events.filter(e=>e.status!=='Done').length}</div><div class="stat-l">Upcoming events</div></div>
-    <div class="stat"><div class="stat-n">${fmt(S.influencers.reduce((a,i)=>a+i.followers,0))}</div><div class="stat-l">Influencer reach</div></div>
+    <div class="stat"><div class="stat-n">${fmt(S.influencers.filter(i=>!i.inactive).reduce((a,i)=>a+i.followers,0))}</div><div class="stat-l">Influencer reach</div></div>
   </div>
   ${pending>0?`<div class="notice"><i class="ti ti-bell"></i> ${pending} post${pending>1?'s':''} awaiting approval.<button class="btn-sm" onclick="nav('social')" style="margin-left:auto">Review &rarr;</button></div>`:''}
   <div style="margin-bottom:22px">
@@ -1207,7 +1207,7 @@ function renderInfluencerBoard(qList) {
           <span style="background:${STAGE_BG[stage]};color:${STAGE_COLOR[stage]};font-size:10px;font-weight:600;padding:1px 7px;border-radius:20px">${items.length}</span>
         </div>
         ${items.map(inf=>`
-          <div class="kanban-card" onclick="editInfluencer(${inf.id})">
+          <div class="kanban-card" onclick="editInfluencer(${inf.id})" style="${inf.inactive?'opacity:0.45;filter:grayscale(0.4)':''}">
             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px;margin-bottom:2px">
               <div class="kc-handle">${esc((inf.firstName||inf.lastName)?(inf.firstName+' '+inf.lastName).trim():(inf.fullName||inf.instagramHandle||inf.name))}</div>
               ${inf.quarter?`<span style="font-size:9px;font-weight:600;padding:1px 6px;border-radius:10px;background:var(--surface2);color:var(--text2);flex-shrink:0;margin-top:1px">${esc(inf.quarter)}</span>`:''}
@@ -1244,7 +1244,10 @@ function renderInfluencerBoard(qList) {
               <button onclick="event.stopPropagation();syncClickiCard(${inf.id})" title="Sync Clicki stats" id="clicki-btn-${inf.id}" style="flex-shrink:0;padding:3px 7px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface2);cursor:pointer;font-size:11px;color:var(--text2)"><i class="ti ti-refresh"></i></button>
             </div>
             <div style="margin-top:7px">${reminderChipHtml(inf)}${nextServiceChipHtml(inf)}</div>
-            <div style="margin-top:7px">${agreementCheckboxHtml(inf)}</div>
+            <div style="margin-top:7px;display:flex;align-items:center;justify-content:space-between;gap:6px">
+              ${agreementCheckboxHtml(inf)}
+              <button onclick="event.stopPropagation();toggleInactive(${inf.id})" title="${inf.inactive?'Mark active':'Mark inactive'}" style="flex-shrink:0;font-size:10px;padding:2px 7px;border-radius:20px;border:0.5px solid ${inf.inactive?'var(--accent)':'var(--border2)'};background:${inf.inactive?'var(--accent)':'transparent'};color:${inf.inactive?'#fff':'var(--text3)'};cursor:pointer;font-family:var(--font);white-space:nowrap">${inf.inactive?'Inactive':'Set inactive'}</button>
+            </div>
           </div>`).join('')}
         ${items.length===0?`<div class="kc-empty">No influencers</div>`:''}
       </div>`;
@@ -1268,7 +1271,7 @@ function renderInfluencerList(qList) {
   </div>
   ${list.length===0?`<div class="empty"><i class="ti ti-user-star"></i>No influencers match this filter.</div>`:
   list.map(inf=>`
-    <div class="card">
+    <div class="card" style="${inf.inactive?'opacity:0.45;filter:grayscale(0.4)':''}">
       <div class="card-row">
         <div class="avatar" style="background:var(--purple-bg);color:var(--purple);font-size:12px;width:38px;height:38px;flex-shrink:0">${(inf.platform||'?')[0]}</div>
         <div class="card-body">
@@ -1278,6 +1281,7 @@ function renderInfluencerList(qList) {
             <span class="badge" style="background:${STAGE_BG[inf.stage||'Messaged']};color:${STAGE_COLOR[inf.stage||'Messaged']}">${inf.stage||'Messaged'}</span>
             <span class="badge b-accent">${inf.tier}</span>
             ${inf.quarter?`<span class="badge b-draft">${esc(inf.quarter)}</span>`:''}
+          ${inf.inactive?`<span class="badge" style="background:var(--border2);color:var(--text3)">Inactive</span>`:''}
           </div>
           <div class="card-meta" style="margin-top:6px">
             <span><i class="ti ti-users"></i> ${fmt(inf.followers)}</span>
@@ -1297,6 +1301,7 @@ function renderInfluencerList(qList) {
         </div>
         <div class="card-actions">
           <button class="btn-sm" onclick="editInfluencer(${inf.id})"><i class="ti ti-edit"></i> Edit</button>
+          <button class="btn-sm" onclick="event.stopPropagation();toggleInactive(${inf.id})" title="${inf.inactive?'Mark active':'Mark inactive'}" style="${inf.inactive?'color:var(--accent);border-color:var(--accent)':''}">${inf.inactive?'<i class="ti ti-eye"></i> Restore':'<i class="ti ti-eye-off"></i> Inactive'}</button>
         </div>
       </div>
     </div>`).join('')}`;
@@ -1431,6 +1436,12 @@ function toggleAgreement(id) {
   const inf = S.influencers.find(i=>i.id===id);
   if (!inf) return;
   inf.agreementSigned = !inf.agreementSigned;
+  persist(); render();
+}
+function toggleInactive(id) {
+  const inf = S.influencers.find(i=>i.id===id);
+  if (!inf) return;
+  inf.inactive = !inf.inactive;
   persist(); render();
 }
 function movePartnerStage(id, stage) {
@@ -1811,9 +1822,9 @@ function renderKPIs() {
     <button class="btn-primary btn-sm" onclick="generateKPIReport()"><i class="ti ti-file-analytics"></i> Generate AI Report</button>
   </div>
   <div class="stats">
-    <div class="stat"><div class="stat-n">${S.influencers.filter(i=>i.stage==='Serviced'||i.stage==='Paid').length}</div><div class="stat-l">Active influencers</div></div>
+    <div class="stat"><div class="stat-n">${S.influencers.filter(i=>!i.inactive&&(i.stage==='Serviced'||i.stage==='Paid')).length}</div><div class="stat-l">Active influencers</div></div>
     <div class="stat"><div class="stat-n">${nlAvgOpen}%</div><div class="stat-l">Avg open rate (${q})</div></div>
-    <div class="stat"><div class="stat-n">${S.influencers.filter(i=>i.roi>0).length>0?(S.influencers.filter(i=>i.roi>0).reduce((a,i)=>a+i.roi,0)/S.influencers.filter(i=>i.roi>0).length).toFixed(1)+'x':'—'}</div><div class="stat-l">Avg influencer ROI</div></div>
+    <div class="stat"><div class="stat-n">${S.influencers.filter(i=>!i.inactive&&i.roi>0).length>0?(S.influencers.filter(i=>!i.inactive&&i.roi>0).reduce((a,i)=>a+i.roi,0)/S.influencers.filter(i=>!i.inactive&&i.roi>0).length).toFixed(1)+'x':'—'}</div><div class="stat-l">Avg influencer ROI</div></div>
     <div class="stat"><div class="stat-n">${qEvents.length}</div><div class="stat-l">Events in ${q}</div></div>
   </div>
 
@@ -1870,7 +1881,7 @@ function renderKPIs() {
     </div>
     <div class="kpi-block">
       <div class="kpi-title"><i class="ti ti-user-star"></i>Influencer Following — ${q}</div>
-      ${(()=>{const qi=S.influencers.filter(i=>i.quarter===q);return qi.length?qi.map(i=>`<div class="kpi-row"><span style="display:flex;flex-direction:column;gap:1px"><span>${esc([i.firstName,i.lastName].filter(Boolean).join(' ')||i.instagramHandle||i.name)}</span>${i.instagramHandle?`<span style="font-size:11px;color:var(--text3)">${esc(i.instagramHandle)}</span>`:''}</span><span class="kpi-val">${fmt(i.followers)}</span></div>`).join(''):`<div style="font-size:12px;color:var(--text3);padding:8px 0">No influencers in ${q} yet.</div>`;})()}
+      ${(()=>{const qi=S.influencers.filter(i=>!i.inactive&&i.quarter===q);return qi.length?qi.map(i=>`<div class="kpi-row"><span style="display:flex;flex-direction:column;gap:1px"><span>${esc([i.firstName,i.lastName].filter(Boolean).join(' ')||i.instagramHandle||i.name)}</span>${i.instagramHandle?`<span style="font-size:11px;color:var(--text3)">${esc(i.instagramHandle)}</span>`:''}</span><span class="kpi-val">${fmt(i.followers)}</span></div>`).join(''):`<div style="font-size:12px;color:var(--text3);padding:8px 0">No influencers in ${q} yet.</div>`;})()}
     </div>
     <div class="kpi-block">
       <div class="kpi-title"><i class="ti ti-calendar-event"></i>Events & community</div>
