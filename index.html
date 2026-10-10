@@ -118,6 +118,9 @@ label{font-size:12px;color:var(--text2);display:block;margin-bottom:4px;font-wei
 .kpi-row:last-child{border-bottom:none}
 .kpi-val{font-weight:600;font-family:var(--font);letter-spacing:-.02em}
 .kpi-up{color:var(--green)}.kpi-dn{color:var(--red)}
+.kpi-input{background:none;border:none;border-bottom:1px dashed var(--border);color:var(--text1);font-size:13px;font-weight:600;font-family:var(--font);letter-spacing:-.02em;text-align:right;width:110px;padding:2px 4px;cursor:text;outline:none;transition:border-color .15s}
+.kpi-input:focus{border-bottom-color:var(--accent);background:var(--surface2);border-radius:3px 3px 0 0}
+.kpi-input::placeholder{color:var(--text3);font-weight:400}
 .cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}
 .cal-day-hdr{text-align:center;font-size:11px;color:var(--text3);padding:5px 0;font-weight:500;text-transform:uppercase;letter-spacing:.04em}
 .cal-day{min-height:58px;border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:5px 7px;font-size:11px;background:var(--surface)}
@@ -480,10 +483,12 @@ if (CONFIGURED) {
         ['influencers','social','newsletters','events','partners','files','todos','promoCodes'].forEach(k => {
           if (Array.isArray(d[k])) S[k] = d[k];
         });
+        if (d.kpiData && typeof d.kpiData === 'object') S.kpiData = d.kpiData;
         // Mirror to localStorage for offline fallback
         localStorage.setItem('solve-os-data', JSON.stringify({
           influencers:S.influencers, social:S.social, newsletters:S.newsletters,
-          events:S.events, partners:S.partners, files:S.files, todos:S.todos, promoCodes:S.promoCodes
+          events:S.events, partners:S.partners, files:S.files, todos:S.todos,
+          promoCodes:S.promoCodes, kpiData:S.kpiData
         }));
         if (window.render) window.render();
       } else {
@@ -524,9 +529,11 @@ if (CONFIGURED) {
       ['influencers','social','newsletters','events','partners','files','todos','promoCodes'].forEach(k => {
         if (Array.isArray(d[k])) S[k] = d[k];
       });
+      if (d.kpiData && typeof d.kpiData === 'object') S.kpiData = d.kpiData;
       localStorage.setItem('solve-os-data', JSON.stringify({
         influencers:S.influencers, social:S.social, newsletters:S.newsletters,
-        events:S.events, partners:S.partners, files:S.files, todos:S.todos, promoCodes:S.promoCodes
+        events:S.events, partners:S.partners, files:S.files, todos:S.todos,
+        promoCodes:S.promoCodes, kpiData:S.kpiData
       }));
       setSyncStatus('synced');
       if (window.render) window.render();
@@ -662,6 +669,7 @@ window.APP_STATE = {
     {id:201,code:'SOLVE10',discount:'10% off first pest service',type:'community',active:true,notes:'General community offer — shareable anywhere',influencerId:null},
     {id:202,code:'PEST2026',discount:'Free initial inspection',type:'community',active:true,notes:'Current seasonal promotion',influencerId:null},
   ],
+  kpiData: JSON.parse(localStorage.getItem('solve-kpi-data') || '{}'),
 };
 const S = window.APP_STATE;
 
@@ -673,20 +681,28 @@ function loadData() {
     ['influencers','social','newsletters','events','partners','files','todos','promoCodes'].forEach(k => {
       if (Array.isArray(d[k])) S[k] = d[k];
     });
+    if (d.kpiData && typeof d.kpiData === 'object') S.kpiData = d.kpiData;
   } catch(e) {}
 }
 function persist() {
   try {
     const data = {
       influencers:S.influencers, social:S.social, newsletters:S.newsletters,
-      events:S.events, partners:S.partners, files:S.files, todos:S.todos, promoCodes:S.promoCodes
+      events:S.events, partners:S.partners, files:S.files, todos:S.todos,
+      promoCodes:S.promoCodes, kpiData:S.kpiData
     };
-    // Always save locally (instant)
     localStorage.setItem('solve-os-data', JSON.stringify(data));
-    // Also push to Firestore so all devices stay in sync
     if (window.syncToFirestore) window.syncToFirestore(data);
-    // Schedule a debounced Google Sheets backup (30 s after last change)
     scheduleSheetBackup(data);
+  } catch(e) {}
+}
+function saveKPI(q, key, val) {
+  if (!S.kpiData) S.kpiData = {};
+  if (!S.kpiData[q]) S.kpiData[q] = {};
+  S.kpiData[q][key] = val.trim();
+  try {
+    localStorage.setItem('solve-kpi-data', JSON.stringify(S.kpiData));
+    persist();
   } catch(e) {}
 }
 loadData();
@@ -1809,16 +1825,16 @@ async function loadInfluencersFromSheets() {
 
 // ── KPIs ──────────────────────────────────────────────────
 function renderKPIs() {
-  const q = window._kpiQ || 'Q2';
+  const curQ = ['Q1','Q2','Q3','Q4'][Math.floor((new Date().getMonth())/3)];
+  const q = window._kpiQ || curQ;
   const qNums = {Q1:['01','02','03'],Q2:['04','05','06'],Q3:['07','08','09'],Q4:['10','11','12']};
-  const qMonths = qNums[q] || qNums.Q2;
-  // Filter newsletters by quarter
+  const qMonths = qNums[q] || qNums[curQ];
   const qNL = S.newsletters.filter(n=>{ if(!n.sentDate||n.sentDate==='—') return false; const m=n.sentDate.slice(5,7); return qMonths.includes(m); });
-  const qEvents = S.events.filter(e=>{ if(!e.date) return false; const m=e.date.slice(5,7); return qMonths.includes(m); });
-  const nlOpens = qNL.reduce((a,n)=>a+n.opens,0);
   const nlAvgOpen = qNL.filter(n=>n.openRate>0).length ? Math.round(qNL.filter(n=>n.openRate>0).reduce((a,n)=>a+n.openRate,0)/qNL.filter(n=>n.openRate>0).length) : 0;
+  const kd = (S.kpiData && S.kpiData[q]) || {};
+  const v = key => { const val = kd[key]; return val != null ? String(val).replace(/"/g,'&quot;') : ''; };
+  const row = (label, key, hint) => `<div class="kpi-row"><span>${label}</span><input class="kpi-input" type="text" value="${v(key)}" placeholder="—"${hint?` title="${hint}"`:''}onchange="saveKPI('${q}','${key}',this.value)"></div>`;
   setTimeout(loadGHLData, 60);
-  setTimeout(loadInstagramData, 120);
   return `
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
     <div class="tab-bar" style="margin:0">
@@ -1826,75 +1842,93 @@ function renderKPIs() {
     </div>
     <button class="btn-primary btn-sm" onclick="generateKPIReport()"><i class="ti ti-file-analytics"></i> Generate AI Report</button>
   </div>
-  <div class="stats">
-    <div class="stat"><div class="stat-n">${S.influencers.filter(i=>!i.inactive&&(i.stage==='Serviced'||i.stage==='Paid')).length}</div><div class="stat-l">Active influencers</div></div>
-    <div class="stat"><div class="stat-n">${nlAvgOpen}%</div><div class="stat-l">Avg open rate (${q})</div></div>
-    <div class="stat"><div class="stat-n">${S.influencers.filter(i=>!i.inactive&&i.roi>0).length>0?(S.influencers.filter(i=>!i.inactive&&i.roi>0).reduce((a,i)=>a+i.roi,0)/S.influencers.filter(i=>!i.inactive&&i.roi>0).length).toFixed(1)+'x':'—'}</div><div class="stat-l">Avg influencer ROI</div></div>
-    <div class="stat"><div class="stat-n">${qEvents.length}</div><div class="stat-l">Events in ${q}</div></div>
-  </div>
 
   <!-- GoHighLevel live block -->
   <div class="kpi-block" style="margin-bottom:16px">
     <div class="kpi-title" style="display:flex;align-items:center">
-      <i class="ti ti-building-skyscraper"></i>GoHighLevel — Marketing
+      <i class="ti ti-building-skyscraper"></i>GoHighLevel — Live
       <span id="ghl-status" style="margin-left:auto;font-size:10px;color:var(--text3);font-family:var(--mono)">Loading…</span>
     </div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:8px">
-      <div>
-        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Total contacts</div>
-        <div id="ghl-contacts" style="font-size:24px;font-weight:600;font-family:var(--font);letter-spacing:-.03em">—</div>
-      </div>
-      <div>
-        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">New this month</div>
-        <div id="ghl-new" style="font-size:24px;font-weight:600;font-family:var(--font);letter-spacing:-.03em;color:var(--green)">—</div>
-      </div>
-      <div>
-        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Newsletter subscribers</div>
-        <div id="ghl-nl" style="font-size:24px;font-weight:600;font-family:var(--font);letter-spacing:-.03em">—</div>
-      </div>
-      <div>
-        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Affiliates</div>
-        <div id="ghl-aff" style="font-size:24px;font-weight:600;font-family:var(--font);letter-spacing:-.03em">—</div>
-      </div>
+      <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Total contacts</div><div id="ghl-contacts" style="font-size:24px;font-weight:600;font-family:var(--font);letter-spacing:-.03em">—</div></div>
+      <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">New this month</div><div id="ghl-new" style="font-size:24px;font-weight:600;font-family:var(--font);letter-spacing:-.03em;color:var(--green)">—</div></div>
+      <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Newsletter subscribers</div><div id="ghl-nl" style="font-size:24px;font-weight:600;font-family:var(--font);letter-spacing:-.03em">—</div></div>
+      <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Affiliates</div><div id="ghl-aff" style="font-size:24px;font-weight:600;font-family:var(--font);letter-spacing:-.03em">—</div></div>
     </div>
     <div class="divider"></div>
     <div style="font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Email campaigns</div>
     <div id="ghl-campaigns" style="color:var(--text3);font-size:12px">Loading…</div>
   </div>
 
-  <!-- Instagram live block -->
-  <div class="kpi-block" style="margin-bottom:16px" id="ig-block">
-    <div class="kpi-title"><i class="ti ti-brand-instagram"></i>Instagram <span style="margin-left:auto;font-size:10px;color:var(--text3);font-family:var(--mono)">Loading…</span></div>
-    <div style="font-size:12px;color:var(--text3)">Fetching data…</div>
-  </div>
-
   <div class="grid2">
+    <!-- OUTPUT -->
     <div class="kpi-block">
-      <div class="kpi-title"><i class="ti ti-brand-instagram"></i>Social engagement</div>
-      <div class="kpi-row"><span>Instagram reach</span><span class="kpi-val kpi-up">38K</span></div>
-      <div class="kpi-row"><span>Avg engagement rate</span><span class="kpi-val kpi-up">4.8%</span></div>
-      <div class="kpi-row"><span>Story views</span><span class="kpi-val">8.1K</span></div>
+      <div class="kpi-title"><i class="ti ti-send"></i>Output — ${q}</div>
+      ${row('Emails sent','emailsSent')}
+      ${row('Social posts published','socialPostsPublished')}
+      ${row('Ad creatives produced','adCreativesProduced')}
+      ${row('Campaigns launched','campaignsLaunched')}
+      ${row('Creative tests run','creativeTestsRun')}
     </div>
+
+    <!-- SOCIAL GROWTH -->
+    <div class="kpi-block">
+      <div class="kpi-title"><i class="ti ti-trending-up"></i>Social growth — ${q}</div>
+      ${row('Net new followers','netNewFollowers')}
+      ${row('Follower growth rate','followerGrowthRate','e.g. 3.2%')}
+      ${row('Non-follower reach %','nonFollowerReachPct','% of reach from non-followers')}
+    </div>
+
+    <!-- CREATIVE PERFORMANCE -->
+    <div class="kpi-block">
+      <div class="kpi-title"><i class="ti ti-palette"></i>Creative performance — ${q}</div>
+      ${row('Engagement rate by reach (organic)','engagementRateOrganic','e.g. 4.8%')}
+      ${row('Share + save rate','shareSaveRate','e.g. 1.2%')}
+      ${row('Email click-through rate','emailCTR','e.g. 2.4%')}
+      ${row('Email click-to-open rate','emailCTOR','e.g. 18%')}
+      ${row('Email unsubscribe rate','emailUnsubRate','e.g. 0.3%')}
+      ${row('Boosted post click-through rate','boostedCTR','e.g. 1.8%')}
+      ${row('Community response time','communityResponseTime','avg hrs — comments + DMs')}
+    </div>
+
+    <!-- CAMPAIGN RESULTS -->
+    <div class="kpi-block">
+      <div class="kpi-title"><i class="ti ti-target"></i>Campaign results — ${q}</div>
+      ${row('Leads from social','leadsFromSocial')}
+      ${row('Net email list growth','netEmailListGrowth')}
+      ${row('Giveaway qualified entry rate','giveawayEntryRate','e.g. 68%')}
+      ${row('Customer tags / mentions','customerTagsMentions')}
+      ${row('Boosted post cost per lead','boostedCostPerLead','e.g. $4.20')}
+    </div>
+
+    <!-- INFLUENCER PROGRAM -->
+    <div class="kpi-block">
+      <div class="kpi-title"><i class="ti ti-user-star"></i>Influencer program — ${q}</div>
+      ${row('Delivery rate','infDeliveryRate','% who delivered content')}
+      ${row('Cost per 1,000 views','infCostPer1kViews','e.g. $8.50')}
+      ${row('Engagement rate by reach','infEngagementRate','e.g. 5.2%')}
+      ${row('Reusable assets secured','infReusableAssets','# of assets')}
+      <div class="divider"></div>
+      <div style="font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin:6px 0">Influencers in ${q}</div>
+      ${(()=>{const qi=S.influencers.filter(i=>!i.inactive&&i.quarter===q);return qi.length?qi.map(i=>`<div class="kpi-row"><span style="display:flex;flex-direction:column;gap:1px"><span>${esc([i.firstName,i.lastName].filter(Boolean).join(' ')||i.instagramHandle||i.name)}</span>${i.instagramHandle?`<span style="font-size:11px;color:var(--text3)">${esc(i.instagramHandle)}</span>`:''}</span><span class="kpi-val">${fmt(i.followers)}</span></div>`).join(''):`<div style="font-size:12px;color:var(--text3);padding:8px 0">No influencers in ${q} yet.</div>`;})()}
+    </div>
+
+    <!-- REPORTS -->
+    <div class="kpi-block">
+      <div class="kpi-title"><i class="ti ti-file-analytics"></i>Reports — ${q}</div>
+      ${row('Bookings from email campaigns','bookingsFromEmail')}
+      ${row('Bookings from social / influencer / giveaways','bookingsFromSocial')}
+    </div>
+
+    <!-- NEWSLETTER (from app data) -->
     <div class="kpi-block">
       <div class="kpi-title"><i class="ti ti-mail"></i>Newsletter performance — ${q}</div>
       <div class="kpi-row"><span>Newsletters sent</span><span class="kpi-val">${qNL.filter(n=>n.status==='Sent').length}</span></div>
-      <div class="kpi-row"><span>Avg open rate</span><span class="kpi-val ${nlAvgOpen>30?'kpi-up':''}">${nlAvgOpen}%</span></div>
-      <div class="kpi-row"><span>Total opens</span><span class="kpi-val">${nlOpens.toLocaleString()}</span></div>
-      <div class="kpi-row"><span>Total clicks</span><span class="kpi-val">${qNL.reduce((a,n)=>a+n.clicks,0).toLocaleString()}</span></div>
+      <div class="kpi-row"><span>Avg open rate</span><span class="kpi-val ${nlAvgOpen>30?'kpi-up':''}">${nlAvgOpen||'—'}${nlAvgOpen?'%':''}</span></div>
+      <div class="kpi-row"><span>Total opens</span><span class="kpi-val">${qNL.reduce((a,n)=>a+n.opens,0).toLocaleString()||'—'}</span></div>
+      <div class="kpi-row"><span>Total clicks</span><span class="kpi-val">${qNL.reduce((a,n)=>a+n.clicks,0).toLocaleString()||'—'}</span></div>
       ${qNL.map(n=>`<div class="kpi-row"><span style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2)">${esc(n.subject)}</span><span class="kpi-val">${n.openRate>0?n.openRate+'% open':esc(n.status)}</span></div>`).join('')}
-      ${qNL.length===0?`<div style="font-size:12px;color:var(--text3);padding:8px 0">No newsletters sent in ${q} yet.</div>`:''}
-    </div>
-    <div class="kpi-block">
-      <div class="kpi-title"><i class="ti ti-user-star"></i>Influencer Following — ${q}</div>
-      ${(()=>{const qi=S.influencers.filter(i=>!i.inactive&&i.quarter===q);return qi.length?qi.map(i=>`<div class="kpi-row"><span style="display:flex;flex-direction:column;gap:1px"><span>${esc([i.firstName,i.lastName].filter(Boolean).join(' ')||i.instagramHandle||i.name)}</span>${i.instagramHandle?`<span style="font-size:11px;color:var(--text3)">${esc(i.instagramHandle)}</span>`:''}</span><span class="kpi-val">${fmt(i.followers)}</span></div>`).join(''):`<div style="font-size:12px;color:var(--text3);padding:8px 0">No influencers in ${q} yet.</div>`;})()}
-    </div>
-    <div class="kpi-block">
-      <div class="kpi-title"><i class="ti ti-calendar-event"></i>Events & community</div>
-      <div class="kpi-row"><span>Events this quarter</span><span class="kpi-val">4</span></div>
-      <div class="kpi-row"><span>Total attendees</span><span class="kpi-val kpi-up">816</span></div>
-      <div class="kpi-row"><span>Active partners</span><span class="kpi-val">2</span></div>
-      <div class="kpi-row"><span>Partner media reach</span><span class="kpi-val">4.2K</span></div>
-      <div class="kpi-row"><span>Budget utilization</span><span class="kpi-val">$4.7K / $17K</span></div>
+      ${qNL.length===0?`<div style="font-size:12px;color:var(--text3);padding:8px 0">No newsletters logged in ${q} yet.</div>`:''}
     </div>
   </div>`;
 }
