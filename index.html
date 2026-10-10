@@ -44,7 +44,9 @@ a{color:var(--accent);text-decoration:none}
 .app{display:flex;min-height:100vh}
 .sidebar{width:var(--nav);min-width:var(--nav);background:var(--nav-bg);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;z-index:10}
 .main{flex:1;min-width:0;display:flex;flex-direction:column;min-height:100vh;overflow-x:hidden}
-.topbar{background:var(--surface);border-bottom:0.5px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
+.topbar{background:var(--surface);border-bottom:0.5px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;z-index:5}
+.topbar-row{display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 24px;width:100%}
+#theme-banner{width:100%;text-align:center;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:5px 16px;color:#fff;display:none}
 .content{padding:24px;flex:1;width:100%}
 .logo{padding:18px 18px 14px;border-bottom:1px solid rgba(255,255,255,0.08)}
 .logo-wordmark{font-size:16px;font-weight:500;color:#fff;letter-spacing:-.01em;font-family:var(--font-heading)}
@@ -307,25 +309,28 @@ label{font-size:12px;color:var(--text2);display:block;margin-bottom:4px;font-wei
 
 <div class="main">
   <div class="topbar">
-    <div style="display:flex;align-items:center;gap:10px">
-      <button class="hamburger" onclick="toggleSidebar()" title="Toggle menu"><span></span><span></span><span></span></button>
-      <div class="page-title" id="page-title">Dashboard</div>
-    </div>
-    <div class="topbar-search">
-      <i class="ti ti-search"></i>
-      <input id="global-search" placeholder="Search…" oninput="window._searchQ=this.value;render()" autocomplete="off">
-      <button id="search-clear" onclick="window._searchQ='';document.getElementById('global-search').value='';render()" style="display:none;background:none;border:none;cursor:pointer;color:var(--text3);padding:0;font-size:14px">×</button>
-    </div>
-    <div class="topbar-right">
-      <div id="firebase-indicator" class="firebase-status fs-disconnected"><span class="fs-dot"></span>Chat offline</div>
-      <div id="sync-chip" class="sync-chip sync-offline"><i class="ti ti-cloud-off"></i>Local only</div>
-      <div id="backup-chip" style="font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px;white-space:nowrap" title="Google Sheets auto-backup status"></div>
-      <div style="position:relative">
-        <div class="topbar-btn" onclick="toggleChat()" title="Team chat"><i class="ti ti-message-circle"></i></div>
-        <div class="unread-dot" id="unread-dot" style="display:none"></div>
+    <div id="theme-banner"></div>
+    <div class="topbar-row">
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="hamburger" onclick="toggleSidebar()" title="Toggle menu"><span></span><span></span><span></span></button>
+        <div class="page-title" id="page-title">Dashboard</div>
       </div>
-      <div class="avatar" id="topbar-avatar" style="background:var(--accent);cursor:pointer" onclick="nav('profile')">
-        <span class="av-initials" id="topbar-initials" style="color:#fff;font-size:11px">ME</span>
+      <div class="topbar-search">
+        <i class="ti ti-search"></i>
+        <input id="global-search" placeholder="Search…" oninput="window._searchQ=this.value;render()" autocomplete="off">
+        <button id="search-clear" onclick="window._searchQ='';document.getElementById('global-search').value='';render()" style="display:none;background:none;border:none;cursor:pointer;color:var(--text3);padding:0;font-size:14px">×</button>
+      </div>
+      <div class="topbar-right">
+        <div id="firebase-indicator" class="firebase-status fs-disconnected"><span class="fs-dot"></span>Chat offline</div>
+        <div id="sync-chip" class="sync-chip sync-offline"><i class="ti ti-cloud-off"></i>Local only</div>
+        <div id="backup-chip" style="font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px;white-space:nowrap" title="Google Sheets auto-backup status"></div>
+        <div style="position:relative">
+          <div class="topbar-btn" onclick="toggleChat()" title="Team chat"><i class="ti ti-message-circle"></i></div>
+          <div class="unread-dot" id="unread-dot" style="display:none"></div>
+        </div>
+        <div class="avatar" id="topbar-avatar" style="background:var(--accent);cursor:pointer" onclick="nav('profile')">
+          <span class="av-initials" id="topbar-initials" style="color:#fff;font-size:11px">ME</span>
+        </div>
       </div>
     </div>
   </div>
@@ -2188,6 +2193,42 @@ function generatePDF() {
   const ca=document.getElementById('content-area'); if(ca){const t=document.createElement('div');t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.2)';t.textContent='✓ Saved to Files & Briefs';document.body.appendChild(t);setTimeout(()=>t.remove(),3000);}
 }
 
+// ── Monthly theme system ──────────────────────────────────
+const MONTH_THEMES = {
+  0:{name:'Prevention Season',    palette:'prevention'},
+  1:{name:'Prevention → Peak',    palette:'prevention'},
+  2:{name:'Peak Pest Season',     palette:'peak'},
+  3:{name:'Peak Pest Season',     palette:'peak'},
+  4:{name:'Summer Kickoff',       palette:'summer'},
+  5:{name:'Hurricane Season',     palette:'hurricane'},
+  6:{name:'Hurricane Season',     palette:'hurricane'},
+  7:{name:'Hurricane Season',     palette:'hurricane'},
+  8:{name:'Hurricane Season',     palette:'hurricane'},
+  9:{name:'Prevention + Hurricane',palette:'fall'},
+  10:{name:'Prevention + Hurricane',palette:'fall'},
+  11:{name:'Prevention Season',   palette:'prevention'},
+};
+const PALETTES = {
+  prevention:{primary:'#243d2f',accent:'#3d6b4f',accent2:'#7ab090',light:'#e6ede9',secondary:'#7ab090',banner:'#3d6b4f'},
+  peak:      {primary:'#3d2410',accent:'#b5541e',accent2:'#e8955a',light:'#f5ece4',secondary:'#e8955a',banner:'#b5541e'},
+  summer:    {primary:'#2e3b1e',accent:'#c17b2a',accent2:'#e8b86d',light:'#f7f0e4',secondary:'#e8b86d',banner:'#c17b2a'},
+  hurricane: {primary:'#1a2b3d',accent:'#2c5f8a',accent2:'#6a9ec4',light:'#e4ecf5',secondary:'#6a9ec4',banner:'#2c5f8a'},
+  fall:      {primary:'#1a2e35',accent:'#2a7060',accent2:'#6aaa96',light:'#e4efee',secondary:'#6aaa96',banner:'#2a7060'},
+};
+function applyMonthTheme(){
+  const mo=new Date().getMonth();
+  const th=MONTH_THEMES[mo]; if(!th)return;
+  const p=PALETTES[th.palette];
+  const r=document.documentElement;
+  r.style.setProperty('--brand-primary',p.primary);
+  r.style.setProperty('--brand-accent',p.accent);
+  r.style.setProperty('--brand-accent2',p.accent2);
+  r.style.setProperty('--brand-light',p.light);
+  r.style.setProperty('--brand-secondary',p.secondary);
+  const b=document.getElementById('theme-banner');
+  if(b){b.style.background=p.banner;b.style.display='block';b.textContent='Theme: '+th.name;}
+}
+
 // ── Calendar ──────────────────────────────────────────────
 // ── Weekly recurring work schedule ────────────────────────────────────────────
 // dow: 0=Sun 1=Mon 2=Tue 3=Wed 4=Thu 5=Fri 6=Sat
@@ -3281,6 +3322,7 @@ function loginAs(userId) {
   document.getElementById('main-app').style.display = 'flex';
   updateProfileUI();
   render();
+  applyMonthTheme();
 }
 function logout() {
   S.currentUserId = null;
@@ -3434,6 +3476,7 @@ if (S.currentUserId && S.users.find(u => u.id === S.currentUserId)) {
   document.getElementById('main-app').style.display = 'flex';
   updateProfileUI();
   render();
+  applyMonthTheme();
 } else {
   showLogin();
 }
